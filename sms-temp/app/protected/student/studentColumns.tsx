@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { MessageCircle, Phone } from "lucide-react";
+import { MessageCircle, Phone, UserCircle } from "lucide-react";
 import Link from "next/link";
 
 export type Students = {
@@ -65,6 +65,21 @@ export const studentColumns: ColumnDef<Students>[] = [
             </Link>
           </Button>
         </div>
+      );
+    }
+  },
+  {
+    header: "Profile",
+    accessorKey: "matric_no",
+    cell: ({ row }) => {
+      const matricNo = row.getValue("matric_no");
+      return (
+        <Link
+          href={`/protected/student/${matricNo}`}
+          className="text-blue-600 hover:underline"
+        >
+          <UserCircle className="h-5 w-5 text-purple-500" />
+        </Link>
       );
     }
   }

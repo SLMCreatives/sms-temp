@@ -10,7 +10,6 @@ import {
   ColumnFiltersState,
   getFilteredRowModel
 } from "@tanstack/react-table";
-import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -30,13 +29,6 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle
-} from "@/components/ui/sheet";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -51,8 +43,8 @@ export default function DataTable<TData, TValue>({
     import("@tanstack/react-table").SortingState
   >([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<TData | null>(null);
+  //const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  //const [selectedStudent, setSelectedStudent] = useState<TData | null>(null);
 
   const table = useReactTable({
     data,
@@ -88,11 +80,6 @@ export default function DataTable<TData, TValue>({
     table.getColumn("matric_no")?.setFilterValue("");
     table.getColumn("faculty_code")?.setFilterValue("");
     table.getColumn("status")?.setFilterValue("");
-  };
-
-  const handleRowClick = (rowData: TData) => {
-    setSelectedStudent(rowData);
-    setIsDrawerOpen(true);
   };
 
   const filteredRows = table.getFilteredRowModel().rows;
@@ -223,11 +210,10 @@ export default function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                onClick={() => handleRowClick(row.original)}
-                className="cursor-pointer hover:bg-muted/50"
+                className=" hover:bg-muted/50"
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="text-sm">
+                  <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -246,7 +232,7 @@ export default function DataTable<TData, TValue>({
         <DataTablePagination table={table} />
       </div>
 
-      <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      {/* <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <SheetContent className="w-[380px] md:w-1/3">
           <SheetHeader>
             <SheetTitle>Student Details</SheetTitle>
@@ -280,7 +266,7 @@ export default function DataTable<TData, TValue>({
             </div>
           )}
         </SheetContent>
-      </Sheet>
+      </Sheet> */}
     </div>
   );
 }
