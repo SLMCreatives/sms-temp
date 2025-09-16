@@ -1,0 +1,232 @@
+"use client";
+
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  GraduationCap,
+  BookOpen,
+  Globe,
+  FileText,
+  CheckCircle
+} from "lucide-react";
+import { Students } from "@/app/student/studentColumns";
+import { EngagementForm } from "./engagement-form";
+//import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
+//import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from "./ui/sheet";
+import { Button } from "./ui/button";
+
+interface StudentDetailsProps {
+  studentData: Students;
+}
+
+const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
+        <div className="space-y-6 lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0">
+          {/* Personal Information Card */}
+          <div className="lg:col-span-2">
+            <Card className="shadow-sm">
+              <CardHeader className="">
+                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  Personal Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 md:space-y-6">
+                <div className="flex flex-col sm:flex-row items-start gap-4">
+                  <div className="flex-1 md:text-center text-left">
+                    <h2 className="text-xl md:text-2xl font-bold text-foreground mb-1">
+                      {studentData.full_name}
+                    </h2>
+                    <p className="text-sm md:text-base text-muted-foreground mb-3">
+                      Matric No: {studentData.matric_no}
+                    </p>
+                    <Badge variant="outline">{studentData.status}</Badge>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-muted-foreground">Email</p>
+                        <p className="font-medium text-sm md:text-base break-all">
+                          {studentData.email}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Phone</p>
+                        <p className="font-medium text-sm md:text-base">
+                          {studentData.phone}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Globe className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Nationality
+                        </p>
+                        <p className="font-medium text-sm md:text-base">
+                          {studentData.nationality}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Registration Date
+                        </p>
+                        <p className="font-medium text-sm md:text-base">
+                          {studentData.admission_date}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Entry Type
+                        </p>
+                        <p className="font-medium text-sm md:text-base">
+                          {studentData.entry_type}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <BookOpen className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Study Mode
+                        </p>
+                        <p className="font-medium text-sm md:text-base">
+                          {studentData.study_mode}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Academic Details Card */}
+          <div>
+            <Card className="shadow-sm">
+              <CardHeader className="">
+                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5" />
+                  Academic Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-6">
+                <div className="">
+                  <p className="text-sm text-muted-foreground mb-1">Faculty</p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    {" "}
+                    {studentData.faculty_code}
+                  </p>
+                </div>
+                <div className="">
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Programme
+                  </p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    {" "}
+                    {studentData.programme_code}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Study Level
+                  </p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    {studentData.study_level}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Intake</p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    September 2025
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Additional Information */}
+        <div className="mt-6">
+          <Card className="shadow-sm">
+            <CardHeader className="">
+              <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                <CheckCircle className="w-5 h-5" />
+                Engagement Tracker
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {studentData.engagements.length === 0 && "No activity yet"}
+              {studentData.engagements.length > 0 &&
+                studentData.engagements.map((engagement, index) => (
+                  <ul key={index} className="list-disc pl-4">
+                    <li>
+                      {engagement.created_at.slice(5, 10)} -{" "}
+                      {engagement.channel} - {engagement.subject}
+                    </li>
+                  </ul>
+                ))}
+            </CardContent>
+            <CardFooter>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant={"default"}>Add Engagement</Button>
+                </SheetTrigger>
+                <SheetContent
+                  side="right"
+                  className="w-full h-full overflow-y-scroll"
+                >
+                  <SheetHeader>
+                    <SheetTitle>Add Engagement</SheetTitle>
+                  </SheetHeader>
+                  <EngagementForm />
+                </SheetContent>
+              </Sheet>
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default StudentDetailsPage;
