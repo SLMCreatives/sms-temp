@@ -12,12 +12,20 @@ export type Students = {
   phone: string;
   programme_code: string;
   faculty_code: string;
-  status: "active" | "lost" | "withdrawn" | "deferred";
+  status: "Active" | "Lost" | "Withdrawn" | "Deferred" | "change-program";
   admission_date: string;
   intake_code: string;
 };
 
 export const studentColumns: ColumnDef<Students>[] = [
+  {
+    header: "No.",
+    accessorKey: "id",
+    cell: ({ row }) => row.index + 1,
+    enableSorting: false,
+    enableColumnFilter: false,
+    size: 10
+  },
   {
     accessorKey: "matric_no",
     header: "Matrix ID"

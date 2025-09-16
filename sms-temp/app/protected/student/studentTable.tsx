@@ -102,8 +102,8 @@ export default function DataTable<TData, TValue>({
   ).length;
 
   return (
-    <div className="overflow-auto rounded-md border w-[1000px] px-4">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 py-4 border-b">
+    <div className="container mx-auto rounded-md border max-w-sm md:max-w-6xl px-4">
+      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-4 py-4 border-b">
         <div className="text-center">
           <div className="text-2xl font-bold text-blue-600">
             {totalStudents}
@@ -139,7 +139,7 @@ export default function DataTable<TData, TValue>({
           <div className="text-sm text-muted-foreground">Deferred</div>
         </div>
       </div>
-      <div className="flex items-center gap-4 py-4">
+      <div className="flex flex-col md:flex-row items-center gap-4 py-4">
         <Input
           placeholder="Search matric number..."
           value={
@@ -148,34 +148,35 @@ export default function DataTable<TData, TValue>({
           onChange={(event) =>
             table.getColumn("matric_no")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="w-full"
         />
 
-        <Select onValueChange={handleFacultyFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by Faculty" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Faculties</SelectItem>
-            <SelectItem value="FoB">FoB</SelectItem>
-            <SelectItem value="FEH">FEH</SelectItem>
-            <SelectItem value="SIT">SIT</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select onValueChange={handleStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="Change-Program">Change Programme</SelectItem>
-            <SelectItem value="lost">Lost</SelectItem>
-            <SelectItem value="withdrawn">Withdrawn</SelectItem>
-            <SelectItem value="deferred">Deferred</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="grid grid-cols-2 gap-2 w-full">
+          <Select onValueChange={handleFacultyFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Filter by Faculty" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Faculties</SelectItem>
+              <SelectItem value="FoB">FoB</SelectItem>
+              <SelectItem value="FEH">FEH</SelectItem>
+              <SelectItem value="SIT">SIT</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select onValueChange={handleStatusFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Filter by Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="Change-Program">Change Programme</SelectItem>
+              <SelectItem value="lost">Lost</SelectItem>
+              <SelectItem value="withdrawn">Withdrawn</SelectItem>
+              <SelectItem value="deferred">Deferred</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         <Button
           variant="outline"
@@ -187,11 +188,11 @@ export default function DataTable<TData, TValue>({
       </div>
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
+          {table.getHeaderGroups().map((headerGroup, index) => (
+            <TableRow key={index}>
+              {headerGroup.headers.map((header, index) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={index}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -206,14 +207,14 @@ export default function DataTable<TData, TValue>({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
+            table.getRowModel().rows.map((row, index) => (
               <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
+                key={index}
+                //data-state={row.getIsSelected() && "selected"}
                 className=" hover:bg-muted/50"
               >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                {row.getVisibleCells().map((cell, index) => (
+                  <TableCell key={index}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
