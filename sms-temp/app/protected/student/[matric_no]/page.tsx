@@ -6,6 +6,11 @@ import { useEffect, useState, use } from "react";
 
 const supabase = createClient();
 
+interface Programme {
+  programme_code: string;
+  programme_name: string;
+}
+
 interface Student {
   id: number;
   matric_no: string;
@@ -16,7 +21,7 @@ interface Student {
   email: string;
   phone: string;
   admission_date: string;
-  // Add other student fields as needed
+  programmes: Programme;
 }
 
 export default function StudentPage({
@@ -34,7 +39,15 @@ export default function StudentPage({
       try {
         const { data, error } = await supabase
           .from("students")
-          .select("*")
+          .select(
+            `
+            *,
+            programmes (
+              programme_code,
+              programme_name
+            )
+          `
+          )
           .eq("matric_no", matric_no)
           .single();
 
@@ -63,7 +76,8 @@ export default function StudentPage({
       <div className="mt-4">
         <p>Matric Number: {student.matric_no}</p>
         <p>Full Name: {student.full_name}</p>
-        <p>Programme Code: {student.programme_code}</p>
+        <p>Programme Name: {student.programmes.programme_name}</p>
+
         <p>Faculty Code: {student.faculty_code}</p>
         <p>Status: {student.status}</p>
         <p>Email: {student.email}</p>

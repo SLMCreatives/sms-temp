@@ -14,7 +14,10 @@ export type Students = {
   faculty_code: string;
   status: "Active" | "Lost" | "Withdrawn" | "Deferred" | "change-program";
   admission_date: string;
-  intake_code: string;
+  nationality: string;
+  entry_type: string;
+  study_mode: string;
+  study_level: string;
 };
 
 export const studentColumns: ColumnDef<Students>[] = [

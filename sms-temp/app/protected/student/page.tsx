@@ -4,9 +4,23 @@ import DataTable from "./studentTable";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRightCircle, Inbox, MessageCircle, Phone } from "lucide-react";
+import {
+  ArrowRightCircle,
+  ArrowUpCircle,
+  Mail,
+  MessageCircle,
+  Phone
+} from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger
+} from "@/components/ui/drawer";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const supabase = createClient();
 
@@ -27,7 +41,7 @@ export default async function DemoPage() {
   const fob_data = data.filter((student) => student.faculty_code === "FOB");
   const feh_data = data.filter((student) => student.faculty_code === "FEH");
   const sit_data = data.filter((student) => student.faculty_code === "SIT");
-  const dataMobile = data.slice(0, 20); // Limit to first 20 records for mobile view
+  const dataMobile = data.slice(0, 50); // Limit to first 20 records for mobile view
   /* const statusFiltered = data.filter(
     (student) =>
       student.status === "Active" ||
@@ -84,24 +98,18 @@ export default async function DemoPage() {
                   key={student.matric_no}
                   className="w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_auto] gap-4"
                 >
-                  {/*  <CardHeader className="flex flex-col flex-nowrap gap-2">
-                <CardTitle className="text-2xl font-bold">
-                  {student.full_name}
-                  <p className="text-sm font-normal">[ {student.matric_no} ]</p>
-                </CardTitle>
-              </CardHeader> */}
                   <CardContent>
-                    <div className="flex flex-col gap-2 relative">
-                      <p className="absolute -top-4 -left-4 italic text-sm text-slate-500">
-                        {index + 1}
+                    <div className="flex flex-col gap-2">
+                      <p className="italic text-xs text-slate-500 ">
+                        {index + 1} - {student.matric_no}
                       </p>
-                      <p className="text-2xl font-bold">{student.full_name}</p>
-                      <p className="text-sm font-normal">
-                        [ {student.matric_no} ]
+                      <p className="text-xl font-bold line-clamp-2">
+                        {student.full_name}
                       </p>
-                      <div className="flex flex-row gap-2">
+
+                      <div className="flex flex-row flex-wrap gap-2">
                         <Badge
-                          className={`text-md  ${
+                          className={`text-sm  ${
                             student.status === "Active"
                               ? "bg-green-100 text-green-700 border-green-700/30"
                               : "bg-red-200 text-red-700"
@@ -114,16 +122,17 @@ export default async function DemoPage() {
                         >
                           {student.status === "Active" ? "Active" : "I"}
                         </Badge>
-                        <Badge variant="default" className="text-md">
-                          {student.programme_code}
+
+                        <Badge variant="default" className="text-sm">
+                          {student.faculty_code} - {student.programme_code}
                         </Badge>
-                        <Badge variant="secondary" className="text-md">
-                          {student.faculty_code}
+                        <Badge variant="secondary" className="text-sm">
+                          {student.study_level}
                         </Badge>
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="w-full flex flex-col gap-3 justify-end">
+                  <CardFooter className="w-full flex flex-col gap-3 justify-end items-between h-full">
                     <Link href={`tel:6${student.phone.replace(/[-]/g, "")}`}>
                       <Phone className="h-6 w-6 text-cyan-500" />
                     </Link>
@@ -136,11 +145,135 @@ export default async function DemoPage() {
                       <MessageCircle className="h-6 w-6 text-green-500" />
                     </Link>
                     <Link href={`mailto:${student.email}`}>
-                      <Inbox className="h-6 w-6 text-slate-500" />
+                      <Mail className="h-6 w-6 text-slate-500" />
                     </Link>
-                    <Link href={`/protected/student/${student.matric_no}`}>
-                      <ArrowRightCircle className="w-6 h-6 text-purple-500" />
-                    </Link>
+                    {/*  <Link href={`/protected/student/${student.matric_no}`}>
+                      <ArrowUpCircle className="w-6 h-6 text-purple-500" />
+                    </Link> */}
+                    <Drawer>
+                      <DrawerTrigger asChild>
+                        <ArrowUpCircle className="w-6 h-6 text-purple-500" />
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <div className="w-full mx-auto min-h-screen p-8 flex flex-col gap-2">
+                          <DrawerTitle>Student Name</DrawerTitle>
+                          <p className="text-3xl font-bold line-clamp-2">
+                            {student.full_name}
+                          </p>
+                          <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                            <p className="text-md font-bold col-span-2">
+                              Student Details
+                            </p>
+                            <Label
+                              htmlFor="matric_no"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Matric No
+                            </Label>
+                            <Input
+                              name="matric_no"
+                              readOnly
+                              value={student.matric_no}
+                            />
+                            <Label
+                              htmlFor="email"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Email
+                            </Label>
+                            <Input
+                              name="email"
+                              readOnly
+                              value={student.email.toLocaleLowerCase()}
+                            />
+                            <Label
+                              htmlFor="phone"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Phone No.
+                            </Label>
+                            <Input
+                              name="phone"
+                              readOnly
+                              value={student.phone}
+                            />
+                            <Label
+                              htmlFor="nationality"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Nationality
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.nationality}
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                            <p className="text-md font-bold col-span-2">
+                              Programme Details
+                            </p>
+                            <Label
+                              htmlFor="programme_code"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Programme Name
+                            </Label>
+                            <Input
+                              name="programme_code"
+                              readOnly
+                              value={student.programme_code}
+                            />
+                            <Label
+                              htmlFor="study_level"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Study Level
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.study_level}
+                            />
+                            <Label
+                              htmlFor="study_mode"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Study Mode
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.study_mode}
+                            />
+                          </div>
+                          <div className="flex flex-row gap-2 justify-between w-full py-8">
+                            <p className="text-md font-bold">Actions</p>
+                            <Link
+                              href={`tel:6${student.phone.replace(/[-]/g, "")}`}
+                            >
+                              <Phone className="h-6 w-6 text-cyan-500" />
+                            </Link>
+                            <Link
+                              href={`https://wa.me/6${student.phone.replace(
+                                /[-]/g,
+                                ""
+                              )}`}
+                            >
+                              <MessageCircle className="h-6 w-6 text-green-500" />
+                            </Link>
+                            <Link href={`mailto:${student.email}`}>
+                              <Mail className="h-6 w-6 text-slate-500" />
+                            </Link>
+                            <Link
+                              href={`/protected/student/${student.matric_no}`}
+                            >
+                              <ArrowRightCircle className="w-6 h-6 text-orange-500" />
+                            </Link>
+                          </div>
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
                   </CardFooter>
                 </Card>
               ))}
@@ -151,24 +284,18 @@ export default async function DemoPage() {
                   key={student.matric_no}
                   className="w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_auto] gap-4"
                 >
-                  {/*  <CardHeader className="flex flex-col flex-nowrap gap-2">
-                <CardTitle className="text-2xl font-bold">
-                  {student.full_name}
-                  <p className="text-sm font-normal">[ {student.matric_no} ]</p>
-                </CardTitle>
-              </CardHeader> */}
                   <CardContent>
-                    <div className="flex flex-col gap-2 relative">
-                      <p className="absolute -top-4 -left-4 italic text-sm text-slate-500">
-                        {index + 1}
+                    <div className="flex flex-col gap-2">
+                      <p className="italic text-xs text-slate-500 ">
+                        {index + 1} - {student.matric_no}
                       </p>
-                      <p className="text-2xl font-bold">{student.full_name}</p>
-                      <p className="text-sm font-normal">
-                        [ {student.matric_no} ]
+                      <p className="text-xl font-bold line-clamp-2">
+                        {student.full_name}
                       </p>
-                      <div className="flex flex-row gap-2">
+
+                      <div className="flex flex-row flex-wrap gap-2">
                         <Badge
-                          className={`text-md  ${
+                          className={`text-sm  ${
                             student.status === "Active"
                               ? "bg-green-100 text-green-700 border-green-700/30"
                               : "bg-red-200 text-red-700"
@@ -181,18 +308,19 @@ export default async function DemoPage() {
                         >
                           {student.status === "Active" ? "Active" : "I"}
                         </Badge>
-                        <Badge variant="default" className="text-md">
-                          {student.programme_code}
+
+                        <Badge variant="default" className="text-sm">
+                          {student.faculty_code} - {student.programme_code}
                         </Badge>
-                        <Badge variant="secondary" className="text-md">
-                          {student.faculty_code}
+                        <Badge variant="secondary" className="text-sm">
+                          {student.study_level}
                         </Badge>
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="w-full flex flex-col gap-3 justify-end">
+                  <CardFooter className="w-full flex flex-col gap-3 justify-end items-between h-full">
                     <Link href={`tel:6${student.phone.replace(/[-]/g, "")}`}>
-                      <Phone className="h-6 w-6 text-cyan-500 hover:text-cyan-700" />
+                      <Phone className="h-6 w-6 text-cyan-500" />
                     </Link>
                     <Link
                       href={`https://wa.me/6${student.phone.replace(
@@ -203,11 +331,135 @@ export default async function DemoPage() {
                       <MessageCircle className="h-6 w-6 text-green-500" />
                     </Link>
                     <Link href={`mailto:${student.email}`}>
-                      <Inbox className="h-6 w-6 text-slate-500" />
+                      <Mail className="h-6 w-6 text-slate-500" />
                     </Link>
-                    <Link href={`/protected/student/${student.matric_no}`}>
-                      <ArrowRightCircle className="w-6 h-6 text-purple-500" />
-                    </Link>
+                    {/*  <Link href={`/protected/student/${student.matric_no}`}>
+                      <ArrowUpCircle className="w-6 h-6 text-purple-500" />
+                    </Link> */}
+                    <Drawer>
+                      <DrawerTrigger asChild>
+                        <ArrowUpCircle className="w-6 h-6 text-purple-500" />
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <div className="w-full mx-auto min-h-screen p-8 flex flex-col gap-2">
+                          <DrawerTitle>Student Name</DrawerTitle>
+                          <p className="text-3xl font-bold line-clamp-2">
+                            {student.full_name}
+                          </p>
+                          <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                            <p className="text-md font-bold col-span-2">
+                              Student Details
+                            </p>
+                            <Label
+                              htmlFor="matric_no"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Matric No
+                            </Label>
+                            <Input
+                              name="matric_no"
+                              readOnly
+                              value={student.matric_no}
+                            />
+                            <Label
+                              htmlFor="email"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Email
+                            </Label>
+                            <Input
+                              name="email"
+                              readOnly
+                              value={student.email.toLocaleLowerCase()}
+                            />
+                            <Label
+                              htmlFor="phone"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Phone No.
+                            </Label>
+                            <Input
+                              name="phone"
+                              readOnly
+                              value={student.phone}
+                            />
+                            <Label
+                              htmlFor="nationality"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Nationality
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.nationality}
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                            <p className="text-md font-bold col-span-2">
+                              Programme Details
+                            </p>
+                            <Label
+                              htmlFor="programme_code"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Programme Name
+                            </Label>
+                            <Input
+                              name="programme_code"
+                              readOnly
+                              value={student.programme_code}
+                            />
+                            <Label
+                              htmlFor="study_level"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Study Level
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.study_level}
+                            />
+                            <Label
+                              htmlFor="study_mode"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Study Mode
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.study_mode}
+                            />
+                          </div>
+                          <div className="flex flex-row gap-2 justify-between w-full py-8">
+                            <p className="text-md font-bold">Actions</p>
+                            <Link
+                              href={`tel:6${student.phone.replace(/[-]/g, "")}`}
+                            >
+                              <Phone className="h-6 w-6 text-cyan-500" />
+                            </Link>
+                            <Link
+                              href={`https://wa.me/6${student.phone.replace(
+                                /[-]/g,
+                                ""
+                              )}`}
+                            >
+                              <MessageCircle className="h-6 w-6 text-green-500" />
+                            </Link>
+                            <Link href={`mailto:${student.email}`}>
+                              <Mail className="h-6 w-6 text-slate-500" />
+                            </Link>
+                            <Link
+                              href={`/protected/student/${student.matric_no}`}
+                            >
+                              <ArrowRightCircle className="w-6 h-6 text-orange-500" />
+                            </Link>
+                          </div>
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
                   </CardFooter>
                 </Card>
               ))}
@@ -218,24 +470,18 @@ export default async function DemoPage() {
                   key={student.matric_no}
                   className="w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_auto] gap-4"
                 >
-                  {/*  <CardHeader className="flex flex-col flex-nowrap gap-2">
-                <CardTitle className="text-2xl font-bold">
-                  {student.full_name}
-                  <p className="text-sm font-normal">[ {student.matric_no} ]</p>
-                </CardTitle>
-              </CardHeader> */}
                   <CardContent>
-                    <div className="flex flex-col gap-2 relative">
-                      <p className="absolute -top-4 -left-4 italic text-sm text-slate-500">
-                        {index + 1}
+                    <div className="flex flex-col gap-2">
+                      <p className="italic text-xs text-slate-500 ">
+                        {index + 1} - {student.matric_no}
                       </p>
-                      <p className="text-2xl font-bold">{student.full_name}</p>
-                      <p className="text-sm font-normal">
-                        [ {student.matric_no} ]
+                      <p className="text-xl font-bold line-clamp-2">
+                        {student.full_name}
                       </p>
-                      <div className="flex flex-row gap-2">
+
+                      <div className="flex flex-row flex-wrap gap-2">
                         <Badge
-                          className={`text-md  ${
+                          className={`text-sm  ${
                             student.status === "Active"
                               ? "bg-green-100 text-green-700 border-green-700/30"
                               : "bg-red-200 text-red-700"
@@ -248,16 +494,17 @@ export default async function DemoPage() {
                         >
                           {student.status === "Active" ? "Active" : "I"}
                         </Badge>
-                        <Badge variant="default" className="text-md">
-                          {student.programme_code}
+
+                        <Badge variant="default" className="text-sm">
+                          {student.faculty_code} - {student.programme_code}
                         </Badge>
-                        <Badge variant="secondary" className="text-md">
-                          {student.faculty_code}
+                        <Badge variant="secondary" className="text-sm">
+                          {student.study_level}
                         </Badge>
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="w-full flex flex-col gap-3 justify-end">
+                  <CardFooter className="w-full flex flex-col gap-3 justify-end items-between h-full">
                     <Link href={`tel:6${student.phone.replace(/[-]/g, "")}`}>
                       <Phone className="h-6 w-6 text-cyan-500" />
                     </Link>
@@ -270,11 +517,135 @@ export default async function DemoPage() {
                       <MessageCircle className="h-6 w-6 text-green-500" />
                     </Link>
                     <Link href={`mailto:${student.email}`}>
-                      <Inbox className="h-6 w-6 text-slate-500" />
+                      <Mail className="h-6 w-6 text-slate-500" />
                     </Link>
-                    <Link href={`/protected/student/${student.matric_no}`}>
-                      <ArrowRightCircle className="w-6 h-6 text-purple-500" />
-                    </Link>
+                    {/*  <Link href={`/protected/student/${student.matric_no}`}>
+                      <ArrowUpCircle className="w-6 h-6 text-purple-500" />
+                    </Link> */}
+                    <Drawer>
+                      <DrawerTrigger asChild>
+                        <ArrowUpCircle className="w-6 h-6 text-purple-500" />
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <div className="w-full mx-auto min-h-screen p-8 flex flex-col gap-2">
+                          <DrawerTitle>Student Name</DrawerTitle>
+                          <p className="text-3xl font-bold line-clamp-2">
+                            {student.full_name}
+                          </p>
+                          <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                            <p className="text-md font-bold col-span-2">
+                              Student Details
+                            </p>
+                            <Label
+                              htmlFor="matric_no"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Matric No
+                            </Label>
+                            <Input
+                              name="matric_no"
+                              readOnly
+                              value={student.matric_no}
+                            />
+                            <Label
+                              htmlFor="email"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Email
+                            </Label>
+                            <Input
+                              name="email"
+                              readOnly
+                              value={student.email.toLocaleLowerCase()}
+                            />
+                            <Label
+                              htmlFor="phone"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Phone No.
+                            </Label>
+                            <Input
+                              name="phone"
+                              readOnly
+                              value={student.phone}
+                            />
+                            <Label
+                              htmlFor="nationality"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Nationality
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.nationality}
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                            <p className="text-md font-bold col-span-2">
+                              Programme Details
+                            </p>
+                            <Label
+                              htmlFor="programme_code"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Programme Name
+                            </Label>
+                            <Input
+                              name="programme_code"
+                              readOnly
+                              value={student.programme_code}
+                            />
+                            <Label
+                              htmlFor="study_level"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Study Level
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.study_level}
+                            />
+                            <Label
+                              htmlFor="study_mode"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Study Mode
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.study_mode}
+                            />
+                          </div>
+                          <div className="flex flex-row gap-2 justify-between w-full py-8">
+                            <p className="text-md font-bold">Actions</p>
+                            <Link
+                              href={`tel:6${student.phone.replace(/[-]/g, "")}`}
+                            >
+                              <Phone className="h-6 w-6 text-cyan-500" />
+                            </Link>
+                            <Link
+                              href={`https://wa.me/6${student.phone.replace(
+                                /[-]/g,
+                                ""
+                              )}`}
+                            >
+                              <MessageCircle className="h-6 w-6 text-green-500" />
+                            </Link>
+                            <Link href={`mailto:${student.email}`}>
+                              <Mail className="h-6 w-6 text-slate-500" />
+                            </Link>
+                            <Link
+                              href={`/protected/student/${student.matric_no}`}
+                            >
+                              <ArrowRightCircle className="w-6 h-6 text-orange-500" />
+                            </Link>
+                          </div>
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
                   </CardFooter>
                 </Card>
               ))}
@@ -285,24 +656,18 @@ export default async function DemoPage() {
                   key={student.matric_no}
                   className="w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_auto] gap-4"
                 >
-                  {/*  <CardHeader className="flex flex-col flex-nowrap gap-2">
-                <CardTitle className="text-2xl font-bold">
-                  {student.full_name}
-                  <p className="text-sm font-normal">[ {student.matric_no} ]</p>
-                </CardTitle>
-              </CardHeader> */}
                   <CardContent>
-                    <div className="flex flex-col gap-2 relative">
-                      <p className="absolute -top-4 -left-4 italic text-sm text-slate-500">
-                        {index + 1}
+                    <div className="flex flex-col gap-2">
+                      <p className="italic text-xs text-slate-500 ">
+                        {index + 1} - {student.matric_no}
                       </p>
-                      <p className="text-2xl font-bold">{student.full_name}</p>
-                      <p className="text-sm font-normal">
-                        [ {student.matric_no} ]
+                      <p className="text-xl font-bold line-clamp-2">
+                        {student.full_name}
                       </p>
-                      <div className="flex flex-row gap-2">
+
+                      <div className="flex flex-row flex-wrap gap-2">
                         <Badge
-                          className={`text-md  ${
+                          className={`text-sm  ${
                             student.status === "Active"
                               ? "bg-green-100 text-green-700 border-green-700/30"
                               : "bg-red-200 text-red-700"
@@ -315,16 +680,17 @@ export default async function DemoPage() {
                         >
                           {student.status === "Active" ? "Active" : "I"}
                         </Badge>
-                        <Badge variant="default" className="text-md">
-                          {student.programme_code}
+
+                        <Badge variant="default" className="text-sm">
+                          {student.faculty_code} - {student.programme_code}
                         </Badge>
-                        <Badge variant="secondary" className="text-md">
-                          {student.faculty_code}
+                        <Badge variant="secondary" className="text-sm">
+                          {student.study_level}
                         </Badge>
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="w-full flex flex-col gap-3 justify-end">
+                  <CardFooter className="w-full flex flex-col gap-3 justify-end items-between h-full">
                     <Link href={`tel:6${student.phone.replace(/[-]/g, "")}`}>
                       <Phone className="h-6 w-6 text-cyan-500" />
                     </Link>
@@ -337,11 +703,135 @@ export default async function DemoPage() {
                       <MessageCircle className="h-6 w-6 text-green-500" />
                     </Link>
                     <Link href={`mailto:${student.email}`}>
-                      <Inbox className="h-6 w-6 text-slate-500" />
+                      <Mail className="h-6 w-6 text-slate-500" />
                     </Link>
-                    <Link href={`/protected/student/${student.matric_no}`}>
-                      <ArrowRightCircle className="w-6 h-6 text-purple-500" />
-                    </Link>
+                    {/*  <Link href={`/protected/student/${student.matric_no}`}>
+                      <ArrowUpCircle className="w-6 h-6 text-purple-500" />
+                    </Link> */}
+                    <Drawer>
+                      <DrawerTrigger asChild>
+                        <ArrowUpCircle className="w-6 h-6 text-purple-500" />
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <div className="w-full mx-auto min-h-screen p-8 flex flex-col gap-2">
+                          <DrawerTitle>Student Name</DrawerTitle>
+                          <p className="text-3xl font-bold line-clamp-2">
+                            {student.full_name}
+                          </p>
+                          <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                            <p className="text-md font-bold col-span-2">
+                              Student Details
+                            </p>
+                            <Label
+                              htmlFor="matric_no"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Matric No
+                            </Label>
+                            <Input
+                              name="matric_no"
+                              readOnly
+                              value={student.matric_no}
+                            />
+                            <Label
+                              htmlFor="email"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Email
+                            </Label>
+                            <Input
+                              name="email"
+                              readOnly
+                              value={student.email.toLocaleLowerCase()}
+                            />
+                            <Label
+                              htmlFor="phone"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Phone No.
+                            </Label>
+                            <Input
+                              name="phone"
+                              readOnly
+                              value={student.phone}
+                            />
+                            <Label
+                              htmlFor="nationality"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Nationality
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.nationality}
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                            <p className="text-md font-bold col-span-2">
+                              Programme Details
+                            </p>
+                            <Label
+                              htmlFor="programme_code"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Programme Name
+                            </Label>
+                            <Input
+                              name="programme_code"
+                              readOnly
+                              value={student.programme_code}
+                            />
+                            <Label
+                              htmlFor="study_level"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Study Level
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.study_level}
+                            />
+                            <Label
+                              htmlFor="study_mode"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Study Mode
+                            </Label>
+                            <Input
+                              name="nationality"
+                              readOnly
+                              value={student.study_mode}
+                            />
+                          </div>
+                          <div className="flex flex-row gap-2 justify-between w-full py-8">
+                            <p className="text-md font-bold">Actions</p>
+                            <Link
+                              href={`tel:6${student.phone.replace(/[-]/g, "")}`}
+                            >
+                              <Phone className="h-6 w-6 text-cyan-500" />
+                            </Link>
+                            <Link
+                              href={`https://wa.me/6${student.phone.replace(
+                                /[-]/g,
+                                ""
+                              )}`}
+                            >
+                              <MessageCircle className="h-6 w-6 text-green-500" />
+                            </Link>
+                            <Link href={`mailto:${student.email}`}>
+                              <Mail className="h-6 w-6 text-slate-500" />
+                            </Link>
+                            <Link
+                              href={`/protected/student/${student.matric_no}`}
+                            >
+                              <ArrowRightCircle className="w-6 h-6 text-orange-500" />
+                            </Link>
+                          </div>
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
                   </CardFooter>
                 </Card>
               ))}
