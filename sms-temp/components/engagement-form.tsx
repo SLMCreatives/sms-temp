@@ -89,6 +89,7 @@ export function EngagementForm() {
         outcome: "",
         next_action_date: undefined
       });
+      window.location.reload();
     }, 3000);
   };
 

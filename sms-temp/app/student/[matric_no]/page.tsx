@@ -49,7 +49,7 @@ export default function StudentPage({
         href={`/student/${student.faculty_code.toLowerCase()}`}
         className="text-blue-500 hover:underline"
       >
-        &larr; Back to Student List
+        &larr; Back
       </Link>
       <StudentDetailsPage studentData={student} />
     </main>

@@ -18,7 +18,8 @@ import {
   BookOpen,
   Globe,
   FileText,
-  CheckCircle
+  CheckCircle,
+  Trash2
 } from "lucide-react";
 import { Students } from "@/app/student/studentColumns";
 import { EngagementForm } from "./engagement-form";
@@ -32,10 +33,26 @@ import {
   SheetTrigger
 } from "./ui/sheet";
 import { Button } from "./ui/button";
+import { createClient } from "@/lib/supabase/client";
 
 interface StudentDetailsProps {
   studentData: Students;
 }
+const supabase = createClient();
+const handleDeleteEngagement = async (engagementId: string) => {
+  // Implement the logic to delete the engagement
+
+  const { error } = await supabase
+    .from("engagements")
+    .delete()
+    .eq("id", engagementId);
+
+  if (error) {
+    console.log("Error deleting engagement:", error.message);
+    return;
+  }
+  window.location.reload();
+};
 
 const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
   return (
@@ -194,17 +211,44 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                 Engagement Tracker
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {studentData.engagements.length === 0 && "No activity yet"}
               {studentData.engagements.length > 0 &&
                 studentData.engagements.map((engagement, index) => (
-                  <ul key={index} className="list-disc pl-4">
-                    <li>
-                      {engagement.created_at.slice(5, 10)} -{" "}
-                      {engagement.channel} - {engagement.subject}
-                    </li>
-                  </ul>
+                  <Card
+                    key={index}
+                    className="flex flex-row gap-2 justify-between items-end"
+                  >
+                    <CardContent className="flex flex-col gap-2">
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(engagement.created_at)
+                          .toLocaleString()
+                          .slice(0, 10)}{" "}
+                        - {engagement.handled_by}
+                      </p>
+                      <p className="text-lg font-medium">
+                        {engagement.subject}{" "}
+                        <Badge variant={"default"}>{engagement.channel}</Badge>
+                      </p>
+                      <p className="text-sm italic">{engagement.body}</p>
+                    </CardContent>
+                    <CardFooter>
+                      <Button
+                        variant={"link"}
+                        size="icon"
+                        onClick={() => {
+                          handleDeleteEngagement(engagement.id);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </CardFooter>
+                  </Card>
                 ))}
+              {/*  <EngagementTable
+                columns={engagementColumns}
+                data={studentData.engagements}
+              /> */}
             </CardContent>
             <CardFooter>
               <Sheet>

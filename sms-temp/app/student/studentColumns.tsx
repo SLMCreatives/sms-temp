@@ -6,6 +6,7 @@ import { MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
 
 export type Engagements = {
+  id: string;
   matric_no: string;
   channel: string;
   direction: string;
