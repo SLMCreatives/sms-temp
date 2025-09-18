@@ -48,9 +48,13 @@ interface EngagementFormData {
   next_action_date: Date | undefined;
 }
 
-export function EngagementForm() {
+interface EngagementFormProps {
+  matric_no: string;
+}
+
+export function EngagementForm({ matric_no }: EngagementFormProps) {
   const [formData, setFormData] = useState<EngagementFormData>({
-    matric_no: "",
+    matric_no: matric_no,
     channel: "whatsapp",
     direction: "outbound",
     subject: "",
@@ -61,6 +65,7 @@ export function EngagementForm() {
     next_action_date: undefined
   });
 
+  //const studentMatric = matric_no;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -149,15 +154,16 @@ export function EngagementForm() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 gap-4 md:gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="matric_no" className="text-sm font-medium">
                     Student Matric Number *
                   </Label>
                   <Input
                     id="matric_no"
-                    placeholder="e.g., MC250930001"
+                    placeholder="Matric Number"
                     value={formData.matric_no}
+                    readOnly
                     onChange={(e) =>
                       updateFormData("matric_no", e.target.value)
                     }
@@ -168,11 +174,12 @@ export function EngagementForm() {
 
                 <div className="space-y-2">
                   <Label htmlFor="handled_by" className="text-sm font-medium">
-                    Handled By
+                    Handled By *
                   </Label>
                   <Input
                     id="handled_by"
                     placeholder="Your name"
+                    required
                     value={formData.handled_by}
                     onChange={(e) =>
                       updateFormData("handled_by", e.target.value)
@@ -184,7 +191,7 @@ export function EngagementForm() {
 
               <Separator />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 gap-4 md:gap-6">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">
                     Communication Channel *
@@ -197,6 +204,12 @@ export function EngagementForm() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="call">
+                        <div className="flex items-center gap-2">
+                          <span>{getChannelIcon("call")}</span>
+                          Phone Call
+                        </div>
+                      </SelectItem>
                       <SelectItem value="whatsapp">
                         <div className="flex items-center gap-2">
                           <span>{getChannelIcon("whatsapp")}</span>
@@ -209,29 +222,17 @@ export function EngagementForm() {
                           Email
                         </div>
                       </SelectItem>
-                      <SelectItem value="call">
-                        <div className="flex items-center gap-2">
-                          <span>{getChannelIcon("call")}</span>
-                          Phone Call
-                        </div>
-                      </SelectItem>
                       <SelectItem value="sms">
                         <div className="flex items-center gap-2">
                           <span>{getChannelIcon("sms")}</span>
                           SMS
                         </div>
                       </SelectItem>
-                      <SelectItem value="lms">
-                        <div className="flex items-center gap-2">
-                          <span>{getChannelIcon("lms")}</span>
-                          LMS
-                        </div>
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="space-y-2 hidden">
+                {/* <div className="space-y-2 hidden">
                   <Label className="text-sm font-medium">Direction *</Label>
                   <Select
                     value={formData.direction}
@@ -251,9 +252,9 @@ export function EngagementForm() {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label className="text-sm font-medium">Sentiment</Label>
                   <Select
                     value={formData.sentiment}
@@ -288,7 +289,7 @@ export function EngagementForm() {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
               </div>
             </CardContent>
           </Card>
@@ -310,6 +311,7 @@ export function EngagementForm() {
                   id="subject"
                   placeholder="Brief description of the topic discussed"
                   value={formData.subject}
+                  required
                   onChange={(e) => updateFormData("subject", e.target.value)}
                   className="w-full"
                 />
@@ -323,12 +325,48 @@ export function EngagementForm() {
                   id="body"
                   placeholder="Provide detailed notes about the interaction, including key points discussed, student concerns, and any actions taken..."
                   value={formData.body}
+                  required
                   onChange={(e) => updateFormData("body", e.target.value)}
                   className="min-h-[120px] w-full resize-none"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Sentiment</Label>
+                <Select
+                  value={formData.sentiment}
+                  onValueChange={(value) => updateFormData("sentiment", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select sentiment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="positive">
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-green-100 text-green-800 border-green-200">
+                          Positive
+                        </Badge>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="neutral">
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-gray-100 text-gray-800 border-gray-200">
+                          Neutral
+                        </Badge>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="negative">
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-red-100 text-red-800 border-red-200">
+                          Negative
+                        </Badge>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:gap-6">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Outcome</Label>
                   <Select
@@ -392,7 +430,7 @@ export function EngagementForm() {
                         )}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-[300px] p-2" align="start">
                       <Calendar
                         mode="single"
                         selected={formData.next_action_date}
@@ -400,6 +438,8 @@ export function EngagementForm() {
                           updateFormData("next_action_date", date)
                         }
                         initialFocus
+                        className="w-full"
+                        disabled={{ before: new Date() }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -413,7 +453,7 @@ export function EngagementForm() {
             <Button
               type="submit"
               disabled={
-                isSubmitting || !formData.matric_no || !formData.direction
+                isSubmitting || !formData.handled_by || !formData.direction
               }
               className="w-full md:w-auto px-8"
             >

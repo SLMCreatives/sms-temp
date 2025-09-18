@@ -255,12 +255,12 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                 </SheetTrigger>
                 <SheetContent
                   side="right"
-                  className="w-full h-full overflow-y-scroll"
+                  className="w-full h-full overflow-y-scroll lg:w-1/2"
                 >
                   <SheetHeader>
                     <SheetTitle>Add Engagement</SheetTitle>
                   </SheetHeader>
-                  <EngagementForm />
+                  <EngagementForm matric_no={studentData.matric_no} />
                 </SheetContent>
               </Sheet>
             </CardFooter>
