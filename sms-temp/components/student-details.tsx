@@ -3,6 +3,7 @@
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle
@@ -56,7 +57,7 @@ const handleDeleteEngagement = async (engagementId: string) => {
 
 const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background w-full">
       <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
         <div className="space-y-6 lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0">
           {/* Personal Information Card */}
@@ -164,21 +165,21 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                   Academic Details
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-6">
-                <div className="">
-                  <p className="text-sm text-muted-foreground mb-1">Faculty</p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    {" "}
-                    {studentData.faculty_code}
-                  </p>
-                </div>
+              <CardContent className="grid grid-cols-1 gap-3">
                 <div className="">
                   <p className="text-sm text-muted-foreground mb-1">
                     Programme
                   </p>
                   <p className="font-medium text-foreground text-sm md:text-base">
                     {" "}
-                    {studentData.programme_code}
+                    {studentData.programme_name}
+                  </p>
+                </div>
+                <div className="">
+                  <p className="text-sm text-muted-foreground mb-1">Faculty</p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    {" "}
+                    {studentData.faculty_code}
                   </p>
                 </div>
 
@@ -188,13 +189,6 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                   </p>
                   <p className="font-medium text-foreground text-sm md:text-base">
                     {studentData.study_level}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Intake</p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    September 2025
                   </p>
                 </div>
               </CardContent>
@@ -210,6 +204,10 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                 <CheckCircle className="w-5 h-5" />
                 Engagement Tracker
               </CardTitle>
+              <CardDescription>
+                Track and manage student engagement. Everytime you contact a
+                students, please add it here.
+              </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {studentData.engagements.length === 0 && "No activity yet"}

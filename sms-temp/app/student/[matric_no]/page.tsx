@@ -44,10 +44,10 @@ export default function StudentPage({
   if (!student) return <div>No student found</div>;
 
   return (
-    <main className="p-6">
+    <main className="py-6 px-2 container mx-auto">
       <Link
         href={`/student/${student.faculty_code.toLowerCase()}`}
-        className="text-blue-500 hover:underline"
+        className="text-blue-500 hover:underline pl-4"
       >
         &larr; Back
       </Link>

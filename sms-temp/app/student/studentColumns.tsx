@@ -25,6 +25,7 @@ export type Students = {
   email: string;
   phone: string;
   programme_code: string;
+  programme_name: string;
   faculty_code: string;
   status: "Active" | "Lost" | "Withdrawn" | "Deferred" | "change-program";
   admission_date: string;

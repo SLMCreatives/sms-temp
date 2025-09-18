@@ -2,6 +2,7 @@ import { StudentList } from "@/components/student-list";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "../studentColumns";
+import { ChevronRight } from "lucide-react";
 
 const supabase = createClient();
 
@@ -19,6 +20,37 @@ async function getData(): Promise<Students[]> {
 
 export default async function SITPage() {
   const sit_data = await getData();
+  const uniqueProgrammesMaster = [
+    ...new Set(
+      sit_data
+        .filter((student) => student.study_level === "Master")
+        .map((item) => item.programme_name)
+    )
+  ];
+
+  const uniqueProgrammesFoundation = [
+    ...new Set(
+      sit_data
+        .filter((student) => student.study_level === "Foundation")
+        .map((item) => item.programme_name)
+    )
+  ];
+
+  const uniqueProgrammesDiploma = [
+    ...new Set(
+      sit_data
+        .filter((student) => student.study_level === "Diploma")
+        .map((item) => item.programme_name)
+    )
+  ];
+
+  const uniqueProgrammesBachelor = [
+    ...new Set(
+      sit_data
+        .filter((student) => student.study_level === "Bachelor")
+        .map((item) => item.programme_name)
+    )
+  ];
 
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
@@ -44,15 +76,25 @@ export default async function SITPage() {
           <p className="text-sm italic font-bold lg:col-span-2">
             Foundation Students
           </p>
-          {sit_data
-            .filter((student) => student.study_level === "Foundation")
-            .map((student, index) => (
-              <StudentList
-                key={student.matric_no}
-                student={student}
-                index={index}
-              />
-            ))}
+          {uniqueProgrammesFoundation.map((programme, index) => (
+            <div key={index}>
+              <p className="text-md font-bold py-2">
+                <ChevronRight className="min-w-4 min-h-4 inline-block" />
+                {programme}
+              </p>
+              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+                {sit_data
+                  .filter((student) => student.programme_name === programme)
+                  .map((student, index) => (
+                    <StudentList
+                      key={student.matric_no}
+                      student={student}
+                      index={index}
+                    />
+                  ))}
+              </div>
+            </div>
+          ))}
         </TabsContent>
         <TabsContent
           value="diploma"
@@ -61,15 +103,25 @@ export default async function SITPage() {
           <p className="text-sm italic font-bold lg:col-span-2">
             Diploma Students
           </p>
-          {sit_data
-            .filter((student) => student.study_level === "Diploma")
-            .map((student, index) => (
-              <StudentList
-                key={student.matric_no}
-                student={student}
-                index={index}
-              />
-            ))}
+          {uniqueProgrammesDiploma.map((programme, index) => (
+            <div key={index}>
+              <p className="text-md font-bold py-2">
+                <ChevronRight className="min-w-4 min-h-4 inline-block" />
+                {programme}
+              </p>
+              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+                {sit_data
+                  .filter((student) => student.programme_name === programme)
+                  .map((student, index) => (
+                    <StudentList
+                      key={student.matric_no}
+                      student={student}
+                      index={index}
+                    />
+                  ))}
+              </div>
+            </div>
+          ))}
         </TabsContent>
         <TabsContent
           value="bachelor"
@@ -78,15 +130,25 @@ export default async function SITPage() {
           <p className="text-sm italic font-bold lg:col-span-2">
             Bachelor Students
           </p>
-          {sit_data
-            .filter((student) => student.study_level === "Bachelor")
-            .map((student, index) => (
-              <StudentList
-                key={student.matric_no}
-                student={student}
-                index={index}
-              />
-            ))}
+          {uniqueProgrammesBachelor.map((programme, index) => (
+            <div key={index}>
+              <p className="text-md font-bold py-2">
+                <ChevronRight className="min-w-4 min-h-4 inline-block" />
+                {programme}
+              </p>
+              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+                {sit_data
+                  .filter((student) => student.programme_name === programme)
+                  .map((student, index) => (
+                    <StudentList
+                      key={student.matric_no}
+                      student={student}
+                      index={index}
+                    />
+                  ))}
+              </div>
+            </div>
+          ))}
         </TabsContent>
         <TabsContent
           value="master"
@@ -95,15 +157,25 @@ export default async function SITPage() {
           <p className="text-sm italic font-bold lg:col-span-2">
             Master Students
           </p>
-          {sit_data
-            .filter((student) => student.study_level === "Master")
-            .map((student, index) => (
-              <StudentList
-                key={student.matric_no}
-                student={student}
-                index={index}
-              />
-            ))}
+          {uniqueProgrammesMaster.map((programme, index) => (
+            <div key={index}>
+              <p className="text-md font-bold py-2">
+                <ChevronRight className="min-w-4 min-h-4 inline-block" />
+                {programme}
+              </p>
+              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+                {sit_data
+                  .filter((student) => student.programme_name === programme)
+                  .map((student, index) => (
+                    <StudentList
+                      key={student.matric_no}
+                      student={student}
+                      index={index}
+                    />
+                  ))}
+              </div>
+            </div>
+          ))}
         </TabsContent>
       </Tabs>
     </div>
