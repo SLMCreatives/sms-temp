@@ -3,6 +3,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "../studentColumns";
 import { ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const supabase = createClient();
 
@@ -52,15 +53,19 @@ export default async function SITPage() {
     )
   ];
 
+  const atRisk = sit_data.filter(
+    (student) => student.lms_activity?.srb_progress === 0
+  );
+
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
       <p className="text-2xl italic font-bold">
         School of Information Technology
       </p>
       <div className="flex flex-row gap-2 justify-between divide-x-2">
-        <p className="text-sm -mt-2">Active: {sit_data.length}</p>
-        <p className="text-sm -mt-2 pl-2">At Risk: 0 </p>
-        <p className="text-sm -mt-2 pl-2">Lost: 0 </p>
+        <Badge variant={"default"}>At Risk: {sit_data.length}</Badge>
+        <Badge variant={"destructive"}>At Risk: {atRisk.length}</Badge>
+        <Badge variant={"outline"}>Lost: {0}</Badge>
       </div>
       <Tabs className="w-full" defaultValue="foundation">
         <TabsList className="w-full">
