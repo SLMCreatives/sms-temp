@@ -157,7 +157,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
           </div>
 
           {/* Academic Details Card */}
-          <div>
+          <div className="flex flex-col gap-4">
             <Card className="shadow-sm">
               <CardHeader className="">
                 <CardTitle className="text-lg md:text-xl flex items-center gap-2">
@@ -189,6 +189,65 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                   </p>
                   <p className="font-medium text-foreground text-sm md:text-base">
                     {studentData.study_level}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardHeader className="">
+                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5" />
+                  LMS Activity
+                </CardTitle>
+                <CardDescription className="text-sm text-muted-foreground italic">
+                  Data as of:{" "}
+                  {(studentData.lms_activity &&
+                    studentData.lms_activity.updated_at.slice(5, 10)) ||
+                    "Unknown"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-3">
+                <div className="">
+                  <p className="text-sm text-muted-foreground mb-1">
+                    SRB Progress
+                  </p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    {" "}
+                    {(studentData.lms_activity &&
+                      studentData.lms_activity.srb_progress + "%") ||
+                      "No record"}
+                  </p>
+                </div>
+                <div className="">
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Course Progress
+                  </p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    {(studentData.lms_activity &&
+                      studentData.lms_activity.course_progress + "%") ||
+                      "No record"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Last Login
+                  </p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    {studentData.lms_activity === null && "Unknown"}
+                    {(studentData.lms_activity &&
+                      studentData.lms_activity.last_login_at) ||
+                      "Unknown"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Status</p>
+                  <p className="font-medium text-foreground text-sm md:text-base">
+                    {studentData.lms_activity === null ? "Unknown" : ""}
+                    {studentData.lms_activity &&
+                    studentData.lms_activity?.srb_progress < 10
+                      ? "⚠️ At Risk"
+                      : "Good"}
                   </p>
                 </div>
               </CardContent>

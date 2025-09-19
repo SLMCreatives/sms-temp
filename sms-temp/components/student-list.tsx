@@ -3,21 +3,28 @@ import {
   MessageCircle,
   Mail,
   ArrowUpCircle,
-  ArrowRightCircle
+  ArrowRightCircle,
+  AlertCircle
 } from "lucide-react";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { Input } from "./ui/input";
 import Link from "next/link";
-import { Students } from "@/app/student/studentColumns";
+import { LMSActivity, Students } from "@/app/student/studentColumns";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface StudentCardProps {
   student: Students;
+  lms_activity: LMSActivity;
   index: number;
 }
 
-export function StudentList({ student, index }: StudentCardProps) {
+export function StudentList({
+  student,
+  lms_activity,
+  index
+}: StudentCardProps) {
   return (
     <Card
       key={student.matric_no}
@@ -25,16 +32,20 @@ export function StudentList({ student, index }: StudentCardProps) {
     >
       <CardContent className="w-full pl-2">
         <div className="flex flex-col gap-2 px-0">
-          {/* <p className="italic text-xs text-slate-500 ">
-            {index + 1} - {student.programme_code}
-          </p> */}
           <p className="text-md font-normal line-clamp-1 capitalize">
-            <span className="font-thin">{index + 1}.</span>{" "}
-            {student.full_name.toLocaleLowerCase()}
+            <span className="font-thin">{index + 1}.</span> {student.full_name}
           </p>
         </div>
       </CardContent>
-      <CardFooter className="w-full flex flex-col gap-3 justify-end items-between h-full">
+      <CardFooter className="w-full flex flex-row gap-2 justify-end h-full">
+        {lms_activity && lms_activity.srb_progress === 0 ? (
+          <Tooltip>
+            <TooltipTrigger>
+              <AlertCircle className="min-w-6 min-h-6 text-red-500" />
+            </TooltipTrigger>
+            <TooltipContent>0% SRB Progress</TooltipContent>
+          </Tooltip>
+        ) : null}{" "}
         <Drawer>
           <DrawerTrigger asChild>
             <ArrowUpCircle className="min-w-6 min-h-6 text-purple-500" />

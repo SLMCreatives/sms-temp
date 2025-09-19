@@ -19,6 +19,16 @@ export type Engagements = {
   created_at: string;
 };
 
+export type LMSActivity = {
+  matric_no: string;
+  last_login_at: string;
+  total_minutes: number;
+  course_progress: number;
+  submitted_assignments: number;
+  srb_progress: number;
+  updated_at: string;
+};
+
 export type Students = {
   matric_no: string;
   full_name: string;
@@ -34,6 +44,7 @@ export type Students = {
   study_mode: string;
   study_level: string;
   engagements: Engagements[];
+  lms_activity: LMSActivity;
 };
 
 export const studentColumns: ColumnDef<Students>[] = [

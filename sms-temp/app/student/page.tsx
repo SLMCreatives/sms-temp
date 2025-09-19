@@ -45,15 +45,22 @@ export default async function DemoPage() {
             SIT has {n_sit} <span className="italic">active</span> students
           </li>
         </ul>
-        <div className="flex flex-col py-10 gap-2 justify-between">
+        <div className="flex flex-col lg:grid grid-cols-3 py-10 gap-2 justify-between">
+          <p className="lg:col-span-3">View student list by faculty:</p>
           <Button variant="default" asChild>
-            <Link href="/student/fob">FoB</Link>
+            <Link href="/student/fob" prefetch>
+              FoB
+            </Link>
           </Button>
           <Button variant="default" asChild>
-            <Link href="/student/feh">FEH</Link>
+            <Link href="/student/feh" prefetch>
+              FEH
+            </Link>
           </Button>
           <Button variant="default" asChild>
-            <Link href="/student/sit">SIT</Link>
+            <Link href="/student/sit" prefetch>
+              SIT
+            </Link>
           </Button>
         </div>
       </div>

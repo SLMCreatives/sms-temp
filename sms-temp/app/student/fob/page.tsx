@@ -9,7 +9,7 @@ const supabase = createClient();
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("students")
-    .select("*")
+    .select("*, lms_activity(*)")
     .eq("faculty_code", "FOB");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -76,26 +76,22 @@ export default async function FoBPage() {
           <TabsTrigger value="master">MAS</TabsTrigger>
           <TabsTrigger value="doctorate">DOC</TabsTrigger>
         </TabsList>
-        <TabsContent
-          value="foundation"
-          className="flex flex-col lg:grid grid-cols-2 gap-4"
-        >
-          <p className="text-sm italic font-bold lg:col-span-2">
-            Foundation Students
-          </p>
+        <TabsContent value="foundation" className="flex flex-col gap-4">
+          <p className="text-sm italic font-bold">Foundation Students</p>
           {uniqueProgrammesFoundation.map((programme, index) => (
             <div key={index}>
               <p className="text-md font-bold py-2">
                 <ChevronRight className="min-w-4 min-h-4 inline-block" />
                 {programme}
               </p>
-              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+              <div className="flex flex-col lg:grid grid-cols-2 gap-2 pb-4 border-b-2 border-b-foreground/10">
                 {fob_data
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
                       key={student.matric_no}
                       student={student}
+                      lms_activity={student.lms_activity}
                       index={index}
                     />
                   ))}
@@ -103,26 +99,22 @@ export default async function FoBPage() {
             </div>
           ))}
         </TabsContent>
-        <TabsContent
-          value="diploma"
-          className="flex flex-col lg:grid grid-cols-2 gap-4 "
-        >
-          <p className="text-sm italic font-bold lg:col-span-2">
-            Diploma Students
-          </p>
+        <TabsContent value="diploma" className="flex flex-col  gap-4 ">
+          <p className="text-sm italic font-bold ">Diploma Students</p>
           {uniqueProgrammesDiploma.map((programme, index) => (
             <div key={index}>
               <p className="text-md font-bold py-2">
                 <ChevronRight className="min-w-4 min-h-4 inline-block" />
                 {programme}
               </p>
-              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+              <div className="flex flex-col gap-2 lg:grid grid-cols-2 pb-4 border-b-2 border-b-foreground/10">
                 {fob_data
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
                       key={student.matric_no}
                       student={student}
+                      lms_activity={student.lms_activity}
                       index={index}
                     />
                   ))}
@@ -130,26 +122,22 @@ export default async function FoBPage() {
             </div>
           ))}
         </TabsContent>
-        <TabsContent
-          value="bachelor"
-          className="flex flex-col lg:grid grid-cols-2 gap-4"
-        >
-          <p className="text-sm italic font-bold lg:col-span-2">
-            Bachelor Students
-          </p>
+        <TabsContent value="bachelor" className="flex flex-col gap-4">
+          <p className="text-sm italic font-bold">Bachelor Students</p>
           {uniqueProgrammesBachelor.map((programme, index) => (
             <div key={index}>
               <p className="text-md font-bold py-2">
                 <ChevronRight className="min-w-4 min-h-4 inline-block" />
                 {programme}
               </p>
-              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10 lg:grid grid-cols-2">
                 {fob_data
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
                       key={student.matric_no}
                       student={student}
+                      lms_activity={student.lms_activity}
                       index={index}
                     />
                   ))}
@@ -157,26 +145,22 @@ export default async function FoBPage() {
             </div>
           ))}
         </TabsContent>
-        <TabsContent
-          value="master"
-          className="flex flex-col lg:grid grid-cols-2 gap-4"
-        >
-          <p className="text-sm italic font-bold lg:col-span-2">
-            Master Students
-          </p>
+        <TabsContent value="master" className="flex flex-col gap-4">
+          <p className="text-sm italic font-bold">Master Students</p>
           {uniqueProgrammesMaster.map((programme, index) => (
             <div key={index}>
               <p className="text-md font-bold py-2">
                 <ChevronRight className="min-w-4 min-h-4 inline-block" />
                 {programme}
               </p>
-              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+              <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
                 {fob_data
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
                       key={student.matric_no}
                       student={student}
+                      lms_activity={student.lms_activity}
                       index={index}
                     />
                   ))}
@@ -184,26 +168,22 @@ export default async function FoBPage() {
             </div>
           ))}
         </TabsContent>
-        <TabsContent
-          value="doctorate"
-          className="flex flex-col lg:grid grid-cols-2 gap-4"
-        >
-          <p className="text-sm italic font-bold lg:col-span-2">
-            Doctorate Students
-          </p>
+        <TabsContent value="doctorate" className="flex flex-col gap-4">
+          <p className="text-sm italic font-bold">Doctorate Students</p>
           {uniqueProgrammesDoctorate.map((programme, index) => (
             <div key={index}>
               <p className="text-md font-bold py-2">
                 <ChevronRight className="min-w-4 min-h-4 inline-block" />
                 {programme}
               </p>
-              <div className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10">
+              <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
                 {fob_data
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
                       key={student.matric_no}
                       student={student}
+                      lms_activity={student.lms_activity}
                       index={index}
                     />
                   ))}

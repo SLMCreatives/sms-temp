@@ -88,7 +88,14 @@ export function Hero() {
             </CardContent>
           </Card>
         </div>
-        <Button variant={"default"} asChild>
+        <Button variant={"default"} className="text-md mt-4" asChild>
+          <Link href="/student">Student List</Link>
+        </Button>
+        <Button
+          variant={"link"}
+          className="text-sm font-thin -mt-4 italic"
+          asChild
+        >
           <Link href="/auth/sign-up">Let&apos;s Get Started</Link>
         </Button>
       </div>
