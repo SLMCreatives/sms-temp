@@ -37,7 +37,7 @@ export type Students = {
   programme_code: string;
   programme_name: string;
   faculty_code: string;
-  status: "Active" | "Lost" | "Withdrawn" | "Deferred" | "change-program";
+  status: "Active" | "At-Risk" | "Withdrawn" | "Deferred";
   admission_date: string;
   nationality: string;
   entry_type: string;

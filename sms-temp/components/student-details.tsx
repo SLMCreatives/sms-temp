@@ -78,7 +78,22 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                     <p className="text-sm md:text-base text-muted-foreground mb-3">
                       Matric No: {studentData.matric_no}
                     </p>
-                    <Badge variant="outline">{studentData.status}</Badge>
+                    <div className="flex flex-row justify-between w-full">
+                      <Badge variant="default">{studentData.status}</Badge>
+                      {/*  <Drawer>
+                        <DrawerTrigger asChild>
+                          <Button variant="secondary">
+                            <SquarePen className="w-4 h-4" /> Edit Status
+                          </Button>
+                        </DrawerTrigger>
+                        <DrawerContent>
+                          <DrawerHeader>
+                            <DrawerTitle>Edit Student Status</DrawerTitle>
+                          </DrawerHeader>
+                          <ChangeStatusForm student={studentData} />
+                        </DrawerContent>
+                      </Drawer> */}
+                    </div>
                   </div>
                 </div>
 
