@@ -7,7 +7,6 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
-import { n_feh, n_fob, n_sit } from "../student/page";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import {
@@ -25,9 +24,24 @@ import {
   DrawerTitle,
   DrawerTrigger
 } from "@/components/ui/drawer";
+import { Students } from "../student/studentColumns";
 
 export const dynamic = "force-dynamic";
 const supabase = createClient();
+
+async function getData(): Promise<Students[]> {
+  const { data: students, error } = await supabase.from("students").select("*");
+  if (error) {
+    console.log("Error fetching data:", error.message);
+    return [];
+  }
+  return students as Students[];
+}
+
+const data = await getData();
+const n_fob = data.filter((student) => student.faculty_code === "FOB").length;
+const n_feh = data.filter((student) => student.faculty_code === "FEH").length;
+const n_sit = data.filter((student) => student.faculty_code === "SIT").length;
 
 export default async function EngagementPage() {
   // Create and await the client

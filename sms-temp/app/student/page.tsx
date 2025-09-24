@@ -16,15 +16,9 @@ async function getData(): Promise<Students[]> {
 }
 
 const data = await getData();
-export const n_fob = data.filter(
-  (student) => student.faculty_code === "FOB"
-).length;
-export const n_feh = data.filter(
-  (student) => student.faculty_code === "FEH"
-).length;
-export const n_sit = data.filter(
-  (student) => student.faculty_code === "SIT"
-).length;
+const n_fob = data.filter((student) => student.faculty_code === "FOB").length;
+const n_feh = data.filter((student) => student.faculty_code === "FEH").length;
+const n_sit = data.filter((student) => student.faculty_code === "SIT").length;
 export default async function DemoPage() {
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start">
