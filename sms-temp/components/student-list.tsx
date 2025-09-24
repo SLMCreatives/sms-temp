@@ -38,12 +38,12 @@ export function StudentList({
         </div>
       </CardContent>
       <CardFooter className="w-full flex flex-row gap-2 justify-end h-full">
-        {lms_activity && lms_activity.srb_progress === 0 ? (
+        {lms_activity && lms_activity.course_progress < 0.1 ? (
           <Tooltip>
             <TooltipTrigger>
               <AlertCircle className="min-w-6 min-h-6 text-red-500" />
             </TooltipTrigger>
-            <TooltipContent>0% SRB Progress</TooltipContent>
+            <TooltipContent>less than 10% CP</TooltipContent>
           </Tooltip>
         ) : null}{" "}
         <Drawer>
@@ -54,7 +54,7 @@ export function StudentList({
             <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
               <DrawerTitle className="w-full flex flex-row justify-between py-6">
                 {student.matric_no}
-                {/* <div className="flex flex-row gap-4">
+                <div className="flex flex-row gap-4">
                   <Link href={`tel:6${student.phone.replace(/[-]/g, "")}`}>
                     <Phone className="h-6 w-6 text-cyan-500" />
                   </Link>
@@ -66,7 +66,7 @@ export function StudentList({
                   <Link href={`mailto:${student.email}`}>
                     <Mail className="h-6 w-6 text-slate-500" />
                   </Link>
-                </div> */}
+                </div>
               </DrawerTitle>
               <p className="text-2xl font-bold line-clamp-2 ">
                 {student.full_name}
@@ -142,7 +142,7 @@ export function StudentList({
                       readOnly
                       value={student.lms_activity.course_progress + "%"}
                       className={`w-full ${
-                        student.lms_activity.course_progress === 0
+                        student.lms_activity.course_progress < 0.1
                           ? "text-red-500 font-bold"
                           : ""
                       }`}
@@ -151,7 +151,7 @@ export function StudentList({
                 )}
               </div>
 
-              <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
+              {/* <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
                 <p className="text-md group-hover:font-bold">Contact Student</p>
                 <div className="flex flex-row gap-4">
                   <Link href={`tel:6${student.phone.replace(/[-]/g, "")}`}>
@@ -166,11 +166,11 @@ export function StudentList({
                     <Mail className="h-6 w-6 text-slate-500" />
                   </Link>
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
                 <p className="text-md group-hover:font-bold">
-                  View Student Page
+                  View Student Page & Add Engagement
                 </p>
                 <div className="flex flex-row gap-2">
                   <Link href={`/student/${student.matric_no}`}>

@@ -2,7 +2,7 @@ import { StudentList } from "@/components/student-list";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "../studentColumns";
-import { ChevronRight } from "lucide-react";
+import { AlertCircle, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const supabase = createClient();
@@ -62,7 +62,7 @@ export default async function FoBPage() {
   ];
 
   const atRisk = fob_data.filter(
-    (student) => student.lms_activity?.srb_progress === 0
+    (student) => student.lms_activity?.course_progress < 0.1
   );
 
   return (
@@ -72,6 +72,10 @@ export default async function FoBPage() {
         <Badge variant={"default"}>At Risk: {fob_data.length}</Badge>
         <Badge variant={"destructive"}>At Risk: {atRisk.length}</Badge>
         <Badge variant={"outline"}>Lost: {0}</Badge>
+      </div>
+      <div className="flex flex-row gap-2 items-center justify-center">
+        <AlertCircle className="min-w-6 min-h-6 text-red-500" /> At Risk
+        Students - less than 10% Course Progress
       </div>
       <Tabs className="lg:min-w-[760px] w-full" defaultValue="foundation">
         <TabsList className="w-full">
