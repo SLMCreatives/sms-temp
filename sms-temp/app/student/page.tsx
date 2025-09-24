@@ -15,11 +15,11 @@ async function getData(): Promise<Students[]> {
   return students as Students[];
 }
 
-const data = await getData();
-const n_fob = data.filter((student) => student.faculty_code === "FOB").length;
-const n_feh = data.filter((student) => student.faculty_code === "FEH").length;
-const n_sit = data.filter((student) => student.faculty_code === "SIT").length;
 export default async function DemoPage() {
+  const data = await getData();
+  const n_fob = data.filter((student) => student.faculty_code === "FOB").length;
+  const n_feh = data.filter((student) => student.faculty_code === "FEH").length;
+  const n_sit = data.filter((student) => student.faculty_code === "SIT").length;
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start">
       {/* <div className="md:flex hidden flex-col gap-2 items-start">
