@@ -56,6 +56,13 @@ const handleDeleteEngagement = async (engagementId: string) => {
 };
 
 const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
+  const dateFormated = (dateString: string) => {
+    // convert date to locate string
+    const date = new Date(dateString);
+    const localisedDate = date.toLocaleDateString("en-MY");
+    const localisedTime = date.toLocaleTimeString("en-MY");
+    return `${localisedDate} ${localisedTime}`;
+  };
   return (
     <div className="min-h-screen bg-background w-full">
       <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
@@ -215,10 +222,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                   LMS Activity
                 </CardTitle>
                 <CardDescription className="text-sm text-muted-foreground italic">
-                  Data as of:{" "}
-                  {(studentData.lms_activity &&
-                    studentData.lms_activity.updated_at.slice(5, 10)) ||
-                    "Unknown"}
+                  Data as of: 22 Sept 2025
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-3">
@@ -251,7 +255,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                   <p className="font-medium text-foreground text-sm md:text-base">
                     {studentData.lms_activity === null && "Unknown"}
                     {(studentData.lms_activity &&
-                      studentData.lms_activity.last_login_at) ||
+                      dateFormated(studentData.lms_activity.last_login_at)) ||
                       "Unknown"}
                   </p>
                 </div>
