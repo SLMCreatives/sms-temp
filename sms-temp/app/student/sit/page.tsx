@@ -63,9 +63,10 @@ export default async function SITPage() {
         School of Information Technology
       </p>
       <div className="flex flex-row gap-2 justify-between divide-x-2">
-        <Badge variant={"default"}>At Risk: {sit_data.length}</Badge>
+        <Badge variant={"default"}>Students: {sit_data.length}</Badge>
         <Badge variant={"destructive"}>At Risk: {atRisk.length}</Badge>
-        <Badge variant={"outline"}>Lost: {0}</Badge>
+        {/*         <Badge variant={"outline"}>Lost: {0}</Badge>
+         */}{" "}
       </div>
       <div className="flex flex-row gap-2 items-center justify-center">
         <AlertCircle className="min-w-6 min-h-6 text-red-500" /> At Risk

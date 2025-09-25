@@ -76,9 +76,10 @@ export default async function FEHPage() {
         Faculty of Education & Humanities
       </p>
       <div className="flex flex-row gap-2 justify-between w-full lg:w-fit">
-        <Badge variant={"default"}>At Risk: {feh_data.length}</Badge>
+        <Badge variant={"default"}>Students: {feh_data.length}</Badge>
         <Badge variant={"destructive"}>At Risk: {atRisk.length}</Badge>
-        <Badge variant={"outline"}>Lost: {0}</Badge>
+        {/*         <Badge variant={"outline"}>Lost: {0}</Badge>
+         */}{" "}
       </div>
       <div className="flex flex-row gap-2 items-center justify-center">
         <AlertCircle className="min-w-6 min-h-6 text-red-500" /> At Risk

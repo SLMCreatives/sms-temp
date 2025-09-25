@@ -69,9 +69,10 @@ export default async function FoBPage() {
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
       <p className="text-2xl italic font-bold">Faculty of Business</p>
       <div className="flex flex-row gap-2 justify-between divide-x-2">
-        <Badge variant={"default"}>At Risk: {fob_data.length}</Badge>
+        <Badge variant={"default"}>Students: {fob_data.length}</Badge>
         <Badge variant={"destructive"}>At Risk: {atRisk.length}</Badge>
-        <Badge variant={"outline"}>Lost: {0}</Badge>
+        {/*         <Badge variant={"outline"}>Lost: {0}</Badge>
+         */}{" "}
       </div>
       <div className="flex flex-row gap-2 items-center justify-center">
         <AlertCircle className="min-w-6 min-h-6 text-red-500" /> At Risk
