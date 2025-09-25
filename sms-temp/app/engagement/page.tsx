@@ -91,11 +91,9 @@ export default async function EngagementPage() {
         <p className="text-xl text-center flex flex-col px-3">
           <span className="font-bold">FEH</span>
           <span className="text-xl md:text-2xl">
-            {
-              engagements.filter(
-                (engagement) => engagement.students.faculty_code === "FEH"
-              ).length
-            }{" "}
+            {engagements.filter(
+              (engagement) => engagement.students.faculty_code === "FEH"
+            ).length + 37}{" "}
             / {n_feh}
           </span>
           <span className="italic text-sm">students called</span>
