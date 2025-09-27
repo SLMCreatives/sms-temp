@@ -22,9 +22,7 @@ async function getData(): Promise<Students[]> {
 export default async function FEHPage() {
   const feh_data = await getData();
   const active = feh_data.filter((student) => student.status === "Active");
-  const fob_lost = feh_data.filter(
-    (student) => student.status === "Withdraw" || student.status === "Deferred"
-  );
+  const fob_lost = feh_data.filter((student) => student.status === "Withdraw");
   /* const uniqueProgrames = [
     ...new Set(feh_data.map((item) => item.programme_name))
   ]; */

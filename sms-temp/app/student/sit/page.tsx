@@ -22,9 +22,7 @@ async function getData(): Promise<Students[]> {
 export default async function SITPage() {
   const sit_data = await getData();
   const sit_active = sit_data.filter((student) => student.status === "Active");
-  const sit_lost = sit_data.filter(
-    (student) => student.status === "Withdraw" || student.status === "Deferred"
-  );
+  const sit_lost = sit_data.filter((student) => student.status === "Withdraw");
   const uniqueProgrammesMaster = [
     ...new Set(
       sit_data

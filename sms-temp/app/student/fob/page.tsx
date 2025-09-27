@@ -22,9 +22,7 @@ async function getData(): Promise<Students[]> {
 export default async function FoBPage() {
   const fob_data = await getData();
   const fob_active = fob_data.filter((student) => student.status === "Active");
-  const fob_lost = fob_data.filter(
-    (student) => student.status === "Withdraw" || student.status === "Deferred"
-  );
+  const fob_lost = fob_data.filter((student) => student.status === "Withdraw");
   const uniqueProgrammesMaster = [
     ...new Set(
       fob_data
