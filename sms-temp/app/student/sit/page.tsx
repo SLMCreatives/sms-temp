@@ -2,7 +2,7 @@ import { StudentList } from "@/components/student-list";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "../studentColumns";
-import { AlertCircle, ChevronRight } from "lucide-react";
+import { AlertCircle, BadgeX, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const supabase = createClient();
@@ -21,10 +21,17 @@ async function getData(): Promise<Students[]> {
 
 export default async function SITPage() {
   const sit_data = await getData();
+  const sit_active = sit_data.filter((student) => student.status === "Active");
+  const sit_lost = sit_data.filter(
+    (student) => student.status === "Withdraw" || student.status === "Deferred"
+  );
   const uniqueProgrammesMaster = [
     ...new Set(
       sit_data
-        .filter((student) => student.study_level === "Master")
+        .filter(
+          (student) =>
+            student.study_level === "Master" && student.status === "Active"
+        )
         .map((item) => item.programme_name)
     )
   ];
@@ -32,7 +39,10 @@ export default async function SITPage() {
   const uniqueProgrammesFoundation = [
     ...new Set(
       sit_data
-        .filter((student) => student.study_level === "Foundation")
+        .filter(
+          (student) =>
+            student.study_level === "Foundation" && student.status === "Active"
+        )
         .map((item) => item.programme_name)
     )
   ];
@@ -48,12 +58,15 @@ export default async function SITPage() {
   const uniqueProgrammesBachelor = [
     ...new Set(
       sit_data
-        .filter((student) => student.study_level === "Bachelor")
+        .filter(
+          (student) =>
+            student.study_level === "Bachelor" && student.status === "Active"
+        )
         .map((item) => item.programme_name)
     )
   ];
 
-  const atRisk = sit_data.filter(
+  const atRisk = sit_active.filter(
     (student) => student.lms_activity?.course_progress < 0.1
   );
 
@@ -63,14 +76,19 @@ export default async function SITPage() {
         School of Information Technology
       </p>
       <div className="flex flex-row gap-2 justify-between divide-x-2">
-        <Badge variant={"default"}>Students: {sit_data.length}</Badge>
+        <Badge variant={"default"}>Students: {sit_active.length}</Badge>
         <Badge variant={"destructive"}>At Risk: {atRisk.length}</Badge>
-        {/*         <Badge variant={"outline"}>Lost: {0}</Badge>
-         */}{" "}
+        <Badge variant={"outline"}>Lost: {sit_lost.length}</Badge>
       </div>
-      <div className="flex flex-row gap-2 items-center justify-center">
-        <AlertCircle className="min-w-6 min-h-6 text-red-500" /> At Risk
-        Students - less than 10% Course Progress
+      <div className="flex flex-col gap-2 items-start">
+        <div className="flex flex-row gap-2">
+          <AlertCircle className="min-w-6 min-h-6 text-yellow-500" /> At Risk
+          (less than 10% Course Progress on CN)
+        </div>
+        <div className="flex flex-row gap-2">
+          <BadgeX className="min-w-6 min-h-6 text-red-500" /> Withdrawn /
+          Deferred
+        </div>
       </div>
       <Tabs className="w-full" defaultValue="foundation">
         <TabsList className="w-full">

@@ -2,7 +2,7 @@ import { StudentList } from "@/components/student-list";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "../studentColumns";
-import { AlertCircle, ChevronRight } from "lucide-react";
+import { AlertCircle, BadgeX, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const supabase = createClient();
@@ -21,6 +21,10 @@ async function getData(): Promise<Students[]> {
 
 export default async function FEHPage() {
   const feh_data = await getData();
+  const active = feh_data.filter((student) => student.status === "Active");
+  const fob_lost = feh_data.filter(
+    (student) => student.status === "Withdraw" || student.status === "Deferred"
+  );
   /* const uniqueProgrames = [
     ...new Set(feh_data.map((item) => item.programme_name))
   ]; */
@@ -28,7 +32,10 @@ export default async function FEHPage() {
   const uniqueProgrammesMaster = [
     ...new Set(
       feh_data
-        .filter((student) => student.study_level === "Master")
+        .filter(
+          (student) =>
+            student.study_level === "Master" && student.status === "Active"
+        )
         .map((item) => item.programme_name)
     )
   ];
@@ -36,7 +43,10 @@ export default async function FEHPage() {
   const uniqueProgrammesFoundation = [
     ...new Set(
       feh_data
-        .filter((student) => student.study_level === "Foundation")
+        .filter(
+          (student) =>
+            student.study_level === "Foundation" && student.status === "Active"
+        )
         .map((item) => item.programme_name)
     )
   ];
@@ -44,7 +54,10 @@ export default async function FEHPage() {
   const unqueProgrammesDiploma = [
     ...new Set(
       feh_data
-        .filter((student) => student.study_level === "Diploma")
+        .filter(
+          (student) =>
+            student.study_level === "Diploma" && student.status === "Active"
+        )
         .map((item) => item.programme_name)
     )
   ];
@@ -52,7 +65,10 @@ export default async function FEHPage() {
   const uniqueProgrammesBachelor = [
     ...new Set(
       feh_data
-        .filter((student) => student.study_level === "Bachelor")
+        .filter(
+          (student) =>
+            student.study_level === "Bachelor" && student.status === "Active"
+        )
         .map((item) => item.programme_name)
     )
   ];
@@ -60,12 +76,15 @@ export default async function FEHPage() {
   const uniqueProgrammesDoctorate = [
     ...new Set(
       feh_data
-        .filter((student) => student.study_level === "Doctorate")
+        .filter(
+          (student) =>
+            student.study_level === "Doctorate" && student.status === "Active"
+        )
         .map((item) => item.programme_name)
     )
   ];
 
-  const atRisk = feh_data.filter(
+  const atRisk = active.filter(
     (student) => student.lms_activity?.course_progress === 0
   );
   //const lost = feh_data.filter((student) => student.status === "Lost");
@@ -76,14 +95,19 @@ export default async function FEHPage() {
         Faculty of Education & Humanities
       </p>
       <div className="flex flex-row gap-2 justify-between w-full lg:w-fit">
-        <Badge variant={"default"}>Students: {feh_data.length}</Badge>
+        <Badge variant={"default"}>Students: {active.length}</Badge>
         <Badge variant={"destructive"}>At Risk: {atRisk.length}</Badge>
-        {/*         <Badge variant={"outline"}>Lost: {0}</Badge>
-         */}{" "}
+        <Badge variant={"outline"}>Lost: {fob_lost.length}</Badge>
       </div>
-      <div className="flex flex-row gap-2 items-center justify-center">
-        <AlertCircle className="min-w-6 min-h-6 text-red-500" /> At Risk
-        Students - less than 10% Course Progress
+      <div className="flex flex-col gap-2 items-start">
+        <div className="flex flex-row gap-2">
+          <AlertCircle className="min-w-6 min-h-6 text-yellow-500" /> At Risk
+          (less than 10% Course Progress on CN)
+        </div>
+        <div className="flex flex-row gap-2">
+          <BadgeX className="min-w-6 min-h-6 text-red-500" /> Withdrawn /
+          Deferred
+        </div>
       </div>
       <Tabs className="w-full" defaultValue="foundation">
         <TabsList className="w-full">

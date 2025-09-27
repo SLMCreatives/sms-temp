@@ -39,9 +39,16 @@ async function getData(): Promise<Students[]> {
 }
 
 const data = await getData();
-const n_fob = data.filter((student) => student.faculty_code === "FOB").length;
-const n_feh = data.filter((student) => student.faculty_code === "FEH").length;
-const n_sit = data.filter((student) => student.faculty_code === "SIT").length;
+//const data_active = data.filter((student) => student.status === "Active");
+const n_fob = data.filter(
+  (student) => student.faculty_code === "FOB" && student.status === "Active"
+).length;
+const n_feh = data.filter(
+  (student) => student.faculty_code === "FEH" && student.status === "Active"
+).length;
+const n_sit = data.filter(
+  (student) => student.faculty_code === "SIT" && student.status === "Active"
+).length;
 
 export default async function EngagementPage() {
   // Create and await the client
@@ -81,7 +88,9 @@ export default async function EngagementPage() {
           <span className="text-xl md:text-2xl">
             {
               engagements.filter(
-                (engagement) => engagement.students.faculty_code === "FOB"
+                (engagement) =>
+                  engagement.students.faculty_code === "FOB" &&
+                  engagement.students.status === "Active"
               ).length
             }{" "}
             / {n_fob}
@@ -92,7 +101,9 @@ export default async function EngagementPage() {
           <span className="font-bold">FEH</span>
           <span className="text-xl md:text-2xl">
             {engagements.filter(
-              (engagement) => engagement.students.faculty_code === "FEH"
+              (engagement) =>
+                engagement.students.faculty_code === "FEH" &&
+                engagement.students.status === "Active"
             ).length + 37}{" "}
             / {n_feh}
           </span>
@@ -103,7 +114,9 @@ export default async function EngagementPage() {
           <span className="text-xl md:text-2xl">
             {
               engagements.filter(
-                (engagement) => engagement.students.faculty_code === "SIT"
+                (engagement) =>
+                  engagement.students.faculty_code === "SIT" &&
+                  engagement.students.status === "Active"
               ).length
             }{" "}
             / {n_sit}
