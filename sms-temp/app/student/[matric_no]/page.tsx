@@ -4,7 +4,7 @@ import StudentDetailsPage from "@/components/student-details";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useEffect, useState, use } from "react";
-import { Students } from "../studentColumns";
+import { Comments, Students } from "../studentColumns";
 
 const supabase = createClient();
 
@@ -39,6 +39,25 @@ export default function StudentPage({
     fetchStudent();
   }, [matric_no]);
 
+  const [comments, setComments] = useState<Comments[] | null>(null);
+
+  useEffect(() => {
+    async function fetchComments() {
+      try {
+        const { data, error } = await supabase
+          .from("comments")
+          .select("*")
+          .eq("engagement_id", student?.engagements[0]?.id);
+        if (error) throw error;
+        setComments(data);
+      } catch (error) {
+        console.log("Error fetching comments:", error);
+      }
+    }
+
+    fetchComments();
+  }, [student]);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!student) return <div>No student found</div>;
@@ -51,7 +70,7 @@ export default function StudentPage({
       >
         &larr; Back
       </Link>
-      <StudentDetailsPage studentData={student} />
+      <StudentDetailsPage studentData={student} comments={comments || []} />
     </main>
   );
 }

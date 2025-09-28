@@ -25,6 +25,16 @@ import {
   DrawerTrigger
 } from "@/components/ui/drawer";
 import { Students } from "../student/studentColumns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import CommentSection from "@/components/comment-section";
+//import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 const supabase = createClient();
@@ -54,7 +64,7 @@ export default async function EngagementPage() {
   // Create and await the client
   const { data: engagements, error } = await supabase
     .from("engagements")
-    .select("*, students(*)")
+    .select("*, students(*),comments(*)")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -71,13 +81,6 @@ export default async function EngagementPage() {
     const localisedTime = date.toLocaleTimeString("en-MY");
     return `${localisedDate} ${localisedTime}`; // localisedDate localisedTime;
   };
-
-  /* const feh_engagement = engagements.filter(
-    (engagement) => engagement.faculty_code === "FEH"
-  );
-  const sit_engagement = engagements.filter(
-    (engagement) => engagement.faculty_code === "SIT"
-  ); */
 
   return (
     <div className="flex flex-col gap-4 p-10 lg:grid grid-cols-3">
@@ -167,148 +170,166 @@ export default async function EngagementPage() {
                   {engagement.outcome.replace("_", " ")}
                 </Badge>
               </div>
-              <Drawer>
-                <DrawerTrigger asChild>
-                  <ArrowUpCircle className="min-w-6 min-h-6 text-purple-500 cursor-pointer" />
-                </DrawerTrigger>
-                <DrawerContent className="w-full min-h-full lg:max-w-2xl mx-auto overflow-scroll ring">
-                  <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
-                    <DrawerTitle className="w-full flex flex-row justify-between">
-                      {engagement.students.matric_no}
-                      <div className="flex flex-row gap-4">
-                        <Link
-                          href={`tel:6${engagement.students.phone.replace(
-                            /[-]/g,
-                            ""
-                          )}`}
-                        >
-                          <Phone className="h-6 w-6 text-cyan-500" />
-                        </Link>
-                        <Link
-                          href={`https://wa.me/6${engagement.students.phone.replace(
-                            /[-]/g,
-                            ""
-                          )}`}
-                        >
-                          <MessageCircle className="h-6 w-6 text-green-500" />
-                        </Link>
-                        <Link href={`mailto:${engagement.students.email}`}>
-                          <Mail className="h-6 w-6 text-slate-500" />
-                        </Link>
-                      </div>
-                    </DrawerTitle>
-                    <p className="text-2xl font-bold line-clamp-2 ">
-                      {engagement.students.full_name}
-                    </p>
-                    <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
-                      <Label
-                        htmlFor="programme_code"
-                        className="text-xs italic text-slate-500"
-                      >
-                        Programme Name
-                      </Label>
-                      <Input
-                        name="programme_code"
-                        readOnly
-                        value={engagement.students.programme_name}
-                      />
-                      <Label
-                        htmlFor="email"
-                        className="text-xs italic text-slate-500"
-                      >
-                        Email
-                      </Label>
-                      <Input
-                        name="email"
-                        readOnly
-                        value={engagement.students.email.toLocaleLowerCase()}
-                      />
-                      <Label
-                        htmlFor="phone"
-                        className="text-xs italic text-slate-500"
-                      >
-                        Phone No.
-                      </Label>
-                      <Input
-                        name="phone"
-                        readOnly
-                        value={engagement.students.phone}
-                      />
-                      <Label
-                        htmlFor="nationality"
-                        className="text-xs italic text-slate-500"
-                      >
-                        Nationality
-                      </Label>
-                      <Input
-                        name="nationality"
-                        readOnly
-                        value={engagement.students.nationality}
-                      />
-                      {engagement.students.lms_activity && (
-                        <>
-                          <p className="text-md font-bold col-span-2">
-                            CN Activity
-                          </p>
-                          <Label
-                            htmlFor="lms_activity"
-                            className="text-xs italic text-slate-500"
-                          >
-                            SRB Progress
-                          </Label>
-                          <Input
-                            name="lms_activity"
-                            readOnly
-                            value={
-                              engagement.students.lms_activity.srb_progress +
-                              "%"
-                            }
-                            className={`w-full ${
-                              engagement.students.lms_activity.srb_progress ===
-                              0
-                                ? "text-red-500 font-bold"
-                                : ""
-                            }`}
-                          />
-                          <Label
-                            htmlFor="lms_activity"
-                            className="text-xs italic text-slate-500"
-                          >
-                            Course Progress
-                          </Label>
-                          <Input
-                            name="lms_activity"
-                            readOnly
-                            value={
-                              engagement.students.lms_activity.course_progress +
-                              "%"
-                            }
-                            className={`w-full ${
-                              engagement.students.lms_activity
-                                .course_progress === 0
-                                ? "text-red-500 font-bold"
-                                : ""
-                            }`}
-                          />
-                        </>
-                      )}
-                    </div>
+              <div className="flex flex-row gap-4 justify-end">
+                {engagement.comments && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="link" size={"sm"} className="px-0">
+                        Comments ({engagement.comments.length})
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Comment Section</DialogTitle>
+                      </DialogHeader>
 
-                    <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
-                      <p className="text-md group-hover:font-bold">
-                        View Student Page
+                      <CommentSection engagementId={engagement.id} />
+                    </DialogContent>
+                  </Dialog>
+                )}
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <ArrowUpCircle className="min-w-6 min-h-6 text-purple-500 cursor-pointer" />
+                  </DrawerTrigger>
+                  <DrawerContent className="w-full min-h-full lg:max-w-2xl mx-auto overflow-scroll">
+                    <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
+                      <DrawerTitle className="w-full flex flex-row justify-between">
+                        {engagement.students.matric_no}
+                        <div className="flex flex-row gap-4">
+                          <Link
+                            href={`tel:6${engagement.students.phone.replace(
+                              /[-]/g,
+                              ""
+                            )}`}
+                          >
+                            <Phone className="h-6 w-6 text-cyan-500" />
+                          </Link>
+                          <Link
+                            href={`https://wa.me/6${engagement.students.phone.replace(
+                              /[-]/g,
+                              ""
+                            )}`}
+                          >
+                            <MessageCircle className="h-6 w-6 text-green-500" />
+                          </Link>
+                          <Link href={`mailto:${engagement.students.email}`}>
+                            <Mail className="h-6 w-6 text-slate-500" />
+                          </Link>
+                        </div>
+                      </DrawerTitle>
+                      <p className="text-2xl font-bold line-clamp-2 ">
+                        {engagement.students.full_name}
                       </p>
-                      <div className="flex flex-row gap-2">
-                        <Link
-                          href={`/student/${engagement.students.matric_no}`}
+                      <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                        <Label
+                          htmlFor="programme_code"
+                          className="text-xs italic text-slate-500"
                         >
-                          <ArrowRightCircle className="w-6 h-6 text-orange-500 group-hover:text-orange-600" />
-                        </Link>
+                          Programme Name
+                        </Label>
+                        <Input
+                          name="programme_code"
+                          readOnly
+                          value={engagement.students.programme_name}
+                        />
+                        <Label
+                          htmlFor="email"
+                          className="text-xs italic text-slate-500"
+                        >
+                          Email
+                        </Label>
+                        <Input
+                          name="email"
+                          readOnly
+                          value={engagement.students.email.toLocaleLowerCase()}
+                        />
+                        <Label
+                          htmlFor="phone"
+                          className="text-xs italic text-slate-500"
+                        >
+                          Phone No.
+                        </Label>
+                        <Input
+                          name="phone"
+                          readOnly
+                          value={engagement.students.phone}
+                        />
+                        <Label
+                          htmlFor="nationality"
+                          className="text-xs italic text-slate-500"
+                        >
+                          Nationality
+                        </Label>
+                        <Input
+                          name="nationality"
+                          readOnly
+                          value={engagement.students.nationality}
+                        />
+                        {engagement.students.lms_activity && (
+                          <>
+                            <p className="text-md font-bold col-span-2">
+                              CN Activity
+                            </p>
+                            <Label
+                              htmlFor="lms_activity"
+                              className="text-xs italic text-slate-500"
+                            >
+                              SRB Progress
+                            </Label>
+                            <Input
+                              name="lms_activity"
+                              readOnly
+                              value={
+                                engagement.students.lms_activity.srb_progress +
+                                "%"
+                              }
+                              className={`w-full ${
+                                engagement.students.lms_activity
+                                  .srb_progress === 0
+                                  ? "text-red-500 font-bold"
+                                  : ""
+                              }`}
+                            />
+                            <Label
+                              htmlFor="lms_activity"
+                              className="text-xs italic text-slate-500"
+                            >
+                              Course Progress
+                            </Label>
+                            <Input
+                              name="lms_activity"
+                              readOnly
+                              value={
+                                engagement.students.lms_activity
+                                  .course_progress + "%"
+                              }
+                              className={`w-full ${
+                                engagement.students.lms_activity
+                                  .course_progress === 0
+                                  ? "text-red-500 font-bold"
+                                  : ""
+                              }`}
+                            />
+                          </>
+                        )}
+                      </div>
+
+                      <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
+                        <p className="text-md group-hover:font-bold">
+                          View Student Page
+                        </p>
+                        <div className="flex flex-row gap-2">
+                          <Link
+                            href={`/student/${engagement.students.matric_no}`}
+                          >
+                            <ArrowRightCircle className="w-6 h-6 text-orange-500 group-hover:text-orange-600" />
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </DrawerContent>
-              </Drawer>
+                  </DrawerContent>
+                </Drawer>
+              </div>
             </div>
           </CardFooter>
         </Card>

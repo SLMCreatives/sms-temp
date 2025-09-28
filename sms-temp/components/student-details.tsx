@@ -19,10 +19,9 @@ import {
   BookOpen,
   Globe,
   FileText,
-  CheckCircle,
-  Trash2
+  CheckCircle
 } from "lucide-react";
-import { Students } from "@/app/student/studentColumns";
+//import { Comments, Students } from "@/app/student/studentColumns";
 import { EngagementForm } from "./engagement-form";
 //import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 //import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
@@ -34,28 +33,25 @@ import {
   SheetTrigger
 } from "./ui/sheet";
 import { Button } from "./ui/button";
-import { createClient } from "@/lib/supabase/client";
+//import { createClient } from "@/lib/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "./ui/dialog";
+import CommentSection from "./comment-section";
+import { Comments, Students } from "@/app/student/studentColumns";
 
 interface StudentDetailsProps {
   studentData: Students;
+  comments: Comments[];
 }
-const supabase = createClient();
-const handleDeleteEngagement = async (engagementId: string) => {
-  // Implement the logic to delete the engagement
-
-  const { error } = await supabase
-    .from("engagements")
-    .delete()
-    .eq("id", engagementId);
-
-  if (error) {
-    console.log("Error deleting engagement:", error.message);
-    return;
-  }
-  window.location.reload();
-};
-
-const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
+const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
+  studentData,
+  comments
+}) => {
   const dateFormated = (dateString: string) => {
     // convert date to locate string
     const date = new Date(dateString);
@@ -63,6 +59,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
     const localisedTime = date.toLocaleTimeString("en-MY");
     return `${localisedDate} ${localisedTime}`;
   };
+
   return (
     <div className="min-h-screen bg-background w-full">
       <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
@@ -78,29 +75,17 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
               </CardHeader>
               <CardContent className="space-y-4 md:space-y-6">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
-                  <div className="flex-1 md:text-center text-left">
-                    <h2 className="text-xl md:text-2xl font-bold text-foreground mb-1">
+                  <div className="flex-1 text-left">
+                    <h2 className="text-xl md:text-2xl lg:text-5xl font-bold text-left text-foreground mb-1">
                       {studentData.full_name}
                     </h2>
-                    <p className="text-sm md:text-base text-muted-foreground mb-3">
+                    <p className="text-sm md:text-base text-muted-foreground mb-3 lg:mb-0 flex flex-row gap-2 items-center w-full">
                       Matric No: {studentData.matric_no}
-                    </p>
-                    <div className="flex flex-row justify-between w-full">
                       <Badge variant="default">{studentData.status}</Badge>
-                      {/*  <Drawer>
-                        <DrawerTrigger asChild>
-                          <Button variant="secondary">
-                            <SquarePen className="w-4 h-4" /> Edit Status
-                          </Button>
-                        </DrawerTrigger>
-                        <DrawerContent>
-                          <DrawerHeader>
-                            <DrawerTitle>Edit Student Status</DrawerTitle>
-                          </DrawerHeader>
-                          <ChangeStatusForm student={studentData} />
-                        </DrawerContent>
-                      </Drawer> */}
-                    </div>
+                    </p>
+                    {/*  <div className="flex flex-row justify-between w-full">
+                      <Badge variant="default">{studentData.status}</Badge>
+                    </div> */}
                   </div>
                 </div>
 
@@ -176,173 +161,174 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                 </div>
               </CardContent>
             </Card>
+
+            <div className="flex flex-col gap-4 col-span-2 lg:grid grid-cols-2 py-10">
+              <Card className="shadow-sm">
+                <CardHeader className="">
+                  <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5" />
+                    Academic Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 gap-3">
+                  <div className="">
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Programme
+                    </p>
+                    <p className="font-medium text-foreground text-sm md:text-base">
+                      {" "}
+                      {studentData.programme_name}
+                    </p>
+                  </div>
+                  <div className="">
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Faculty
+                    </p>
+                    <p className="font-medium text-foreground text-sm md:text-base">
+                      {" "}
+                      {studentData.faculty_code}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Study Level
+                    </p>
+                    <p className="font-medium text-foreground text-sm md:text-base">
+                      {studentData.study_level}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="shadow-sm">
+                <CardHeader className="">
+                  <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5" />
+                    LMS Activity
+                  </CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground italic">
+                    Data as of: 22 Sept 2025
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-3">
+                  <div className="">
+                    <p className="text-sm text-muted-foreground mb-1">
+                      SRB Progress
+                    </p>
+                    <p className="font-medium text-foreground text-sm md:text-base">
+                      {" "}
+                      {(studentData.lms_activity &&
+                        studentData.lms_activity.srb_progress + "%") ||
+                        "No record"}
+                    </p>
+                  </div>
+                  <div className="">
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Course Progress
+                    </p>
+                    <p className="font-medium text-foreground text-sm md:text-base">
+                      {(studentData.lms_activity &&
+                        studentData.lms_activity.course_progress + "%") ||
+                        "No record"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Last Login
+                    </p>
+                    <p className="font-medium text-foreground text-sm md:text-base">
+                      {studentData.lms_activity === null && "Unknown"}
+                      {(studentData.lms_activity &&
+                        dateFormated(studentData.lms_activity.last_login_at)) ||
+                        "Unknown"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Status</p>
+                    <p className="font-medium text-foreground text-sm md:text-base">
+                      {studentData.lms_activity === null ? "Unknown" : ""}
+                      {studentData.lms_activity &&
+                      studentData.lms_activity?.srb_progress < 10
+                        ? "⚠️ At Risk"
+                        : "Good"}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          {/* Academic Details Card */}
-          <div className="flex flex-col gap-4">
+          {/* Additional Information */}
+          <div className="mt-6 flex">
             <Card className="shadow-sm">
               <CardHeader className="">
                 <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5" />
-                  Academic Details
+                  <CheckCircle className="w-5 h-5" />
+                  Engagement Tracker
                 </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-3">
-                <div className="">
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Programme
-                  </p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    {" "}
-                    {studentData.programme_name}
-                  </p>
-                </div>
-                <div className="">
-                  <p className="text-sm text-muted-foreground mb-1">Faculty</p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    {" "}
-                    {studentData.faculty_code}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Study Level
-                  </p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    {studentData.study_level}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="shadow-sm">
-              <CardHeader className="">
-                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5" />
-                  LMS Activity
-                </CardTitle>
-                <CardDescription className="text-sm text-muted-foreground italic">
-                  Data as of: 22 Sept 2025
+                <CardDescription>
+                  Track and manage student engagement. Everytime you contact a
+                  students, please add it here.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-3">
-                <div className="">
-                  <p className="text-sm text-muted-foreground mb-1">
-                    SRB Progress
-                  </p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    {" "}
-                    {(studentData.lms_activity &&
-                      studentData.lms_activity.srb_progress + "%") ||
-                      "No record"}
-                  </p>
-                </div>
-                <div className="">
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Course Progress
-                  </p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    {(studentData.lms_activity &&
-                      studentData.lms_activity.course_progress + "%") ||
-                      "No record"}
-                  </p>
-                </div>
+              <CardContent className="grid grid-cols-1 gap-2">
+                {studentData.engagements.length === 0 && "No activity yet"}
+                {studentData.engagements.length > 0 &&
+                  studentData.engagements.map((engagement, index) => (
+                    <Card key={index} className="relative">
+                      <CardContent className="flex flex-col gap-2">
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(engagement.created_at)
+                            .toLocaleString()
+                            .slice(0, 10)}{" "}
+                          - {engagement.handled_by}
+                        </p>
+                        <p className="text-lg font-medium">
+                          {engagement.subject}{" "}
+                          <Badge variant={"default"}>
+                            {engagement.channel}
+                          </Badge>
+                        </p>
+                        <p className="text-sm italic">{engagement.body}</p>
+                      </CardContent>
+                      <CardFooter className="">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="link" size={"sm"} className="px-0">
+                              Comments ({comments.length})
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Comment Section</DialogTitle>
+                            </DialogHeader>
 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Last Login
-                  </p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    {studentData.lms_activity === null && "Unknown"}
-                    {(studentData.lms_activity &&
-                      dateFormated(studentData.lms_activity.last_login_at)) ||
-                      "Unknown"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Status</p>
-                  <p className="font-medium text-foreground text-sm md:text-base">
-                    {studentData.lms_activity === null ? "Unknown" : ""}
-                    {studentData.lms_activity &&
-                    studentData.lms_activity?.srb_progress < 10
-                      ? "⚠️ At Risk"
-                      : "Good"}
-                  </p>
-                </div>
+                            <CommentSection engagementId={engagement.id} />
+                          </DialogContent>
+                        </Dialog>
+                      </CardFooter>
+                    </Card>
+                  ))}
               </CardContent>
+              <CardFooter>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant={"default"}>Add Engagement</Button>
+                  </SheetTrigger>
+                  <SheetContent
+                    side="right"
+                    className="w-full h-full overflow-y-scroll lg:w-1/2"
+                  >
+                    <SheetHeader>
+                      <SheetTitle>Add Engagement</SheetTitle>
+                    </SheetHeader>
+                    <EngagementForm matric_no={studentData.matric_no} />
+                  </SheetContent>
+                </Sheet>
+              </CardFooter>
             </Card>
           </div>
-        </div>
-
-        {/* Additional Information */}
-        <div className="mt-6">
-          <Card className="shadow-sm">
-            <CardHeader className="">
-              <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                Engagement Tracker
-              </CardTitle>
-              <CardDescription>
-                Track and manage student engagement. Everytime you contact a
-                students, please add it here.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {studentData.engagements.length === 0 && "No activity yet"}
-              {studentData.engagements.length > 0 &&
-                studentData.engagements.map((engagement, index) => (
-                  <Card
-                    key={index}
-                    className="flex flex-row gap-2 justify-between items-end"
-                  >
-                    <CardContent className="flex flex-col gap-2">
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(engagement.created_at)
-                          .toLocaleString()
-                          .slice(0, 10)}{" "}
-                        - {engagement.handled_by}
-                      </p>
-                      <p className="text-lg font-medium">
-                        {engagement.subject}{" "}
-                        <Badge variant={"default"}>{engagement.channel}</Badge>
-                      </p>
-                      <p className="text-sm italic">{engagement.body}</p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button
-                        variant={"link"}
-                        size="icon"
-                        onClick={() => {
-                          handleDeleteEngagement(engagement.id);
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              {/*  <EngagementTable
-                columns={engagementColumns}
-                data={studentData.engagements}
-              /> */}
-            </CardContent>
-            <CardFooter>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant={"default"}>Add Engagement</Button>
-                </SheetTrigger>
-                <SheetContent
-                  side="right"
-                  className="w-full h-full overflow-y-scroll lg:w-1/2"
-                >
-                  <SheetHeader>
-                    <SheetTitle>Add Engagement</SheetTitle>
-                  </SheetHeader>
-                  <EngagementForm matric_no={studentData.matric_no} />
-                </SheetContent>
-              </Sheet>
-            </CardFooter>
-          </Card>
         </div>
       </div>
     </div>

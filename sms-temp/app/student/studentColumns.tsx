@@ -17,6 +17,18 @@ export type Engagements = {
   outcome: string;
   next_action_date: string;
   created_at: string;
+  comments: Comments[];
+};
+
+export type Comments = {
+  id: string;
+  engagement_id: string;
+  created_at: string;
+  created_by: string;
+  comment: string;
+  likes: number;
+  parent_id: string;
+  user_id: string;
 };
 
 export type LMSActivity = {
