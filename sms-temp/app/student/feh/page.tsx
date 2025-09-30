@@ -83,7 +83,7 @@ export default async function FEHPage() {
   ];
 
   const atRisk = active.filter(
-    (student) => student.lms_activity?.course_progress === 0
+    (student) => student.lms_activity?.course_progress < 0.2
   );
   //const lost = feh_data.filter((student) => student.status === "Lost");
 
@@ -100,7 +100,7 @@ export default async function FEHPage() {
       <div className="flex flex-col gap-2 items-start">
         <div className="flex flex-row gap-2">
           <AlertCircle className="min-w-6 min-h-6 text-yellow-500" /> At Risk
-          (less than 10% Course Progress on CN)
+          (less than 20% Course Progress on CN)
         </div>
         <div className="flex flex-row gap-2">
           <BadgeX className="min-w-6 min-h-6 text-red-500" /> Withdrawn /

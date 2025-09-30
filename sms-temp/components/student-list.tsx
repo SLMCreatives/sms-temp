@@ -59,7 +59,7 @@ export function StudentList({
         ) : null}
         {lms_activity &&
         student.status === "Active" &&
-        lms_activity.course_progress < 0.1 ? (
+        lms_activity.course_progress < 0.2 ? (
           <Tooltip>
             <TooltipTrigger>
               <AlertCircle className="min-w-6 min-h-6 text-yellow-500" />
@@ -169,7 +169,7 @@ export function StudentList({
                         readOnly
                         value={student.lms_activity.course_progress + "%"}
                         className={`w-full ${
-                          student.lms_activity.course_progress < 0.1
+                          student.lms_activity.course_progress < 0.2
                             ? "text-red-500 font-bold"
                             : ""
                         }`}

@@ -65,7 +65,7 @@ export default async function SITPage() {
   ];
 
   const atRisk = sit_active.filter(
-    (student) => student.lms_activity?.course_progress < 0.1
+    (student) => student.lms_activity?.course_progress < 0.2
   );
 
   return (
@@ -81,7 +81,7 @@ export default async function SITPage() {
       <div className="flex flex-col gap-2 items-start">
         <div className="flex flex-row gap-2">
           <AlertCircle className="min-w-6 min-h-6 text-yellow-500" /> At Risk
-          (less than 10% Course Progress on CN)
+          (less than 20% Course Progress on CN)
         </div>
         <div className="flex flex-row gap-2">
           <BadgeX className="min-w-6 min-h-6 text-red-500" /> Withdrawn /
