@@ -5,7 +5,9 @@ import {
   ArrowUpCircle,
   ArrowRightCircle,
   AlertCircle,
-  BadgeX
+  BadgeX,
+  MessageCircleOff,
+  PhoneMissed
 } from "lucide-react";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -33,6 +35,10 @@ export function StudentList({
         student.status === "Withdraw" || student.status === "Deferred"
           ? "bg-slate-200"
           : ""
+      } ${
+        student.engagements.length > 0 || lms_activity?.course_progress >= 0.2
+          ? ""
+          : "ring-1 ring-red-300 bg-red-50"
       }`}
     >
       <CardContent className="w-full pl-2">
@@ -57,6 +63,26 @@ export function StudentList({
             <TooltipContent>{student.status}</TooltipContent>
           </Tooltip>
         ) : null}
+        {student.engagements &&
+          student.engagements.length > 0 &&
+          student.engagements[0].outcome === "no_response" && (
+            <Tooltip>
+              <TooltipTrigger>
+                <PhoneMissed className="min-w-6 min-h-6 text-red-500" />
+              </TooltipTrigger>
+              <TooltipContent>No Response</TooltipContent>
+            </Tooltip>
+          )}
+        {student.engagements.length > 0 ? (
+          ""
+        ) : (
+          <Tooltip>
+            <TooltipTrigger>
+              <MessageCircleOff className="min-w-6 min-h-6 text-red-500" />
+            </TooltipTrigger>
+            <TooltipContent>Not Engaged</TooltipContent>
+          </Tooltip>
+        )}
         {lms_activity &&
         student.status === "Active" &&
         lms_activity.course_progress < 0.2 ? (
@@ -64,10 +90,10 @@ export function StudentList({
             <TooltipTrigger>
               <AlertCircle className="min-w-6 min-h-6 text-yellow-500" />
             </TooltipTrigger>
-            <TooltipContent>less than 10% CP</TooltipContent>
+            <TooltipContent>less than 20% CP</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {student.status === "Active" && (
+        {student.status && (
           <Drawer>
             <DrawerTrigger asChild>
               <ArrowUpCircle className="min-w-6 min-h-6 text-purple-500" />

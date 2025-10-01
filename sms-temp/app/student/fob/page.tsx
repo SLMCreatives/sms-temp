@@ -2,15 +2,16 @@ import { StudentList } from "@/components/student-list";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "../studentColumns";
-import { AlertCircle, BadgeX, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import StudentListLegend from "@/components/legend";
 
 const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("students")
-    .select("*, lms_activity(*)")
+    .select("*, lms_activity(*), engagements(*)")
     .eq("faculty_code", "FOB");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -91,14 +92,7 @@ export default async function FoBPage() {
         <Badge variant={"outline"}>Lost: {fob_lost.length}</Badge>
       </div>
       <div className="flex flex-col gap-2 items-start">
-        <div className="flex flex-row gap-2">
-          <AlertCircle className="min-w-6 min-h-6 text-yellow-500" /> At Risk
-          (less than 20% Course Progress on CN)
-        </div>
-        <div className="flex flex-row gap-2">
-          <BadgeX className="min-w-6 min-h-6 text-red-500" /> Withdrawn /
-          Deferred
-        </div>
+        <StudentListLegend />
       </div>
       <Tabs className="lg:min-w-[760px] w-full" defaultValue="foundation">
         <TabsList className="w-full">
