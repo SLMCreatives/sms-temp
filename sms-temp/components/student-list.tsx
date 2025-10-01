@@ -5,9 +5,9 @@ import {
   ArrowUpCircle,
   ArrowRightCircle,
   AlertCircle,
-  BadgeX,
   MessageCircleOff,
-  PhoneMissed
+  PhoneMissed,
+  CircleCheckBig
 } from "lucide-react";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -41,10 +41,10 @@ export function StudentList({
           : "ring-1 ring-red-300 bg-red-50"
       }`}
     >
-      <CardContent className="w-full pl-2">
+      <CardContent className="pl-2 overflow-hidden">
         <div className="flex flex-col gap-2 px-0">
           <p
-            className={`text-md font-normal line-clamp-1 capitalize ${
+            className={`text-sm font-normal line-clamp-1 capitalize ${
               student.status === "Withdraw" || student.status === "Deferred"
                 ? "line-through text-muted-foreground"
                 : ""
@@ -54,45 +54,46 @@ export function StudentList({
           </p>
         </div>
       </CardContent>
-      <CardFooter className="w-full flex flex-row gap-2 justify-end h-full">
-        {student.status === "Withdraw" || student.status === "Deferred" ? (
-          <Tooltip>
-            <TooltipTrigger>
-              <BadgeX className="min-w-6 min-h-6 text-red-500" />
-            </TooltipTrigger>
-            <TooltipContent>{student.status}</TooltipContent>
-          </Tooltip>
-        ) : null}
-        {student.engagements &&
-          student.engagements.length > 0 &&
-          student.engagements[0].outcome === "no_response" && (
-            <Tooltip>
-              <TooltipTrigger>
-                <PhoneMissed className="min-w-6 min-h-6 text-red-500" />
-              </TooltipTrigger>
-              <TooltipContent>No Response</TooltipContent>
-            </Tooltip>
-          )}
-        {student.engagements.length > 0 ? (
-          ""
-        ) : (
-          <Tooltip>
-            <TooltipTrigger>
-              <MessageCircleOff className="min-w-6 min-h-6 text-red-500" />
-            </TooltipTrigger>
-            <TooltipContent>Not Engaged</TooltipContent>
-          </Tooltip>
-        )}
+      <CardFooter className="w-full flex flex-row gap-1 justify-end h-full">
         {lms_activity &&
         student.status === "Active" &&
         lms_activity.course_progress < 0.2 ? (
           <Tooltip>
             <TooltipTrigger>
-              <AlertCircle className="min-w-6 min-h-6 text-yellow-500" />
+              <AlertCircle className="w-5 h-5 text-yellow-500" />
             </TooltipTrigger>
             <TooltipContent>less than 20% CP</TooltipContent>
           </Tooltip>
         ) : null}{" "}
+        {student.engagements &&
+          student.engagements.length > 0 &&
+          student.engagements[student.engagements.length - 1].outcome ===
+            "no_response" && (
+            <Tooltip>
+              <TooltipTrigger>
+                <PhoneMissed className="w-5 h-5 text-red-500" />
+              </TooltipTrigger>
+              <TooltipContent>No Response</TooltipContent>
+            </Tooltip>
+          )}
+        {student.status === "Active" &&
+        student.engagements.length > 0 &&
+        student.engagements[student.engagements.length - 1].outcome !==
+          "no_response" ? (
+          <Tooltip>
+            <TooltipTrigger>
+              <CircleCheckBig className="w-5 h-5 text-green-500" />
+            </TooltipTrigger>
+            <TooltipContent>Engaged</TooltipContent>
+          </Tooltip>
+        ) : (
+          <Tooltip>
+            <TooltipTrigger>
+              <MessageCircleOff className="w-5 h-5 text-red-500" />
+            </TooltipTrigger>
+            <TooltipContent>Not Engaged</TooltipContent>
+          </Tooltip>
+        )}
         {student.status && (
           <Drawer>
             <DrawerTrigger asChild>
@@ -168,7 +169,7 @@ export function StudentList({
                       <p className="text-md font-bold col-span-2">
                         CN Activity
                       </p>
-                      <Label
+                      {/* <Label
                         htmlFor="lms_activity"
                         className="text-xs italic text-slate-500"
                       >
@@ -183,7 +184,7 @@ export function StudentList({
                             ? "text-red-500 font-bold"
                             : ""
                         }`}
-                      />
+                      /> */}
                       <Label
                         htmlFor="lms_activity"
                         className="text-xs italic text-slate-500"
@@ -193,11 +194,39 @@ export function StudentList({
                       <Input
                         name="lms_activity"
                         readOnly
-                        value={student.lms_activity.course_progress + "%"}
+                        value={
+                          Math.round(
+                            student.lms_activity.course_progress * 100
+                          ) + "%"
+                        } //student.lms_activity.course_progress * 100 + "%"}
                         className={`w-full ${
                           student.lms_activity.course_progress < 0.2
                             ? "text-red-500 font-bold"
                             : ""
+                        }`}
+                      />
+                      <Label
+                        htmlFor="engagement"
+                        className="text-xs italic text-slate-500"
+                      >
+                        Engagement
+                      </Label>
+                      <Input
+                        name="engagement"
+                        readOnly
+                        value={
+                          student.engagements.length > 0 &&
+                          student.engagements[student.engagements.length - 1]
+                            .outcome !== "no_response"
+                            ? `${student.engagements.length}`
+                            : "Not Engaged / No Response"
+                        }
+                        className={`w-full ${
+                          student.engagements.length > 0 &&
+                          student.engagements[student.engagements.length - 1]
+                            .outcome !== "no_response"
+                            ? "text-green-500"
+                            : "text-red-500"
                         }`}
                       />
                     </>
@@ -223,7 +252,7 @@ export function StudentList({
 
                 <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
                   <p className="text-md group-hover:font-bold">
-                    View Student Page & Add Engagement
+                    Add Engagement
                   </p>
                   <div className="flex flex-row gap-2">
                     <Link href={`/student/${student.matric_no}`}>

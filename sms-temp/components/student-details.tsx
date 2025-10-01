@@ -98,7 +98,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                       <div className="min-w-0 flex-1">
                         <p className="text-sm text-muted-foreground">Email</p>
                         <p className="font-medium text-sm md:text-base break-all">
-                          {studentData.email}
+                          {studentData.email.toLowerCase()}
                         </p>
                       </div>
                     </div>
@@ -207,11 +207,11 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                     LMS Activity
                   </CardTitle>
                   <CardDescription className="text-sm text-muted-foreground italic">
-                    Data as of: 22 Sept 2025
+                    Data as of: 29 Sept 2025
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 gap-3">
-                  <div className="">
+                  {/* <div className="">
                     <p className="text-sm text-muted-foreground mb-1">
                       SRB Progress
                     </p>
@@ -221,19 +221,32 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                         studentData.lms_activity.srb_progress + "%") ||
                         "No record"}
                     </p>
-                  </div>
+                  </div> */}
                   <div className="">
                     <p className="text-sm text-muted-foreground mb-1">
                       Course Progress
                     </p>
                     <p className="font-medium text-foreground text-sm md:text-base">
                       {(studentData.lms_activity &&
-                        studentData.lms_activity.course_progress + "%") ||
+                        Math.round(
+                          studentData.lms_activity.course_progress * 100
+                        ) + "%") ||
                         "No record"}
                     </p>
                   </div>
 
                   <div>
+                    <p className="text-sm text-muted-foreground mb-1">Status</p>
+                    <p className="font-medium text-foreground text-sm md:text-base">
+                      {studentData.lms_activity === null ? "Unknown" : ""}
+                      {studentData.lms_activity &&
+                      studentData.lms_activity?.course_progress <= 0.2
+                        ? "⚠️ At Risk"
+                        : "Engaged"}
+                    </p>
+                  </div>
+
+                  <div className="col-span-2">
                     <p className="text-sm text-muted-foreground mb-1">
                       Last Login
                     </p>
@@ -242,16 +255,6 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                       {(studentData.lms_activity &&
                         dateFormated(studentData.lms_activity.last_login_at)) ||
                         "Unknown"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Status</p>
-                    <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.lms_activity === null ? "Unknown" : ""}
-                      {studentData.lms_activity &&
-                      studentData.lms_activity?.srb_progress < 10
-                        ? "⚠️ At Risk"
-                        : "Good"}
                     </p>
                   </div>
                 </CardContent>

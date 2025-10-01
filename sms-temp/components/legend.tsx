@@ -1,26 +1,24 @@
 import {
   AlertCircle,
-  BadgeX,
+  CircleCheckBig,
   MessageCircleOff,
   PhoneMissed
 } from "lucide-react";
 
 export default function StudentListLegend() {
   return (
-    <div className="grid grid-cols-2 gap-4 items-center">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-center p-4 w-full bg-stone-100 rounded-xl">
       <div className="flex flex-row gap-2">
-        <PhoneMissed className="min-w-6 min-h-6 text-red-500" /> No Reponse
+        <MessageCircleOff className="w-5 h-5 text-red-500" /> Not Engaged
       </div>
       <div className="flex flex-row gap-2">
-        <MessageCircleOff className="min-w-6 min-h-6 text-red-500" /> Not
-        Engaged
+        <PhoneMissed className="w-5 h-5 text-red-500" /> No Reponse
       </div>
       <div className="flex flex-row gap-2">
-        <AlertCircle className="min-w-6 min-h-6 text-yellow-500" /> Low
-        Engagement
+        <AlertCircle className="w-5 h-5 text-yellow-500" /> Low Engagement
       </div>
       <div className="flex flex-row gap-2">
-        <BadgeX className="min-w-6 min-h-6 text-red-500" /> Withdrawn / Deferred
+        <CircleCheckBig className="w-5 h-5 text-green-500" /> Engaged
       </div>
     </div>
   );
