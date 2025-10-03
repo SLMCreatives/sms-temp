@@ -91,13 +91,13 @@ export default async function FEHPage() {
 
   const engaged = active.filter((student) =>
     student.engagements.some(
-      (engagement) => engagement.created_at < "2025-09-28"
+      (engagement) => engagement.created_at > "2025-09-28"
     )
   );
 
   const woneengaged = active.filter((student) =>
     student.engagements.some(
-      (engagement) => engagement.created_at > "2025-09-28"
+      (engagement) => engagement.created_at < "2025-09-28"
     )
   );
 
