@@ -3,8 +3,15 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "../studentColumns";
 import { ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import StudentListLegend from "@/components/legend";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/components/ui/accordion";
+import { Progress } from "@/components/ui/progress";
+import { Label } from "@/components/ui/label";
 
 const supabase = createClient();
 
@@ -82,134 +89,93 @@ export default async function FEHPage() {
     )
   ];
 
-  const atRisk = active.filter(
-    (student) => student.lms_activity?.course_progress < 0.2
+  const engaged = active.filter((student) =>
+    student.engagements.some(
+      (engagement) => engagement.created_at < "2025-09-28"
+    )
   );
 
-  const zeroprogress = active.filter(
-    (student) => student.lms_activity?.course_progress === 0
+  const woneengaged = active.filter((student) =>
+    student.engagements.some(
+      (engagement) => engagement.created_at > "2025-09-28"
+    )
   );
-
-  const zeroprogresspercentage =
-    Math.round((zeroprogress.length / active.length) * 100) + "%";
-
-  const atRiskpercentage =
-    Math.round((atRisk.length / active.length) * 100) + "%";
-
-  const noResponse = active.filter(
-    (student) =>
-      student.engagements[student.engagements.length - 1]?.outcome ===
-      "no_response"
-  );
-
-  const engaged = active.filter(
-    (student) =>
-      student.engagements.length >= 0 &&
-      student.engagements[student.engagements.length - 1]?.created_at >=
-        "2025-09-28"
-  );
-
-  const woneengaged = active.filter(
-    (student) =>
-      student.engagements.length >= 0 &&
-      student.engagements[student.engagements.length - 1]?.created_at <
-        "2025-09-29"
-  );
-
-  const notLoggedIn = active.filter(
-    (student) => student.lms_activity?.last_login_at === null
-  );
-
-  const notLoggedInpercentage =
-    Math.round((notLoggedIn.length / active.length) * 100) + "%";
 
   const woneengaged_actual = woneengaged.length + 37;
 
-  const wonepercentage =
-    Math.round((woneengaged_actual / active.length) * 100) + "%";
+  const wonepercentage = Math.round((woneengaged_actual / active.length) * 100);
 
-  const notEngaged = active.length - engaged.length;
+  const engagedPercentage = Math.round((engaged.length / active.length) * 100);
 
-  const wonenotEngaged = active.length - woneengaged_actual;
-
-  const notEngagedpercentage =
-    Math.round((notEngaged / active.length) * 100) + "%";
-
-  const engagedPercentage =
-    Math.round((engaged.length / active.length) * 100) + "%";
-
-  const noResponsePercentage =
-    Math.round((noResponse.length / active.length) * 100) + "%";
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
       <p className="text-2xl italic font-bold">
         Faculty of Education & Humanities
       </p>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 justify-between w-full text-md">
-        <Badge
-          variant={"default"}
-          className="w-full text-center py-2 justify-between lg:justify-center flex flex-row lg:flex-col col-span-2 lg:row-span-4 lg:text-2xl"
-        >
-          <span className="">Active Students</span> {active.length}
-        </Badge>
-        <Badge
-          variant={"destructive"}
-          className="w-full text-center py-2 justify-between flex flex-row"
-        >
-          <span className="font-bold">Not Logged In</span> {notLoggedIn.length}{" "}
-          ({notLoggedInpercentage})
-        </Badge>
-        <Badge
-          variant={"destructive"}
-          className="w-full text-center py-2 justify-between flex flex-row"
-        >
-          <span className="font-bold">0% Course Progress</span>{" "}
-          {zeroprogress.length} ({zeroprogresspercentage})
-        </Badge>
+      <Accordion type="multiple" className="w-full" defaultValue={["item-1"]}>
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Engagement Progress</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 justify-between w-full">
+              <Label
+                htmlFor="active"
+                className="flex flex-row w-full justify-between"
+              >
+                Active Students{" "}
+                <span className="italic text-muted-foreground">
+                  {active.length}
+                </span>
+              </Label>
+              <Progress id="active" value={100} className=" h-5"></Progress>
 
-        <Badge
-          variant={"destructive"}
-          className="w-full text-center py-2 justify-between flex flex-row bg-yellow-600"
-        >
-          <span className="font-bold">Less than 20% CP</span> {atRisk.length} (
-          {atRiskpercentage})
-        </Badge>
-        <Badge
-          variant={"destructive"}
-          className="w-full text-center py-2 justify-between flex flex-row"
-        >
-          <span className="font-bold">No Response</span> {noResponse.length} (
-          {noResponsePercentage})
-        </Badge>
-        <Badge
-          variant={"default"}
-          className="w-full text-center py-2 justify-between flex flex-row bg-green-600 "
-        >
-          <span className="font-bold">W1 Engaged</span> {woneengaged_actual} (
-          {wonepercentage})
-        </Badge>
-        <Badge
-          variant={"destructive"}
-          className="w-full text-center py-2 justify-between flex flex-row"
-        >
-          <span className="font-bold">W1 Not Engaged</span> {wonenotEngaged} (
-          {Math.round((wonenotEngaged / active.length) * 100) + "%"})
-        </Badge>
-        <Badge
-          variant={"default"}
-          className="w-full text-center py-2 justify-between flex flex-row bg-green-600"
-        >
-          <span className="font-bold">W2 Engaged</span> {engaged.length} (
-          {engagedPercentage})
-        </Badge>
-        <Badge
-          variant={"destructive"}
-          className="w-full text-center py-2 justify-between flex flex-row"
-        >
-          <span className="font-bold">W2 Not Engaged</span> {notEngaged} (
-          {notEngagedpercentage})
-        </Badge>
-      </div>
+              <Label
+                htmlFor="wonepercentage"
+                className="flex flex-row w-full justify-between"
+              >
+                W1 Engaged{" "}
+                <span className="italic text-muted-foreground">
+                  {woneengaged_actual} ({wonepercentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="wonepercentage"
+                value={wonepercentage}
+                className=" h-5"
+              ></Progress>
+              <Label
+                htmlFor="week2engaged"
+                className="flex flex-row w-full justify-between"
+              >
+                W2 Engaged{" "}
+                <span className="italic text-muted-foreground">
+                  {engaged.length} ({engagedPercentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="week2engaged"
+                value={engagedPercentage}
+                className=" h-5"
+              ></Progress>
+              <Label
+                htmlFor="week3engaged"
+                className="flex flex-row w-full justify-between"
+              >
+                W3 Engaged{" "}
+                <span className="italic text-muted-foreground">{0} (0%)</span>
+              </Label>
+              <Progress id="week3engaged" value={0} className=" h-5"></Progress>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+        {/*  <AccordionItem value="item-2">
+                <AccordionTrigger></AccordionTrigger>
+                <AccordionContent>
+                  <div>
+                    
+                  </div>
+                </AccordionContent>
+              </AccordionItem> */}
+      </Accordion>
       <div className="flex flex-col w-full">
         <StudentListLegend />
       </div>
