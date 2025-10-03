@@ -1,25 +1,42 @@
+import { AlertCircle, CircleCheckBig, MessageCircleOff } from "lucide-react";
 import {
-  AlertCircle,
-  CircleCheckBig,
-  MessageCircleOff,
-  PhoneMissed
-} from "lucide-react";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "./ui/dialog";
+import { Button } from "./ui/button";
 
 export default function StudentListLegend() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-center p-4 w-full bg-stone-100 rounded-xl">
-      <div className="flex flex-row gap-2 justify-start items-center">
-        <MessageCircleOff className="w-4 h-4 text-red-500" /> Not Engaged
-      </div>
-      <div className="flex flex-row gap-2 justify-start items-center">
-        <PhoneMissed className="w-4 h-4 text-red-500" /> No Reponse
-      </div>
-      <div className="flex flex-row gap-2 justify-start items-center">
-        <AlertCircle className="w-4 h-4 text-yellow-500" /> Low Engagement
-      </div>
-      <div className="flex flex-row gap-2 justify-start items-center">
-        <CircleCheckBig className="w-4 h-4 text-green-500" /> Engaged
-      </div>
+    <div className="flex flex-col gap-2 fixed bottom-10 right-10">
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant={"default"} size="icon" className="rounded-full ">
+            ?
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-[300px]">
+          <DialogHeader>
+            <DialogTitle>Icon Legend</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 items-start w-full ">
+            <div className="flex flex-row gap-2 justify-start items-center text-sm font-bold">
+              <CircleCheckBig className="w-6 h-6 text-green-500" /> Engaged This
+              Week
+            </div>
+            <div className="flex flex-row gap-2 justify-start items-center text-sm font-bold">
+              <MessageCircleOff className="w-6 h-6 text-red-500" /> Not Engaged
+              This Week
+            </div>
+            <div className="flex flex-row gap-2 justify-start items-center text-sm font-bold">
+              <AlertCircle className="w-6 h-6 text-yellow-500" /> At Risk (as of
+              29 Sept)
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

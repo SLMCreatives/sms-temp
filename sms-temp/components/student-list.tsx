@@ -6,7 +6,6 @@ import {
   ArrowRightCircle,
   AlertCircle,
   MessageCircleOff,
-  PhoneMissed,
   CircleCheckBig
 } from "lucide-react";
 import { Label } from "./ui/label";
@@ -65,7 +64,7 @@ export function StudentList({
             <TooltipContent>less than 20% CP</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {student.engagements &&
+        {/*  {student.engagements &&
           student.engagements.length > 0 &&
           student.engagements[student.engagements.length - 1].outcome ===
             "no_response" && (
@@ -75,11 +74,10 @@ export function StudentList({
               </TooltipTrigger>
               <TooltipContent>No Response</TooltipContent>
             </Tooltip>
-          )}
+          )} */}
         {student.status === "Active" &&
         student.engagements.length > 0 &&
-        student.engagements[student.engagements.length - 1].outcome !==
-          "no_response" ? (
+        student.engagements.some((item) => item.created_at > "2025-09-28") ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleCheckBig className="w-5 h-5 text-green-500" />
@@ -255,7 +253,10 @@ export function StudentList({
                     Add Engagement
                   </p>
                   <div className="flex flex-row gap-2">
-                    <Link href={`/student/${student.matric_no}`}>
+                    <Link
+                      href={`/student/${student.matric_no}`}
+                      target="_blank"
+                    >
                       <ArrowRightCircle className="w-6 h-6 text-orange-500 group-hover:text-orange-600" />
                     </Link>
                   </div>

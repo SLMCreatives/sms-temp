@@ -15,6 +15,9 @@ import { Label } from "@/components/ui/label";
 
 const supabase = createClient();
 
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("students")
@@ -91,9 +94,21 @@ export default async function FEHPage() {
 
   const engaged = active.filter((student) =>
     student.engagements.some(
-      (engagement) => engagement.created_at > "2025-09-28"
+      (engagement) =>
+        engagement.created_at > "2025-09-28" &&
+        engagement.created_at <= "2025-10-05"
     )
   );
+
+  const w3engaged = active.filter((student) =>
+    student.engagements.some(
+      (engagement) =>
+        engagement.created_at > "2025-10-5" &&
+        engagement.created_at <= "2025-10-12"
+    )
+  );
+
+  const w3percentage = Math.round((w3engaged.length / active.length) * 100);
 
   const woneengaged = active.filter((student) =>
     student.engagements.some(
@@ -101,7 +116,9 @@ export default async function FEHPage() {
     )
   );
 
-  const wonepercentage = Math.round((woneengaged.length / active.length) * 100);
+  const wonepercentage = Math.round(
+    ((woneengaged.length + 37) / active.length) * 100
+  );
 
   const engagedPercentage = Math.round((engaged.length / active.length) * 100);
 
@@ -167,7 +184,7 @@ export default async function FEHPage() {
               >
                 W1 Engaged{" "}
                 <span className="italic text-muted-foreground">
-                  {woneengaged.length} ({wonepercentage}%)
+                  {woneengaged.length + 37} ({wonepercentage}%)
                 </span>
               </Label>
               <Progress
@@ -194,9 +211,15 @@ export default async function FEHPage() {
                 className="flex flex-row w-full justify-between"
               >
                 W3 Engaged{" "}
-                <span className="italic text-muted-foreground">{0} (0%)</span>
+                <span className="italic text-muted-foreground">
+                  {w3engaged.length} ({w3percentage}%)
+                </span>
               </Label>
-              <Progress id="week3engaged" value={0} className=" h-5"></Progress>
+              <Progress
+                id="week3engaged"
+                value={w3percentage}
+                className=" h-5"
+              ></Progress>
             </div>
           </AccordionContent>
         </AccordionItem>
