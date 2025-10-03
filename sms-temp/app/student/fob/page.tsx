@@ -93,7 +93,7 @@ export default async function FoBPage() {
   );
 
   const woneengaged = fob_active.filter((student) =>
-    student.engagements.some((item) => item.created_at < "2025-09-28")
+    student.engagements.some((item) => item.created_at <= "2025-09-28")
   );
 
   const wonepercentage = Math.round(

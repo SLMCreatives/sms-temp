@@ -97,13 +97,11 @@ export default async function FEHPage() {
 
   const woneengaged = active.filter((student) =>
     student.engagements.some(
-      (engagement) => engagement.created_at < "2025-09-28"
+      (engagement) => engagement.created_at <= "2025-09-28"
     )
   );
 
-  const woneengaged_actual = woneengaged.length + 37;
-
-  const wonepercentage = Math.round((woneengaged_actual / active.length) * 100);
+  const wonepercentage = Math.round((woneengaged.length / active.length) * 100);
 
   const engagedPercentage = Math.round((engaged.length / active.length) * 100);
 
@@ -169,7 +167,7 @@ export default async function FEHPage() {
               >
                 W1 Engaged{" "}
                 <span className="italic text-muted-foreground">
-                  {woneengaged_actual} ({wonepercentage}%)
+                  {woneengaged.length} ({wonepercentage}%)
                 </span>
               </Label>
               <Progress

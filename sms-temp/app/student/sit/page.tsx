@@ -71,18 +71,13 @@ export default async function SITPage() {
     )
   ];
 
-  const engaged = sit_active.filter(
-    (student) =>
-      student.engagements.length >= 0 &&
-      student.engagements[student.engagements.length - 1]?.created_at >=
-        "2025-09-28"
+  const engaged = sit_active.filter((student) =>
+    student.engagements.some((item) => item.created_at > "2025-09-28")
   );
 
   const woneengaged = sit_active.filter(
     (student) =>
-      student.engagements.length >= 0 &&
-      student.engagements[student.engagements.length - 1]?.created_at <
-        "2025-09-29"
+      !student.engagements.some((item) => item.created_at <= "2025-09-28")
   );
 
   const wonepercentage = Math.round(
