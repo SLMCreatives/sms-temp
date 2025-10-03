@@ -15,6 +15,9 @@ import { Progress } from "@/components/ui/progress";
 
 const supabase = createClient();
 
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("students")
@@ -101,12 +104,50 @@ export default async function FoBPage() {
     (engaged.length / fob_active.length) * 100
   );
 
+  const foundation = fob_active.filter(
+    (student) => student.study_level === "Foundation"
+  );
+  const master = fob_active.filter(
+    (student) => student.study_level === "Master"
+  );
+  const diploma = fob_active.filter(
+    (student) => student.study_level === "Diploma"
+  );
+  const bachelor = fob_active.filter(
+    (student) => student.study_level === "Bachelor"
+  );
+  const doctorate = fob_active.filter(
+    (student) => student.study_level === "Doctorate"
+  );
+
+  const foundationNotEngaged = foundation.filter(
+    (student) =>
+      !student.engagements.some((item) => item.created_at > "2025-09-28")
+  );
+  const masterNotEngaged = master.filter(
+    (student) =>
+      !student.engagements.some((item) => item.created_at > "2025-09-28")
+  );
+  const diplomaNotEngaged = diploma.filter(
+    (student) =>
+      !student.engagements.some((item) => item.created_at > "2025-09-28")
+  );
+  const bachelorNotEngaged = bachelor.filter(
+    (student) =>
+      !student.engagements.some((item) => item.created_at > "2025-09-28")
+  );
+  const doctorateNotEngaged = doctorate.filter(
+    (student) =>
+      !student.engagements.some((item) => item.created_at > "2025-09-28")
+  );
+
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
-      <p className="text-2xl italic font-bold">Faculty of Business</p>
+      <p className="text-3xl italic font-bold">FOB</p>
+      <p className="text-lg font-bold">Engagement Progress</p>
       <Accordion type="multiple" className="w-full" defaultValue={["item-1"]}>
         <AccordionItem value="item-1">
-          <AccordionTrigger>Engagement Progress</AccordionTrigger>
+          <AccordionTrigger>Overall Progress</AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 justify-between w-full">
               <Label
@@ -159,17 +200,91 @@ export default async function FoBPage() {
             </div>
           </AccordionContent>
         </AccordionItem>
-        {/*  <AccordionItem value="item-2">
-          <AccordionTrigger>Student Onboarding Report</AccordionTrigger>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>
+            W2 Engagement (29/9 - 3/10) by Level
+          </AccordionTrigger>
           <AccordionContent>
-            <div>
-              <StudentBarChart
-                chartData={chartData}
-                chartConfig={chartConfig}
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-y-2 gap-x-4 justify-between w-full mr-4">
+              <Label className="flex flex-row w-full justify-between">
+                Foundation
+                <span className="italic text-muted-foreground">
+                  {foundation.length - foundationNotEngaged.length}/
+                  {foundation.length}
+                </span>
+              </Label>
+              <Progress
+                value={
+                  ((foundation.length - foundationNotEngaged.length) /
+                    foundation.length) *
+                  100
+                }
+                className=" h-5 "
+              ></Progress>
+              <Label className="flex flex-row w-full justify-between">
+                Diploma
+                <span className="italic text-muted-foreground">
+                  {diploma.length - diplomaNotEngaged.length}/{diploma.length}
+                </span>
+              </Label>
+              <Progress
+                value={
+                  ((diploma.length - diplomaNotEngaged.length) /
+                    diploma.length) *
+                  100
+                }
+                max={diploma.length}
+                className=" h-5 "
+              />
+              <Label className="flex flex-row w-full justify-between">
+                Bachelor
+                <span className="italic text-muted-foreground">
+                  {bachelor.length - bachelorNotEngaged.length}/
+                  {bachelor.length}
+                </span>
+              </Label>
+              <Progress
+                value={
+                  ((bachelor.length - bachelorNotEngaged.length) /
+                    bachelor.length) *
+                  100
+                }
+                max={bachelor.length}
+                className=" h-5"
+              />
+              <Label className="flex flex-row w-full justify-between">
+                Master
+                <span className="italic text-muted-foreground">
+                  {master.length - masterNotEngaged.length}/{master.length}
+                </span>
+              </Label>
+              <Progress
+                value={
+                  ((master.length - masterNotEngaged.length) / master.length) *
+                  100
+                }
+                max={master.length}
+                className=" h-5 "
+              />
+              <Label className="flex flex-row w-full justify-between">
+                Doctorate
+                <span className="italic text-muted-foreground">
+                  {doctorate.length - doctorateNotEngaged.length}/
+                  {doctorate.length}
+                </span>
+              </Label>
+              <Progress
+                value={
+                  ((doctorate.length - doctorateNotEngaged.length) /
+                    doctorate.length) *
+                  100
+                }
+                max={doctorate.length}
+                className="h-5"
               />
             </div>
           </AccordionContent>
-        </AccordionItem> */}
+        </AccordionItem>
       </Accordion>
       {/*  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 justify-between w-full text-md">
         <Badge
