@@ -1,33 +1,29 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
 import { StudentMetrics } from "@/components/student-metrics";
-import { ProgressChart } from "@/components/progress-chart";
-import { EngagementOutcomes } from "@/components/engagement-outcomes";
-import { StudentStatusTable } from "@/components/student-status-table";
-import { Activity } from "lucide-react";
+import { Students } from "@/app/student/studentColumns";
+import { useState } from "react";
 
-type Faculty = "all" | "FOB" | "FEH" | "SIT";
+interface StudentMetricsProps {
+  data: Students[];
+}
 
-export function StudentAttritionDashboard() {
-  const [selectedFaculty, setSelectedFaculty] = useState<Faculty>("all");
-  const [timeRange, setTimeRange] = useState("30d");
+export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
+  const [faculty, setFilter] = useState("all");
+  const db_students = data;
+
+  const db_fob = db_students?.filter(
+    (student) => student.faculty_code === "FOB"
+  );
+
+  const db_feh = db_students?.filter(
+    (student) => student.faculty_code === "FEH"
+  );
+
+  const db_sit = db_students?.filter(
+    (student) => student.faculty_code === "SIT"
+  );
 
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start">
@@ -37,75 +33,43 @@ export function StudentAttritionDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-foreground">
-                Student Attrition Management
+                Student Attrition Dashboard
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Monitor student engagement and identify at-risk students
               </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-[140px] bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7d">Last 7 days</SelectItem>
-                  <SelectItem value="30d">Last 30 days</SelectItem>
-                  <SelectItem value="90d">Last 90 days</SelectItem>
-                  <SelectItem value="semester">This Semester</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
         </div>
       </header>
       {/* Main Content */}
       <main className="container mx-auto px-6 py-6 ">
-        <Tabs
-          value={selectedFaculty}
-          onValueChange={(faculty) => setSelectedFaculty(faculty as Faculty)}
-          className="space-y-6"
-        >
-          <TabsList className="bg-card border border-border">
-            <TabsTrigger value="all">All Faculties</TabsTrigger>
+        <Tabs value={faculty} onValueChange={setFilter} className="space-y-6">
+          <TabsList className="border border-border bg-slate-300 sticky top-10">
+            <TabsTrigger value="all">Overall</TabsTrigger>
             <TabsTrigger value="FOB">FOB</TabsTrigger>
             <TabsTrigger value="FEH">FEH</TabsTrigger>
             <TabsTrigger value="SIT">SIT</TabsTrigger>
           </TabsList>
 
-          <TabsContent value={selectedFaculty} className="space-y-6">
+          <TabsContent value="all" className="space-y-6">
             {/* Key Metrics */}
-            <StudentMetrics faculty={selectedFaculty} timeRange={timeRange} />
+            <StudentMetrics data={db_students} />
+          </TabsContent>
 
-            {/* Charts Section */}
-            <div className="grid gap-6 md:grid-cols-2">
-              <ProgressChart faculty={selectedFaculty} timeRange={timeRange} />
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle className="text-foreground">
-                    Login Activity Trend
-                  </CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Students not logged in over time
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                    <Activity className="w-8 h-8 mr-2" />
-                    <span>Login activity visualization</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          <TabsContent value="FOB" className="space-y-6">
+            {/* Key Metrics */}
+            <StudentMetrics data={db_fob} />
+          </TabsContent>
 
-            {/* Engagement Outcomes */}
-            {/*  <EngagementOutcomes
-              faculty={selectedFaculty}
-              timeRange={timeRange}
-            /> */}
+          <TabsContent value="FEH" className="space-y-6">
+            {/* Key Metrics */}
+            <StudentMetrics data={db_feh} />
+          </TabsContent>
 
-            {/* Student Status Table */}
-            {/* <StudentStatusTable faculty={selectedFaculty} /> */}
+          <TabsContent value="SIT" className="space-y-6">
+            {/* Key Metrics */}
+            <StudentMetrics data={db_sit} />
           </TabsContent>
         </Tabs>
       </main>
