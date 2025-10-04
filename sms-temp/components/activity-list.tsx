@@ -61,6 +61,7 @@ export function ActivityList() {
 
   useEffect(() => {
     fetchActivities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

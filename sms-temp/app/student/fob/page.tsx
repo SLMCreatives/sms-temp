@@ -15,9 +15,6 @@ import { Progress } from "@/components/ui/progress";
 
 const supabase = createClient();
 
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
-
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("students")
@@ -89,7 +86,10 @@ export default async function FoBPage() {
   ];
 
   const engaged = fob_active.filter((student) =>
-    student.engagements.some((item) => item.created_at > "2025-09-28")
+    student.engagements.some(
+      (item) =>
+        item.created_at > "2025-09-28" && item.created_at <= "2025-10-05"
+    )
   );
 
   const woneengaged = fob_active.filter((student) =>

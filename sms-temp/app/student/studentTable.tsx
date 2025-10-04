@@ -83,7 +83,6 @@ export default function DataTable<TData, TValue>({
   };
 
   const filteredRows = table.getFilteredRowModel().rows;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filteredData = filteredRows.map((row) => row.original as any);
 
   const totalStudents = data.length;

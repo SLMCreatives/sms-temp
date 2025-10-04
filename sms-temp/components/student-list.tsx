@@ -35,7 +35,8 @@ export function StudentList({
           ? "bg-slate-200"
           : ""
       } ${
-        student.engagements.length > 0 || lms_activity?.course_progress >= 0.2
+        lms_activity?.course_progress > 0 ||
+        lms_activity?.last_login_at === null
           ? ""
           : "ring-1 ring-red-300 bg-red-50"
       }`}
