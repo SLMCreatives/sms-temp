@@ -14,6 +14,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
@@ -24,7 +25,7 @@ import { Engagements } from "@/app/student/studentColumns";
 
 const supabase = createClient();
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 12;
 
 export default function EngagementsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,7 +42,7 @@ export default function EngagementsPage() {
       const { data, error } = await supabase
         .from("students")
         .select("*, engagements(*)")
-        .order("created_at", { foreignTable: "engagements", ascending: false });
+        .order("created_at", { ascending: false });
       if (error) {
         console.error("Error fetching data:", error);
       } else {
@@ -134,6 +135,11 @@ export default function EngagementsPage() {
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
     }
+  };
+
+  const gotoStudentPage = (matric_no: string) => {
+    // Open new window to student page
+    window.open(`/student/${matric_no}`, "_blank");
   };
 
   return (
@@ -244,10 +250,69 @@ export default function EngagementsPage() {
         {filteredEngagements.length} engagements
       </div>
 
+      {filteredEngagements.length > 0 && totalPages > 1 && (
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+
+            {/* Page Numbers */}
+            <div className="hidden sm:flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className="w-9 h-9 p-0"
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Engagements List - Mobile Optimized Cards */}
-      <div className="space-y-4 lg:grid lg:grid-cols-3 gap-4">
+      <div className="space-y-4 lg:grid lg:grid-cols-3 gap-4 ">
         {filteredEngagements.length === 0 ? (
-          <Card className="col-span-3">
+          <Card className="">
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground">
                 No engagements found matching your criteria.
@@ -258,73 +323,79 @@ export default function EngagementsPage() {
           paginatedEngagements.map((engagement) => (
             <Card
               key={engagement.id}
-              className="hover:shadow-md transition-shadow"
+              className="hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => {
+                gotoStudentPage(engagement.matric_no);
+              }}
             >
-              <CardContent className="p-4 md:p-6">
-                <div className="space-y-3">
-                  {/* Header Row */}
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                    <div>
-                      <h3 className="font-semibold text-lg">
-                        {engagement.matric_no}
-                      </h3>
-                      <p></p>
-                      <p className="text-sm text-muted-foreground">
-                        {engagement.subject}
-                      </p>
+              <CardHeader>
+                <div className="flex flex-row justify-between w-full">
+                  <CardTitle>
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-2">
+                      <div>
+                        <h3 className="font-semibold text-lg">
+                          {engagement.matric_no}
+                        </h3>
+                        <p className="text-sm text-muted-foreground line-clamp-1">
+                          {engagement.subject}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline" className="capitalize">
-                        {engagement.channel}
-                      </Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    <div className="flex flex-col items-end justify-end gap-1">
                       <Badge
-                        className={getSentimentColor(engagement.sentiment)}
+                        className={
+                          getSentimentColor(engagement.sentiment) +
+                          " capitalize"
+                        }
                       >
                         {engagement.sentiment}
                       </Badge>
-                      <Badge className={getOutcomeColor(engagement.outcome)}>
+                      <Badge
+                        className={
+                          getOutcomeColor(engagement.outcome) + " capitalize"
+                        }
+                      >
                         {engagement.outcome.replace("_", " ")}
                       </Badge>
                     </div>
-                  </div>
-
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 md:p-6 min-h-[150px]">
+                <div className="space-y-3">
                   {/* Body */}
-                  <p className="text-sm leading-relaxed">{engagement.body}</p>
-
-                  {/* Footer Info */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2 border-t text-sm text-muted-foreground">
-                    <div>
-                      <span className="font-medium">Handled by:</span>{" "}
-                      {engagement.handled_by}
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <span>
-                        {new Date(engagement.created_at).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric"
-                          }
-                        )}
-                      </span>
-                      {engagement.next_action_date && (
-                        <Badge variant="secondary" className="w-fit">
-                          Next:{" "}
-                          {new Date(
-                            engagement.next_action_date
-                          ).toLocaleDateString()}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
+                  <p className="text-sm leading-relaxed line-clamp-5">
+                    {engagement.body}
+                  </p>
                 </div>
               </CardContent>
+              <CardFooter className="w-full">
+                <div className="flex flex-row flex-nowrap items-center justify-between gap-2 pt-2 border-t text-sm text-muted-foreground w-full">
+                  <div className="flex flex-col flex-nowrap items-start gap-0">
+                    <span className="font-medium text-xs capitalize">
+                      {engagement.channel} by:
+                    </span>{" "}
+                    {engagement.handled_by}
+                  </div>
+
+                  <div className="flex flex-row flex-nowrap items-end gap-2 italic">
+                    {new Date(engagement.created_at).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric"
+                      }
+                    )}
+                  </div>
+                </div>
+              </CardFooter>
             </Card>
           ))
         )}
       </div>
-
       {filteredEngagements.length > 0 && totalPages > 1 && (
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-muted-foreground">
