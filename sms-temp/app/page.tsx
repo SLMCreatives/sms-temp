@@ -1,8 +1,7 @@
 import { AuthButton } from "@/components/auth-button";
 import { Hero } from "@/components/hero";
+import { NavMenuAuth } from "@/components/navigation";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function Home() {
   return (
@@ -10,18 +9,7 @@ export default function Home() {
       <div className="flex-1 w-full flex flex-col gap-20 items-center">
         <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
           <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-            <div className="flex gap-5 items-center font-semibold">
-              <Link href={"/student"}>SMS</Link>
-              <Button variant="link">
-                <Link href="/student/fob">FOB</Link>
-              </Button>
-              <Button variant="link">
-                <Link href="/student/feh">FEH</Link>
-              </Button>
-              <Button variant="link">
-                <Link href="/student/sit">SIT</Link>
-              </Button>
-            </div>
+            <NavMenuAuth />
             <AuthButton />
           </div>
         </nav>

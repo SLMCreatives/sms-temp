@@ -48,7 +48,7 @@ export default function EngagementsPage() {
       } else {
         console.log("Fetched data:", data);
         setData({
-          engagements: data?.flatMap((student) => student.engagements) || []
+          engagements: data?.map((student) => student.engagements) || []
         });
       }
     }
@@ -312,7 +312,7 @@ export default function EngagementsPage() {
       {/* Engagements List - Mobile Optimized Cards */}
       <div className="space-y-4 lg:grid lg:grid-cols-3 gap-4 ">
         {filteredEngagements.length === 0 ? (
-          <Card className="">
+          <Card className="col-span-3" key={"no-results"}>
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground">
                 No engagements found matching your criteria.
@@ -357,7 +357,7 @@ export default function EngagementsPage() {
                           getOutcomeColor(engagement.outcome) + " capitalize"
                         }
                       >
-                        {engagement.outcome.replace("_", " ")}
+                        {engagement.outcome?.replace("_", " ")}
                       </Badge>
                     </div>
                   </CardDescription>
