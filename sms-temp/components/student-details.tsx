@@ -43,6 +43,7 @@ import {
 } from "./ui/dialog";
 import CommentSection from "./comment-section";
 import { Comments, Students } from "@/app/student/studentColumns";
+import ChangeStatusForm from "./change-status";
 
 interface StudentDetailsProps {
   studentData: Students;
@@ -81,11 +82,8 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                     </h2>
                     <p className="text-sm md:text-base text-muted-foreground mb-3 lg:mb-0 flex flex-row gap-2 items-center w-full">
                       Matric No: {studentData.matric_no}
-                      <Badge variant="default">{studentData.status}</Badge>
                     </p>
-                    {/*  <div className="flex flex-row justify-between w-full">
-                      <Badge variant="default">{studentData.status}</Badge>
-                    </div> */}
+                    <ChangeStatusForm student={studentData} />
                   </div>
                 </div>
 

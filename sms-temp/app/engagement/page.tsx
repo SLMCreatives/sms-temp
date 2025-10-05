@@ -65,7 +65,8 @@ export default async function EngagementPage() {
   const { data: engagements, error } = await supabase
     .from("engagements")
     .select("*, students(*),comments(*)")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(50);
 
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -81,8 +82,6 @@ export default async function EngagementPage() {
     const localisedTime = date.toLocaleTimeString("en-MY");
     return `${localisedDate} ${localisedTime}`; // localisedDate localisedTime;
   };
-
-  
 
   return (
     <div className="flex flex-col gap-4 p-10 lg:grid grid-cols-3">

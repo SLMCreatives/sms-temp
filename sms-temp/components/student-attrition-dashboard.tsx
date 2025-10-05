@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StudentMetrics } from "@/components/student-metrics";
 import { Students } from "@/app/student/studentColumns";
 import { useState } from "react";
+import { StudentPieChart } from "./studentpie";
 
 interface StudentMetricsProps {
   data: Students[];
@@ -55,21 +56,25 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
           <TabsContent value="all" className="space-y-6">
             {/* Key Metrics */}
             <StudentMetrics data={db_students} />
+            <StudentPieChart data={db_students} />
           </TabsContent>
 
           <TabsContent value="FOB" className="space-y-6">
             {/* Key Metrics */}
             <StudentMetrics data={db_fob} />
+            <StudentPieChart data={db_fob} />
           </TabsContent>
 
           <TabsContent value="FEH" className="space-y-6">
             {/* Key Metrics */}
             <StudentMetrics data={db_feh} />
+            <StudentPieChart data={db_feh} />
           </TabsContent>
 
           <TabsContent value="SIT" className="space-y-6">
             {/* Key Metrics */}
             <StudentMetrics data={db_sit} />
+            <StudentPieChart data={db_sit} />
           </TabsContent>
         </Tabs>
       </main>
