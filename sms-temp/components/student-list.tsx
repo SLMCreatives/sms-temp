@@ -15,7 +15,6 @@ import { Input } from "./ui/input";
 import Link from "next/link";
 import { LMSActivity, Students } from "@/app/student/studentColumns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { Textarea } from "./ui/textarea";
 
 interface StudentCardProps {
   student: Students;
@@ -213,7 +212,8 @@ export function StudentList({
                             : "text-red-500"
                         }`}
                       />
-                      <Label
+
+                      {/*  <Label
                         htmlFor="engagement"
                         className="text-xs italic text-slate-500"
                       >
@@ -223,14 +223,16 @@ export function StudentList({
                         name="engagement"
                         readOnly
                         value={
+                          student.engagements.length > 0 &&
                           student.engagements[student.engagements.length - 1]
-                            .body +
-                          " - " +
-                          student.engagements[student.engagements.length - 1]
-                            .subject
+                            .body
+                            ? student.engagements[
+                                student.engagements.length - 1
+                              ].body
+                            : student.engagements[0].body
                         }
                         className={`w-full line-clamp-3 resize-none h-16`}
-                      />
+                      /> */}
                     </>
                   )}
                 </div>
