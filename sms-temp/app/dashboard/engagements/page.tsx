@@ -137,7 +137,7 @@ export default function EngagementsPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6 lg:p-8 max-w-7xl">
+    <div className="container mx-auto p-4 md:p-6 lg:p-8 max-w-6xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Student Engagements</h1>
         <p className="text-muted-foreground">
@@ -169,7 +169,7 @@ export default function EngagementsPage() {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-fit">
             <div>
               <label className="text-sm font-medium mb-2 block">Channel</label>
               <Select value={channelFilter} onValueChange={setChannelFilter}>
@@ -245,9 +245,9 @@ export default function EngagementsPage() {
       </div>
 
       {/* Engagements List - Mobile Optimized Cards */}
-      <div className="space-y-4">
+      <div className="space-y-4 lg:grid lg:grid-cols-3 gap-4">
         {filteredEngagements.length === 0 ? (
-          <Card>
+          <Card className="col-span-3">
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground">
                 No engagements found matching your criteria.
