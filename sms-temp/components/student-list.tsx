@@ -15,6 +15,7 @@ import { Input } from "./ui/input";
 import Link from "next/link";
 import { LMSActivity, Students } from "@/app/student/studentColumns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Textarea } from "./ui/textarea";
 
 interface StudentCardProps {
   student: Students;
@@ -168,22 +169,6 @@ export function StudentList({
                       <p className="text-md font-bold col-span-2">
                         CN Activity
                       </p>
-                      {/* <Label
-                        htmlFor="lms_activity"
-                        className="text-xs italic text-slate-500"
-                      >
-                        SRB Progress
-                      </Label>
-                      <Input
-                        name="lms_activity"
-                        readOnly
-                        value={student.lms_activity.srb_progress + "%"}
-                        className={`w-full ${
-                          student.lms_activity.srb_progress === 0
-                            ? "text-red-500 font-bold"
-                            : ""
-                        }`}
-                      /> */}
                       <Label
                         htmlFor="lms_activity"
                         className="text-xs italic text-slate-500"
@@ -227,6 +212,24 @@ export function StudentList({
                             ? "text-green-500"
                             : "text-red-500"
                         }`}
+                      />
+                      <Label
+                        htmlFor="engagement"
+                        className="text-xs italic text-slate-500"
+                      >
+                        Last Engagement
+                      </Label>
+                      <Textarea
+                        name="engagement"
+                        readOnly
+                        value={
+                          student.engagements[student.engagements.length - 1]
+                            .body +
+                          " - " +
+                          student.engagements[student.engagements.length - 1]
+                            .subject
+                        }
+                        className={`w-full line-clamp-3 resize-none h-16`}
                       />
                     </>
                   )}
