@@ -57,12 +57,12 @@ export function StudentList({
       <CardFooter className="w-full flex flex-row gap-1 justify-end h-full">
         {lms_activity &&
         student.status === "Active" &&
-        lms_activity.course_progress < 0.2 ? (
+        lms_activity.course_progress === 0 ? (
           <Tooltip>
             <TooltipTrigger>
-              <AlertCircle className="w-5 h-5 text-yellow-500" />
+              <AlertCircle className="w-5 h-5 text-red-500" />
             </TooltipTrigger>
-            <TooltipContent>less than 20% CP</TooltipContent>
+            <TooltipContent>0% Course Progress</TooltipContent>
           </Tooltip>
         ) : null}{" "}
         {/*  {student.engagements &&
@@ -78,7 +78,7 @@ export function StudentList({
           )} */}
         {student.status === "Active" &&
         student.engagements.length > 0 &&
-        student.engagements.some((item) => item.created_at > "2025-09-28") ? (
+        student.engagements.some((item) => item.created_at > "2025-10-06") ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleCheckBig className="w-5 h-5 text-green-500" />
@@ -163,57 +163,69 @@ export function StudentList({
                     readOnly
                     value={student.nationality}
                   />
-                  {student.lms_activity && (
-                    <>
-                      <p className="text-md font-bold col-span-2">
-                        CN Activity
-                      </p>
-                      <Label
-                        htmlFor="lms_activity"
-                        className="text-xs italic text-slate-500"
-                      >
-                        Course Progress
-                      </Label>
-                      <Input
-                        name="lms_activity"
-                        readOnly
-                        value={
-                          Math.round(
-                            student.lms_activity.course_progress * 100
-                          ) + "%"
-                        } //student.lms_activity.course_progress * 100 + "%"}
-                        className={`w-full ${
-                          student.lms_activity.course_progress < 0.2
-                            ? "text-red-500 font-bold"
-                            : ""
-                        }`}
-                      />
-                      <Label
-                        htmlFor="engagement"
-                        className="text-xs italic text-slate-500"
-                      >
-                        Engagement
-                      </Label>
-                      <Input
-                        name="engagement"
-                        readOnly
-                        value={
-                          student.engagements.length > 0 &&
-                          student.engagements[student.engagements.length - 1]
-                            .outcome !== "no_response"
-                            ? `${student.engagements.length}`
-                            : "Not Engaged / No Response"
-                        }
-                        className={`w-full ${
-                          student.engagements.length > 0 &&
-                          student.engagements[student.engagements.length - 1]
-                            .outcome !== "no_response"
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                      />
+                  <Label
+                    htmlFor="status"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Status
+                  </Label>
+                  <Input
+                    name="status"
+                    readOnly
+                    value={student.status}
+                    className={`w-full ${
+                      student.status === "Active"
+                        ? "text-green-500 font-bold"
+                        : "text-red-500 font-bold"
+                    }`}
+                  />
 
-                      {/*  <Label
+                  <p className="text-md font-bold col-span-2">CN Activity</p>
+                  <Label
+                    htmlFor="lms_activity"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Course Progress
+                  </Label>
+                  <Input
+                    name="lms_activity"
+                    readOnly
+                    value={
+                      Math.round(
+                        student.lms_activity
+                          ? student.lms_activity.course_progress * 100
+                          : 0
+                      ) + "%"
+                    } //student.lms_activity.course_progress * 100 + "%"}
+                    className={`w-full ${
+                      student.lms_activity &&
+                      student.lms_activity.course_progress < 0.2
+                        ? "text-red-500 font-bold"
+                        : ""
+                    }`}
+                  />
+                  <Label
+                    htmlFor="engagement"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Engagement
+                  </Label>
+                  <Input
+                    name="engagement"
+                    readOnly
+                    value={
+                      student.engagements && student.engagements.length >= 0
+                        ? `${student.engagements.length}`
+                        : "Not Engaged"
+                    }
+                    className={`w-full ${
+                      student.engagements && student.engagements.length >= 0
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  />
+
+                  {/*  <Label
                         htmlFor="engagement"
                         className="text-xs italic text-slate-500"
                       >
@@ -233,8 +245,6 @@ export function StudentList({
                         }
                         className={`w-full line-clamp-3 resize-none h-16`}
                       /> */}
-                    </>
-                  )}
                 </div>
 
                 {/* <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">

@@ -84,6 +84,14 @@ export default async function SITPage() {
     (woneengaged.length / sit_active.length) * 100
   );
 
+  const wthreeengaged = sit_active.filter((student) =>
+    student.engagements.some((item) => item.created_at >= "2025-10-06")
+  );
+
+  const wthreepercentage = Math.round(
+    (wthreeengaged.length / sit_active.length) * 100
+  );
+
   const engagedPercentage = Math.round(
     (engaged.length / sit_active.length) * 100
   );
@@ -103,19 +111,19 @@ export default async function SITPage() {
 
   const foundationNotEngaged = foundation.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at >= "2025-10-06")
   );
   const masterNotEngaged = master.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at >= "2025-10-06")
   );
   const diplomaNotEngaged = diploma.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at >= "2025-10-06")
   );
   const bachelorNotEngaged = bachelor.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at >= "2025-10-06")
   );
 
   return (
@@ -171,15 +179,21 @@ export default async function SITPage() {
                 className="flex flex-row w-full justify-between"
               >
                 W3 Engaged{" "}
-                <span className="italic text-muted-foreground">{0} (0%)</span>
+                <span className="italic text-muted-foreground">
+                  {wthreeengaged.length} ({wthreepercentage}%)
+                </span>
               </Label>
-              <Progress id="week3engaged" value={0} className=" h-5"></Progress>
+              <Progress
+                id="week3engaged"
+                value={wthreepercentage}
+                className=" h-5"
+              ></Progress>
             </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>
-            W2 Engagement (29/9 - 3/10) by Level
+            W3 Engagement (06/10 - 11/10) by Level
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-y-2 gap-x-4 justify-between w-full mr-4">

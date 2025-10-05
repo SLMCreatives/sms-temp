@@ -137,23 +137,23 @@ export default async function FEHPage() {
 
   const foundationNotEngaged = foundation.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at > "2025-10-06")
   );
   const masterNotEngaged = master.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at > "2025-10-06")
   );
   const diplomaNotEngaged = diploma.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at > "2025-10-06")
   );
   const bachelorNotEngaged = bachelor.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at > "2025-10-06")
   );
   const doctorateNotEngaged = doctorate.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-09-28")
+      !student.engagements.some((item) => item.created_at > "2025-10-06")
   );
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
@@ -222,7 +222,7 @@ export default async function FEHPage() {
         </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>
-            W2 Engagement (29/9 - 3/10) by Level
+            W3 Engagement (6/10 - 11/10) by Level
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-y-2 gap-x-4 justify-between w-full mr-4">

@@ -10,7 +10,10 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "UNITAR SMS",
-  description: "UNITAR Student Management System"
+  description: "UNITAR Student Management System",
+  icons: {
+    icon: "/favicon.ico"
+  }
 };
 
 const geistSans = Geist({
