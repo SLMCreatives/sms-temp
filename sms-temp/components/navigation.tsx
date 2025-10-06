@@ -7,13 +7,20 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger
 } from "./ui/navigation-menu";
-import { BookOpenText, Briefcase, ChartPie, Cpu, Mails } from "lucide-react";
+import {
+  BookOpenText,
+  Briefcase,
+  ChartPie,
+  Cpu,
+  GraduationCap,
+  LayoutDashboard
+} from "lucide-react";
 import Image from "next/image";
 
 export function NavMenuAuth() {
   return (
     <div className="flex gap-2 items-center">
-      <NavigationMenu viewport={false}>
+      <NavigationMenu viewport={true}>
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
@@ -29,8 +36,13 @@ export function NavMenuAuth() {
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Student List</NavigationMenuTrigger>
-            <NavigationMenuContent className="max-w-[250px] w-full flex flex-row lg:flex-col gap-2">
+            <NavigationMenuTrigger>
+              <div className="flex flex-row gap-2 items-center">
+                <GraduationCap className="h-5 w-5 flex" />
+                <p className="hidden md:flex">Student List </p>
+              </div>
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="max-w-[250px] w-full flex flex-col gap-2">
               <NavigationMenuLink asChild>
                 <Link href="/student/fob">
                   <p className="flex flex-row gap-4 items-center justify-start">
@@ -64,8 +76,13 @@ export function NavMenuAuth() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Dashboard</NavigationMenuTrigger>
-            <NavigationMenuContent className="lg:max-w-[400px] flex flex-row lg:flex-col gap-2 w-full">
+            <NavigationMenuTrigger>
+              <div className="flex flex-row gap-2 items-center">
+                <LayoutDashboard className="h-5 w-5" />
+                <p className="hidden md:flex">Dashboard</p>{" "}
+              </div>
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="lg:max-w-[400px] flex flex-col gap-2 w-full">
               <NavigationMenuLink asChild>
                 <Link
                   href="/dashboard"
@@ -76,7 +93,7 @@ export function NavMenuAuth() {
                   </p>
                 </Link>
               </NavigationMenuLink>
-              <NavigationMenuLink asChild>
+              {/*  <NavigationMenuLink asChild>
                 <Link
                   href="/dashboard/engagements"
                   className="flex flex-row flex-nowrap justify-between w-full"
@@ -86,7 +103,7 @@ export function NavMenuAuth() {
                     Engagement
                   </p>
                 </Link>
-              </NavigationMenuLink>
+              </NavigationMenuLink> */}
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>

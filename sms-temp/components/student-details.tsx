@@ -69,10 +69,13 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
           <div className="lg:col-span-2">
             <Card className="shadow-sm">
               <CardHeader className="">
-                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                  <User className="w-5 h-5" />
-                  Personal Information
-                </CardTitle>
+                <div className="flex flex-row justify-between">
+                  <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Personal Information
+                  </CardTitle>
+                  <ChangeStatusForm student={studentData} />
+                </div>
               </CardHeader>
               <CardContent className="space-y-4 md:space-y-6">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
@@ -83,7 +86,8 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                     <p className="text-sm md:text-base text-muted-foreground mb-3 lg:mb-0 flex flex-row gap-2 items-center w-full">
                       Matric No: {studentData.matric_no}
                     </p>
-                    <ChangeStatusForm student={studentData} />
+                    {/*                     <ChangeStatusForm student={studentData} />
+                     */}{" "}
                   </div>
                 </div>
 

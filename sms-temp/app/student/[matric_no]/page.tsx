@@ -2,7 +2,6 @@
 
 import StudentDetailsPage from "@/components/student-details";
 import { createClient } from "@/lib/supabase/client";
-import Link from "next/link";
 import { useEffect, useState, use } from "react";
 import { Comments, Students } from "../studentColumns";
 
@@ -63,13 +62,7 @@ export default function StudentPage({
   if (!student) return <div>No student found</div>;
 
   return (
-    <main className="py-6 px-2 container mx-auto">
-      <Link
-        href={`/student/${student.faculty_code.toLowerCase()}`}
-        className="text-blue-500 hover:underline pl-4"
-      >
-        &larr; Back
-      </Link>
+    <main className="py-6 px-2 container mx-auto relative">
       <StudentDetailsPage studentData={student} comments={comments || []} />
     </main>
   );
