@@ -57,6 +57,8 @@ export type Students = {
   study_level: string;
   engagements: Engagements[];
   lms_activity: LMSActivity;
+  lms_activity_w1: LMSActivity;
+  lms_activity_w2: LMSActivity;
 };
 
 export const studentColumns: ColumnDef<Students>[] = [
