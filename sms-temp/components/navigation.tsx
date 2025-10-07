@@ -21,7 +21,7 @@ import Image from "next/image";
 export function NavMenuAuth() {
   return (
     <div className="flex gap-2 items-center">
-      <NavigationMenu viewport={false} className="w-auto">
+      <NavigationMenu viewport={false} className="z-50 w-full">
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
@@ -43,7 +43,7 @@ export function NavMenuAuth() {
                 <p className="hidden md:flex">Student List </p>
               </div>
             </NavigationMenuTrigger>
-            <NavigationMenuContent className="max-w-[250px] w-full flex flex-col gap-2">
+            <NavigationMenuContent className="max-w-[250px] w-full flex flex-row lg:flex-col gap-2">
               <NavigationMenuLink asChild>
                 <Link href="/student/fob">
                   <p className="flex flex-row gap-4 items-center justify-start">

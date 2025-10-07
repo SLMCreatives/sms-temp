@@ -11,6 +11,7 @@ import {
 import { Students } from "@/app/student/studentColumns";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -20,6 +21,7 @@ import {
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 type StudentStatus = "Active" | "At-Risk" | "Withdrawn" | "Deferred";
 
@@ -34,24 +36,28 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
     student.status as StudentStatus
   );
 
-  const handleStatusChange = async (newStatus: StudentStatus) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await handleStatusChange(status);
+  };
+
+  const handleStatusChange = async (status: StudentStatus) => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("students")
-        .update({ status: newStatus })
+        .update({ status: status })
         .eq("matric_no", student.matric_no)
         .select()
         .single();
 
       if (error) {
-        console.error("Error updating status:", error.message);
+        toast.error("Error updating status: " + error.message);
       } else {
-        console.log("Status updated successfully:", data);
-        setStatus(newStatus); // Update local state to reflect the change
-        setClose(true);
+        toast.success("Student status updated to " + status);
+        setStatus(status); // Update local state to reflect the change
       }
     } catch (error) {
-      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred." + error);
     }
   };
 
@@ -60,11 +66,14 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
   return (
     <Dialog open={open} onOpenChange={setClose}>
       <DialogTrigger asChild>
-        <Button variant="outline" size={"sm"} className="px-0">
-          <Badge variant="default" className={`px-3 py-1`}>
-            {status}
-          </Badge>
-        </Button>
+        <Badge
+          variant="default"
+          className={`${
+            status !== "Active" && "bg-red-600"
+          } px-3 py-1 cursor-pointer hover:opacity-80 transition`}
+        >
+          {status}
+        </Badge>
       </DialogTrigger>
       <DialogContent className="w-fit">
         <DialogHeader>
@@ -74,7 +83,7 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <Select
             onValueChange={(status) => setStatus(status as StudentStatus)}
             defaultValue={status}
@@ -89,10 +98,12 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
               <SelectItem value="At Risk">At Risk</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={() => handleStatusChange(status)} className="w-full">
-            Update Status
-          </Button>
-        </div>
+          <DialogClose asChild>
+            <Button type="submit" className="w-full">
+              Update Status
+            </Button>
+          </DialogClose>
+        </form>
       </DialogContent>
     </Dialog>
   );

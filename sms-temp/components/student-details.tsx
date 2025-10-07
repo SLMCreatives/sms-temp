@@ -70,9 +70,9 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
             <Card className="shadow-sm">
               <CardHeader className="">
                 <div className="flex flex-row justify-between">
-                  <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                  <CardTitle className="text-lg md:text-xl text-muted-foreground flex items-center gap-2">
                     <User className="w-5 h-5" />
-                    Personal Information
+                    Student Information
                   </CardTitle>
                   <ChangeStatusForm student={studentData} />
                 </div>
@@ -127,17 +127,6 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                   </div>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Registration Date
-                        </p>
-                        <p className="font-medium text-sm md:text-base">
-                          {studentData.admission_date}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
                       <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                       <div>
                         <p className="text-sm text-muted-foreground">
@@ -173,6 +162,17 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 gap-3">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Registration Date
+                      </p>
+                      <p className="font-medium text-sm md:text-base">
+                        {studentData.admission_date}
+                      </p>
+                    </div>
+                  </div>
                   <div className="">
                     <p className="text-sm text-muted-foreground mb-1">
                       Programme

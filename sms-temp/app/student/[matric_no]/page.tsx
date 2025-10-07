@@ -62,7 +62,7 @@ export default function StudentPage({
   if (!student) return <div>No student found</div>;
 
   return (
-    <main className="py-6 px-2 container mx-auto relative">
+    <main className="container mx-auto relative">
       <StudentDetailsPage studentData={student} comments={comments || []} />
     </main>
   );

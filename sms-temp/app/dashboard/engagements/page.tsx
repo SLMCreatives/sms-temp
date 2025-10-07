@@ -22,6 +22,15 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Engagements } from "@/app/student/studentColumns";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
 
 const supabase = createClient();
 
@@ -165,112 +174,88 @@ export default function EngagementsPage() {
     }
   };
 
-  const gotoStudentPage = (matric_no: string) => {
+  /* const gotoStudentPage = (matric_no: string) => {
     // Open new window to student page
     window.open(`/student/${matric_no}`, "_blank");
-  };
+  }; */
 
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8 max-w-5xl">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Student Engagements</h1>
-          <p className="text-muted-foreground">
-            Search and filter all student feedback and engagements
-          </p>
+        <div className="mb-2">
+          <h1 className="text-3xl font-bold mb-2">Students Engagements</h1>
         </div>
         <div className="relative w-full md:w-1/3">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by matric no, subject, body, or handler..."
+            placeholder="Search "
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-left"
           />
         </div>
       </div>
 
       {/* Filters Section */}
-      <Card className="mb-6">
-        <CardHeader>
+      <Card className="flex flex-row flex-nowrap mb-4 gap-0 items-start justify-between w-full ">
+        <CardHeader className="relative max-w-[24px] lg:hidden">
           <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 md:flex h-4 w-4 text-muted-foreground" />
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="w-full">
           {/* Filter Dropdowns */}
-          <div className="grid grid-cols-2 md:flex md:flex-row gap-4 w-full">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Channel</label>
-              <Select value={channelFilter} onValueChange={setChannelFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All channels" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All channels</SelectItem>
-                  <SelectItem value="call">Call</SelectItem>
-                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                  <SelectItem value="email">Email</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="grid grid-cols-2 md:flex md:flex-row  gap-4 w-full">
+            <Select value={channelFilter} onValueChange={setChannelFilter}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Channels" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Channels</SelectItem>
+                <SelectItem value="call">Call</SelectItem>
+                <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                <SelectItem value="email">Email</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Sentiment
-              </label>
-              <Select
-                value={sentimentFilter}
-                onValueChange={setSentimentFilter}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="All sentiments" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All sentiments</SelectItem>
-                  <SelectItem value="positive">Positive</SelectItem>
-                  <SelectItem value="neutral">Neutral</SelectItem>
-                  <SelectItem value="negative">Negative</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">Outcome</label>
-              <Select value={outcomeFilter} onValueChange={setOutcomeFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All outcomes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All outcomes</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="no_response">No Response</SelectItem>
-                  <SelectItem value="followup">Follow-up</SelectItem>
-                  <SelectItem value="escalated">Escalated</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Time Range
-              </label>
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All time</SelectItem>
-                  <SelectItem value="last_7_days">Last 7 days</SelectItem>
-                  <SelectItem value="last_30_days">Last 30 days</SelectItem>
-                  <SelectItem value="last_90_days">Last 90 days</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={sentimentFilter} onValueChange={setSentimentFilter}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sentiments" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Sentiments</SelectItem>
+                <SelectItem value="positive">Positive</SelectItem>
+                <SelectItem value="neutral">Neutral</SelectItem>
+                <SelectItem value="negative">Negative</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={outcomeFilter} onValueChange={setOutcomeFilter}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Outcomes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Outcomes</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="no_response">No Response</SelectItem>
+                <SelectItem value="followup">Follow-up</SelectItem>
+                <SelectItem value="escalated">Escalated</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Time</SelectItem>
+                <SelectItem value="last_7_days">Last 7 days</SelectItem>
+                <SelectItem value="last_30_days">Last 30 days</SelectItem>
+                <SelectItem value="last_90_days">Last 90 days</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          {/* Clear Filters Button */}
-          {hasActiveFilters && (
+        </CardContent>
+        {hasActiveFilters && (
+          <CardFooter>
             <Button
               variant="outline"
               size="sm"
@@ -280,8 +265,8 @@ export default function EngagementsPage() {
               <X className="h-4 w-4 mr-2" />
               Clear Filters
             </Button>
-          )}
-        </CardContent>
+          </CardFooter>
+        )}
       </Card>
 
       {/* Results Count */}
@@ -362,76 +347,125 @@ export default function EngagementsPage() {
           </Card>
         ) : (
           paginatedEngagements.map((engagement) => (
-            <Card
-              key={engagement.id}
-              className="hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => {
-                gotoStudentPage(engagement.matric_no);
-              }}
-            >
-              <CardHeader>
-                <div className="flex flex-row justify-between w-full">
-                  <CardTitle>
-                    <div className="flex flex-col sm:flex-row items-start justify-between gap-2">
-                      <div>
-                        <h3 className="font-semibold text-lg">
-                          {engagement.matric_no}
-                        </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          {engagement.subject}
-                        </p>
+            <div key={engagement.id}>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Card
+                    key={engagement.id}
+                    className="hover:shadow-md transition-shadow cursor-pointer"
+                  >
+                    <CardHeader>
+                      <div className="flex flex-row justify-between w-full">
+                        <CardTitle>
+                          <div className="flex flex-col sm:flex-row items-start justify-between gap-2">
+                            <div>
+                              <h3 className="font-semibold text-lg">
+                                {engagement.matric_no}
+                              </h3>
+                              <p className="text-sm text-muted-foreground line-clamp-1">
+                                {engagement.subject}
+                              </p>
+                            </div>
+                          </div>
+                        </CardTitle>
+                        <CardDescription>
+                          <div className="flex flex-col items-end justify-end gap-1">
+                            <Badge
+                              className={
+                                getSentimentColor(engagement.sentiment) +
+                                " capitalize"
+                              }
+                            >
+                              {engagement.sentiment}
+                            </Badge>
+                            <Badge
+                              className={
+                                getOutcomeColor(engagement.outcome) +
+                                " capitalize"
+                              }
+                            >
+                              {engagement.outcome?.replace("_", " ")}
+                            </Badge>
+                          </div>
+                        </CardDescription>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="md:p-6 max-h-fit">
+                      {/* Body */}
+                      <p className="text-sm leading-relaxed line-clamp-5">
+                        {engagement.body}
+                      </p>
+                    </CardContent>
+                    <CardFooter className="w-full">
+                      <div className="flex flex-row flex-nowrap items-center justify-between gap-2 pt-2 border-t text-sm text-muted-foreground w-full">
+                        <div className="flex flex-col flex-nowrap items-start gap-0">
+                          <span className="font-medium text-xs capitalize">
+                            {engagement.channel} by:
+                          </span>{" "}
+                          {engagement.handled_by}
+                        </div>
+
+                        <div className="flex flex-row flex-nowrap items-end gap-2 italic">
+                          {new Date(engagement.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric"
+                            }
+                          )}
+                        </div>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="lg:max-w-2xl w-full max-w-[90vw]">
+                  <DialogHeader>
+                    <DialogTitle>{engagement.matric_no}</DialogTitle>
+                    <DialogDescription>{engagement.subject}</DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col gap-4">
+                    <div className="text-sm leading-relaxed">
+                      {engagement.body}
+                    </div>
+                    <div className="flex flex-row flex-nowrap items-center justify-between gap-2 pt-2 border-t text-sm text-muted-foreground w-full">
+                      <div className="flex flex-col flex-nowrap items-start gap-0">
+                        <span className="font-medium text-xs capitalize">
+                          {engagement.channel} by:
+                        </span>{" "}
+                        {engagement.handled_by}
+                      </div>
+
+                      <div className="flex flex-row flex-nowrap items-end gap-2 italic">
+                        {new Date(engagement.created_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric"
+                          }
+                        )}
                       </div>
                     </div>
-                  </CardTitle>
-                  <CardDescription>
-                    <div className="flex flex-col items-end justify-end gap-1">
-                      <Badge
-                        className={
-                          getSentimentColor(engagement.sentiment) +
-                          " capitalize"
-                        }
-                      >
-                        {engagement.sentiment}
-                      </Badge>
-                      <Badge
-                        className={
-                          getOutcomeColor(engagement.outcome) + " capitalize"
-                        }
-                      >
-                        {engagement.outcome?.replace("_", " ")}
-                      </Badge>
-                    </div>
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="md:p-6 max-h-fit">
-                {/* Body */}
-                <p className="text-sm leading-relaxed line-clamp-5">
-                  {engagement.body}
-                </p>
-              </CardContent>
-              <CardFooter className="w-full">
-                <div className="flex flex-row flex-nowrap items-center justify-between gap-2 pt-2 border-t text-sm text-muted-foreground w-full">
-                  <div className="flex flex-col flex-nowrap items-start gap-0">
-                    <span className="font-medium text-xs capitalize">
-                      {engagement.channel} by:
-                    </span>{" "}
-                    {engagement.handled_by}
                   </div>
-
-                  <div className="flex flex-row flex-nowrap items-end gap-2 italic">
-                    {new Date(engagement.created_at).toLocaleDateString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric"
+                  <DialogFooter>
+                    <Button
+                      variant="link"
+                      onClick={() =>
+                        window.open(
+                          `/student/${engagement.matric_no}`,
+                          "_blank"
+                        )
                       }
-                    )}
-                  </div>
-                </div>
-              </CardFooter>
-            </Card>
+                      className="flex flex-row items-center gap-2 hover:gap-[15rem] transition-all duration-200 ease-in-out"
+                    >
+                      Go to Student Page
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           ))
         )}
       </div>
