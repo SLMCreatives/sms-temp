@@ -18,6 +18,10 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
     (student) => student.status === "Active"
   );
 
+  const lost_students = db_students.filter(
+    (student) => student.status !== "Active"
+  );
+
   const w1_active_students = db_students.filter(
     (student) => student.status === "Active" && student.lms_activity_w1
   );
@@ -91,14 +95,21 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-md font-medium text-muted-foreground">
-            Total Students
+            Total Active Students
           </CardTitle>
           <Users className="h-4 w-4 text-success" />
         </CardHeader>
         <CardContent className="flex flex-row justify-between">
           <div className="flex flex-col gap-2">
             <p className="text-3xl font-bold text-foreground">
-              {active_students.length.toLocaleString()}
+              {active_students.length.toLocaleString()}{" "}
+              <span className="font-normal italic">
+                (
+                {Math.round(
+                  (active_students.length / db_students.length) * 100
+                )}
+                %)
+              </span>
             </p>
           </div>
           <div className="flex flex-col gap-0 items-end text-sm">
@@ -107,6 +118,10 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
             </p>
             <p className="text-xs italic text-muted-foreground">
               W2 - {w2_active_students.length}
+            </p>
+            <p className="text-xs italic text-muted-foreground text-red-500 ">
+              Lost - {lost_students.length} (
+              {Math.round((lost_students.length / db_students.length) * 100)}%)
             </p>
           </div>
         </CardContent>

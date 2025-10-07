@@ -13,14 +13,15 @@ import {
   ChartPie,
   Cpu,
   GraduationCap,
-  LayoutDashboard
+  LayoutDashboard,
+  Mails
 } from "lucide-react";
 import Image from "next/image";
 
 export function NavMenuAuth() {
   return (
     <div className="flex gap-2 items-center">
-      <NavigationMenu viewport={true}>
+      <NavigationMenu viewport={false} className="w-auto">
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
@@ -93,7 +94,7 @@ export function NavMenuAuth() {
                   </p>
                 </Link>
               </NavigationMenuLink>
-              {/*  <NavigationMenuLink asChild>
+              <NavigationMenuLink asChild>
                 <Link
                   href="/dashboard/engagements"
                   className="flex flex-row flex-nowrap justify-between w-full"
@@ -103,7 +104,7 @@ export function NavMenuAuth() {
                     Engagement
                   </p>
                 </Link>
-              </NavigationMenuLink> */}
+              </NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>

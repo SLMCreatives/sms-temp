@@ -33,6 +33,7 @@ export default function EngagementsPage() {
   const [sentimentFilter, setSentimentFilter] = useState<string>("all");
   const [outcomeFilter, setOutcomeFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [dateRange, setDateRange] = useState<string>("all");
   const [data, setData] = useState<{ engagements: Engagements[] }>({
     engagements: []
   });
@@ -41,14 +42,19 @@ export default function EngagementsPage() {
     async function fetchData() {
       const { data, error } = await supabase
         .from("students")
-        .select("*, engagements(*)")
-        .order("created_at", { ascending: false });
+        .select("*, engagements(*), lms_activity(*)");
       if (error) {
         console.error("Error fetching data:", error);
       } else {
         console.log("Fetched data:", data);
         setData({
-          engagements: data?.map((student) => student.engagements) || []
+          engagements: data
+            ?.flatMap((student) => student.engagements)
+            .sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+            )
         });
       }
     }
@@ -64,7 +70,8 @@ export default function EngagementsPage() {
         engagement.matric_no.toLowerCase().includes(searchLower) ||
         engagement.subject.toLowerCase().includes(searchLower) ||
         engagement.body.toLowerCase().includes(searchLower) ||
-        engagement.handled_by.toLowerCase().includes(searchLower);
+        engagement.handled_by.toLowerCase().includes(searchLower) ||
+        engagement.created_at.toLowerCase().includes(searchLower);
 
       // Channel filter
       const matchesChannel =
@@ -78,6 +85,24 @@ export default function EngagementsPage() {
       const matchesOutcome =
         outcomeFilter === "all" || engagement.outcome === outcomeFilter;
 
+      // Date range filter
+      let matchesDateRange = true;
+      if (dateRange === "last_7_days") {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        matchesDateRange = new Date(engagement.created_at) >= sevenDaysAgo;
+      } else if (dateRange === "last_30_days") {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        matchesDateRange = new Date(engagement.created_at) >= thirtyDaysAgo;
+      } else if (dateRange === "last_90_days") {
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        matchesDateRange = new Date(engagement.created_at) >= ninetyDaysAgo;
+      }
+
+      if (!matchesDateRange) return false;
+
       return (
         matchesSearch && matchesChannel && matchesSentiment && matchesOutcome
       );
@@ -87,7 +112,8 @@ export default function EngagementsPage() {
     searchQuery,
     channelFilter,
     sentimentFilter,
-    outcomeFilter
+    outcomeFilter,
+    dateRange
   ]);
 
   const totalPages = Math.ceil(filteredEngagements.length / ITEMS_PER_PAGE);
@@ -105,13 +131,15 @@ export default function EngagementsPage() {
     setSentimentFilter("all");
     setOutcomeFilter("all");
     setCurrentPage(1);
+    setDateRange("all");
   };
 
   const hasActiveFilters =
     searchQuery ||
     channelFilter !== "all" ||
     sentimentFilter !== "all" ||
-    outcomeFilter !== "all";
+    outcomeFilter !== "all" ||
+    dateRange !== "all";
 
   const getSentimentColor = (sentiment: string) => {
     switch (sentiment) {
@@ -143,12 +171,23 @@ export default function EngagementsPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6 lg:p-8 max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Student Engagements</h1>
-        <p className="text-muted-foreground">
-          Search and filter all student feedback and engagements
-        </p>
+    <div className="container mx-auto p-4 md:p-6 lg:p-8 max-w-5xl">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">Student Engagements</h1>
+          <p className="text-muted-foreground">
+            Search and filter all student feedback and engagements
+          </p>
+        </div>
+        <div className="relative w-full md:w-1/3">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by matric no, subject, body, or handler..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </div>
 
       {/* Filters Section */}
@@ -158,24 +197,10 @@ export default function EngagementsPage() {
             <Filter className="h-5 w-5" />
             Filters
           </CardTitle>
-          <CardDescription>
-            Search and filter engagements by various criteria
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search Input */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by matric no, subject, body, or handler..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
           {/* Filter Dropdowns */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-fit">
+          <div className="grid grid-cols-2 md:flex md:flex-row gap-4 w-full">
             <div>
               <label className="text-sm font-medium mb-2 block">Channel</label>
               <Select value={channelFilter} onValueChange={setChannelFilter}>
@@ -226,6 +251,22 @@ export default function EngagementsPage() {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Time Range
+              </label>
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All time</SelectItem>
+                  <SelectItem value="last_7_days">Last 7 days</SelectItem>
+                  <SelectItem value="last_30_days">Last 30 days</SelectItem>
+                  <SelectItem value="last_90_days">Last 90 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Clear Filters Button */}
@@ -251,7 +292,7 @@ export default function EngagementsPage() {
       </div>
 
       {filteredEngagements.length > 0 && totalPages > 1 && (
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-6 flex flex-row items-center justify-between gap-4 py-3">
           <div className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
           </div>
@@ -363,13 +404,11 @@ export default function EngagementsPage() {
                   </CardDescription>
                 </div>
               </CardHeader>
-              <CardContent className="p-4 md:p-6 min-h-[150px]">
-                <div className="space-y-3">
-                  {/* Body */}
-                  <p className="text-sm leading-relaxed line-clamp-5">
-                    {engagement.body}
-                  </p>
-                </div>
+              <CardContent className="md:p-6 max-h-fit">
+                {/* Body */}
+                <p className="text-sm leading-relaxed line-clamp-5">
+                  {engagement.body}
+                </p>
               </CardContent>
               <CardFooter className="w-full">
                 <div className="flex flex-row flex-nowrap items-center justify-between gap-2 pt-2 border-t text-sm text-muted-foreground w-full">
@@ -397,7 +436,7 @@ export default function EngagementsPage() {
         )}
       </div>
       {filteredEngagements.length > 0 && totalPages > 1 && (
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-6 flex flex-row items-center justify-between gap-4 py-3">
           <div className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
           </div>
