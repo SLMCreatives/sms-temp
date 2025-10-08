@@ -99,9 +99,7 @@ export default async function FEHPage() {
 
   const w3engaged = active.filter((student) =>
     student.engagements.some(
-      (engagement) =>
-        engagement.created_at > "2025-10-5" &&
-        engagement.created_at <= "2025-10-12"
+      (engagement) => engagement.created_at > "2025-10-05"
     )
   );
 
