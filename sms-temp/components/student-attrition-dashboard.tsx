@@ -5,6 +5,7 @@ import { StudentMetrics } from "@/components/student-metrics";
 import { Students } from "@/app/student/studentColumns";
 import { useState } from "react";
 import { StudentPieChart } from "./studentpie";
+import EngagementTimeline from "./engagement-timeline";
 
 interface StudentMetricsProps {
   data: Students[];
@@ -34,7 +35,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-foreground">
-                Student Attrition Dashboard
+                Online Student Health Dashboard
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Monitor student engagement and identify at-risk students
@@ -55,26 +56,39 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
 
           <TabsContent value="all" className="space-y-6">
             {/* Key Metrics */}
-            <StudentMetrics data={db_students} />
-            <StudentPieChart data={db_students} />
+            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6">
+              <StudentMetrics data={db_students} />
+              <StudentPieChart data={db_students} />
+            </div>
+            {/* Engagement Timeline */}
+            <EngagementTimeline data={db_students} />
           </TabsContent>
 
           <TabsContent value="FOB" className="space-y-6">
-            {/* Key Metrics */}
-            <StudentMetrics data={db_fob} />
-            <StudentPieChart data={db_fob} />
+            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6">
+              {/* Key Metrics */}
+              <StudentMetrics data={db_fob} />
+              <StudentPieChart data={db_fob} />
+            </div>
+            <EngagementTimeline data={db_fob} />
           </TabsContent>
 
           <TabsContent value="FEH" className="space-y-6">
-            {/* Key Metrics */}
-            <StudentMetrics data={db_feh} />
-            <StudentPieChart data={db_feh} />
+            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6">
+              {/* Key Metrics */}
+              <StudentMetrics data={db_feh} />
+              <StudentPieChart data={db_feh} />
+            </div>
+            <EngagementTimeline data={db_feh} />
           </TabsContent>
 
           <TabsContent value="SIT" className="space-y-6">
-            {/* Key Metrics */}
-            <StudentMetrics data={db_sit} />
-            <StudentPieChart data={db_sit} />
+            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6">
+              {/* Key Metrics */}
+              <StudentMetrics data={db_sit} />
+              <StudentPieChart data={db_sit} />
+            </div>
+            <EngagementTimeline data={db_sit} />
           </TabsContent>
         </Tabs>
       </main>

@@ -20,7 +20,7 @@ async function getData(): Promise<Students[]> {
 export default async function Page() {
   const data = await getData();
   return (
-    <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start">
+    <div className="flex flex-col mx-auto max-w-2xl lg:max-w-5xl items-start justify-start">
       <StudentAttritionDashboard data={data} />
     </div>
   );

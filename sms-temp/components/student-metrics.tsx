@@ -18,10 +18,6 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
     (student) => student.status === "Active"
   );
 
-  const lost_students = db_students.filter(
-    (student) => student.status !== "Active"
-  );
-
   const w1_active_students = db_students.filter(
     (student) => student.status === "Active" && student.lms_activity_w1
   );
@@ -91,37 +87,42 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
   );
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-md font-medium text-muted-foreground">
-            Total Active Students
-          </CardTitle>
+          <div className="flex flex-col gap-1">
+            <CardTitle className="text-md font-medium text-muted-foreground">
+              Total Active Students
+            </CardTitle>
+            <CardDescription className="text-xs italic ">
+              Enrolled on CN
+            </CardDescription>
+          </div>
           <Users className="h-4 w-4 text-success" />
         </CardHeader>
-        <CardContent className="flex flex-row justify-between">
-          <div className="flex flex-col gap-2">
+        <CardContent className="flex flex-row lg:flex-col-reverse justify-between">
+          <div className="flex flex-row justify-between items-end gap-2">
             <p className="text-3xl font-bold text-foreground">
               {active_students.length.toLocaleString()}{" "}
-              <span className="font-normal italic">
-                (
-                {Math.round(
-                  (active_students.length / db_students.length) * 100
-                )}
-                %)
-              </span>
             </p>
+            <span className="font-normal italic text-xl text-muted-foreground">
+              {Math.round((active_students.length / db_students.length) * 100)}%
+            </span>
           </div>
-          <div className="flex flex-col gap-0 items-end text-sm">
+          <div className="flex flex-col gap-0 items-end lg:items-start text-sm">
             <p className="text-xs italic text-muted-foreground">
-              W1 - {w1_active_students.length}
+              W1 - {w1_active_students.length} (
+              {Math.round(
+                (w1_active_students.length / db_students.length) * 100
+              )}
+              % )
             </p>
             <p className="text-xs italic text-muted-foreground">
-              W2 - {w2_active_students.length}
-            </p>
-            <p className="text-xs italic text-muted-foreground text-red-500 ">
-              Lost - {lost_students.length} (
-              {Math.round((lost_students.length / db_students.length) * 100)}%)
+              W2 - {w2_active_students.length} (
+              {Math.round(
+                (w2_active_students.length / db_students.length) * 100
+              )}
+              % )
             </p>
           </div>
         </CardContent>
@@ -129,13 +130,18 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
 
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-md font-medium text-muted-foreground">
-            Not Logged In
-          </CardTitle>
+          <div className="flex flex-col gap-1">
+            <CardTitle className="text-md font-medium text-muted-foreground">
+              Not Logged In
+            </CardTitle>
+            <CardDescription className="text-xs italic ">
+              As of 6th Oct 2025
+            </CardDescription>
+          </div>
           <UserX className="h-4 w-4 text-warning" />
         </CardHeader>
-        <CardContent className="flex flex-row justify-between">
-          <div className="text-3xl font-bold text-foreground">
+        <CardContent className="flex flex-row lg:flex-col-reverse justify-between">
+          <div className="text-3xl font-bold text-foreground justify-between">
             {not_logged_in.length}
             <span className="italic font-normal">
               {"  "}
@@ -145,7 +151,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               %
             </span>
           </div>
-          <div className="flex flex-col gap-0 items-end text-sm">
+          <div className="flex flex-col gap-0 items-end lg:items-start text-sm">
             <p className="text-xs italic text-muted-foreground">
               W1 - {w1_notlogged_in.length} (
               {Math.round(
@@ -176,18 +182,18 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
           </div>
           <AlertCircle className="h-4 w-4 text-destructive" />
         </CardHeader>
-        <CardContent className="flex flex-row justify-between">
+        <CardContent className="flex flex-row lg:flex-col-reverse justify-between">
           <div className="text-3xl font-bold text-foreground">
             {zero_progress.length.toLocaleString()}
             <span className="italic font-normal">
               {"  "}
               {Math.round(
                 (zero_progress.length / active_students.length) * 100
-              )}{" "}
+              )}
               %
             </span>
           </div>
-          <div className="flex flex-col gap-0 items-end text-sm">
+          <div className="flex flex-col gap-0 items-end lg:items-start text-sm">
             <p className="text-xs italic text-muted-foreground">
               W1 - {w1_zero_progress.length} (
               {Math.round(
@@ -219,7 +225,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
 
           <AlertCircle className="h-4 w-4 text-warning" />
         </CardHeader>
-        <CardContent className="flex flex-row justify-between">
+        <CardContent className="flex flex-row lg:flex-col-reverse  justify-between">
           <div className="text-3xl font-bold text-foreground">
             {low_progress.length.toLocaleString()}
             <span className="italic font-normal">
@@ -228,7 +234,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               %
             </span>
           </div>
-          <div className="flex flex-col gap-0 items-end text-sm">
+          <div className="flex flex-col gap-0 items-end lg:items-start text-sm">
             <p className="text-xs italic text-muted-foreground">
               W1 - {w1_low_progress.length} (
               {Math.round(

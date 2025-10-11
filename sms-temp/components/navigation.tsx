@@ -83,7 +83,7 @@ export function NavMenuAuth() {
                 <p className="hidden md:flex">Dashboard</p>{" "}
               </div>
             </NavigationMenuTrigger>
-            <NavigationMenuContent className="lg:max-w-[400px] flex flex-col gap-2 w-full">
+            <NavigationMenuContent className="flex flex-col gap-2 w-full">
               <NavigationMenuLink asChild>
                 <Link
                   href="/dashboard"

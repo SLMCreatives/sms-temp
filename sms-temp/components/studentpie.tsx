@@ -121,20 +121,24 @@ export function StudentPieChart({ data }: StudentChartProps) {
 
   const chartData2 = [
     {
-      browser: "Not Logged In",
-      visitors: not_logged_in.length,
-      fill: "darkred"
-    },
-    {
       browser: "0% Progress",
       visitors: zero_progress.length,
-      fill: "red"
+      fill: "#d90429"
     },
-    { browser: "20% Progress", visitors: low_progress.length, fill: "orange" },
-    { browser: "Active", visitors: therest.length, fill: "green" }
+    {
+      browser: "Not Logged In",
+      visitors: not_logged_in.length,
+      fill: "#ef233c"
+    },
+    {
+      browser: "20% Progress",
+      visitors: low_progress.length,
+      fill: "#ff758f"
+    },
+    { browser: "Active", visitors: therest.length, fill: "#007200" }
   ];
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col lg:min-w-[300px]">
       <CardHeader className="items-center pb-0">
         <CardTitle>Student Progress</CardTitle>
         <CardDescription>
@@ -147,9 +151,9 @@ export function StudentPieChart({ data }: StudentChartProps) {
           className="[&_.recharts-pie-label-text]:fill-foreground mx-auto aspect-square max-h-[300px] w-full"
         >
           <PieChart className="h-full space-y-2 p-2">
+            <ChartLegend />
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
             <Pie data={chartData2} dataKey="visitors" label nameKey="browser" />
-            <ChartLegend />
           </PieChart>
         </ChartContainer>
       </CardContent>

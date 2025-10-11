@@ -6,6 +6,7 @@ import { MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
 
 export type Engagements = {
+  [x: string]: string | number | Date;
   id: string;
   matric_no: string;
   channel: string;
@@ -17,7 +18,6 @@ export type Engagements = {
   outcome: string;
   next_action_date: string;
   created_at: string;
-  comments: Comments[];
 };
 
 export type Comments = {
