@@ -21,10 +21,30 @@ async function getData(): Promise<Students[]> {
 
 export default async function DemoPage() {
   const data = await getData();
+  const data_lost = data.filter(
+    (student) => student.status === "Withdraw" || student.status === "Deferred"
+  );
 
-  const fob_data = data.filter((student) => student.faculty_code === "FOB");
-  const feh_data = data.filter((student) => student.faculty_code === "FEH");
-  const sit_data = data.filter((student) => student.faculty_code === "SIT");
+  const data_atrisk = data.filter((student) => student.status === "At Risk");
+  const fob_atrisk = data_atrisk.filter(
+    (student) => student.faculty_code === "FOB"
+  );
+  const feh_atrisk = data_atrisk.filter(
+    (student) => student.faculty_code === "FEH"
+  );
+  const sit_atrisk = data_atrisk.filter(
+    (student) => student.faculty_code === "SIT"
+  );
+
+  const fob_data = data.filter(
+    (student) => student.faculty_code === "FOB" && student.status !== "Active"
+  );
+  const feh_data = data.filter(
+    (student) => student.faculty_code === "FEH" && student.status !== "Active"
+  );
+  const sit_data = data.filter(
+    (student) => student.faculty_code === "SIT" && student.status !== "Active"
+  );
 
   const uniqueprogramesfob = [
     ...new Set(fob_data.map((item) => item.programme_name))
@@ -64,36 +84,61 @@ export default async function DemoPage() {
   const averageWaitTime =
     waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length;
 
+  const fob_lost = data_lost.filter(
+    (student) => student.faculty_code === "FOB"
+  );
+  const feh_lost = data_lost.filter(
+    (student) => student.faculty_code === "FEH"
+  );
+  const sit_lost = data_lost.filter(
+    (student) => student.faculty_code === "SIT"
+  );
+
   return (
-    <div className="container mx-auto py-10 space-y-4 max-w-lg lg:max-w-5xl px-8">
-      <div className="flex flex-row flex-nowrap justify-between items-center ">
-        <div className="flex flex-col gap-1">
-          <p className="text-2xl font-bold ">Total Lost:</p>
-          <p className="text-sm text-muted-foreground italic text-balance">
-            FOB - {fob_data.length} | FEH - {feh_data.length} | SIT -{" "}
-            {sit_data.length}
+    <div className="container mx-auto py-10 space-y-4 max-w-md lg:max-w-5xl px-8">
+      <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-10">
+        <div className="flex flex-row flex-nowrap justify-between items-center ">
+          <div className="flex flex-col gap-1">
+            <p className="text-2xl font-bold ">Total At Risk:</p>
+            <p className="text-sm text-muted-foreground italic text-balance">
+              FOB - {fob_atrisk.length} | FEH - {feh_atrisk.length} | SIT -{" "}
+              {sit_atrisk.length}
+            </p>
+          </div>
+          <p className="text-xl font-bold text-nowrap p-4 bg-red-50 text-amber-800 rounded-lg">
+            {data_atrisk.length} students
           </p>
         </div>
-        <p className="text-2xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">
-          {data.length}
-        </p>
-      </div>
-      <div className="flex flex-row flex-nowrap justify-between items-center ">
-        <div className="flex flex-col gap-1">
-          <p className="text-2xl font-bold ">Average Wait Time:</p>
-          <p className="text-sm text-muted-foreground italic text-balance">
-            From Application to Orientation (13 Sept 2025)
+        <div className="flex flex-row flex-nowrap justify-between items-center ">
+          <div className="flex flex-col gap-1">
+            <p className="text-2xl font-bold ">Already Lost:</p>
+            <p className="text-sm text-muted-foreground italic text-balance">
+              FOB - {fob_lost.length} | FEH - {feh_lost.length} | SIT -{" "}
+              {sit_lost.length}
+            </p>
+          </div>
+          <p className="text-xl font-bold text-nowrap p-4 bg-red-200 text-red-800 rounded-lg">
+            {data_lost.length} students
           </p>
         </div>
-        <p className="text-2xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">
-          {Math.round(averageWaitTime)} days
-        </p>
+        <div className="flex flex-row flex-nowrap justify-between items-center ">
+          <div className="flex flex-col gap-1">
+            <p className="text-2xl font-bold ">Average Wait Time:</p>
+            <p className="text-sm text-muted-foreground italic text-balance">
+              From Application to Orientation (13 Sept 2025)
+            </p>
+          </div>
+          <p className="text-xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">
+            {Math.round(averageWaitTime)} days
+          </p>
+        </div>
       </div>
 
       <Separator />
       <div className="flex flex-col gap-2">
-        <Badge variant={"default"} className="text-xl sticky top-10">
-          FoB
+        <Badge variant={"default"} className="text-xl sticky top-10 z-50">
+          FoB{" "}
+          <span className="text-sm italic">({fob_data.length} students)</span>
         </Badge>
         <div className="lg:grid grid-cols-2 gap-x-10">
           {uniqueprogramesfob.map((programme, index) => (
@@ -120,11 +165,12 @@ export default async function DemoPage() {
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <Badge variant={"default"} className="text-xl sticky top-10">
-          FEH
+        <Badge variant={"default"} className="text-xl sticky top-10 z-50">
+          FEH{" "}
+          <span className="text-sm italic">({feh_data.length} students)</span>
         </Badge>
 
-        <div className="">
+        <div className="lg:grid grid-cols-2 gap-x-10">
           {uniqueprogramesfeh.map((programme, index) => (
             <div key={index} className="pb-4">
               <div className="flex flex-row justify-between">
@@ -149,11 +195,12 @@ export default async function DemoPage() {
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <Badge variant={"default"} className="text-xl sticky top-10">
-          SIT
+        <Badge variant={"default"} className="text-xl sticky top-10 z-50">
+          SIT{" "}
+          <span className="text-sm italic">({sit_data.length} students)</span>
         </Badge>
 
-        <div className="">
+        <div className="lg:grid grid-cols-2 gap-x-10">
           {uniqueprogramessit.map((programme, index) => (
             <div key={index} className="pb-4">
               <div className="flex flex-row justify-between">

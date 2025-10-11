@@ -209,7 +209,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                     LMS Activity
                   </CardTitle>
                   <CardDescription className="text-sm text-muted-foreground italic">
-                    Data as of: 29 Sept 2025
+                    Data as of: 06 Oct 2025
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 gap-3">
