@@ -68,6 +68,18 @@ export default async function DemoPage() {
     <div className="container mx-auto py-10 space-y-4 max-w-lg lg:max-w-5xl px-8">
       <div className="flex flex-row flex-nowrap justify-between items-center ">
         <div className="flex flex-col gap-1">
+          <p className="text-2xl font-bold ">Total Lost:</p>
+          <p className="text-sm text-muted-foreground italic text-balance">
+            FOB - {fob_data.length} | FEH - {feh_data.length} | SIT -{" "}
+            {sit_data.length}
+          </p>
+        </div>
+        <p className="text-2xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">
+          {data.length}
+        </p>
+      </div>
+      <div className="flex flex-row flex-nowrap justify-between items-center ">
+        <div className="flex flex-col gap-1">
           <p className="text-2xl font-bold ">Average Wait Time:</p>
           <p className="text-sm text-muted-foreground italic text-balance">
             From Application to Orientation (13 Sept 2025)
