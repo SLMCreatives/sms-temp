@@ -3,7 +3,13 @@
 import { Students } from "@/app/student/studentColumns";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import {
+  ArrowRightCircle,
+  ArrowUpDown,
+  Mail,
+  MessageCircle,
+  Phone
+} from "lucide-react";
 import {
   HoverCard,
   HoverCardContent,
@@ -11,6 +17,13 @@ import {
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger
+} from "@/components/ui/drawer";
+import Link from "next/link";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -20,48 +33,192 @@ export type StudentProps = {
 
 export const columns: ColumnDef<Students>[] = [
   {
-    header: "No.",
-    cell: ({ row }) => row.index + 1
-  },
-  {
     accessorKey: "full_name",
     header: "Full Name",
     cell: ({ row }) => (
-      <div className="flex items-center w-[150px] lg:w-[175px]">
-        <HoverCard>
-          <HoverCardTrigger asChild>
-            <p className="text-sm leading-none text-muted-foreground truncate tracking-tighter capitalize">
-              {row.original.full_name.toLocaleLowerCase()}
-            </p>
-          </HoverCardTrigger>
-          <HoverCardContent className="w-80 flex flex-col gap-2 p-4">
-            <p className="text-xl font-semibold">{row.original.full_name}</p>
-            <div className="grid grid-cols-2 gap-2 justify-between">
-              <Label className="text-sm">Matric No.</Label>
-              <Input
-                type="text"
-                className="text-sm"
-                readOnly
-                defaultValue={row.original.matric_no}
-              />
-              <Label className="text-sm">Phone</Label>
-              <Input
-                type="text"
-                className="text-sm"
-                readOnly
-                defaultValue={row.original.phone}
-              />
-            </div>
-          </HoverCardContent>
-        </HoverCard>
-        {/* <Tooltip>
-          <TooltipTrigger asChild>
-            <p className="text-sm font-bold leading-none text-muted-foreground truncate">
-              {row.original.full_name}
-            </p>
-          </TooltipTrigger>
-          <TooltipContent>{row.original.full_name}</TooltipContent>
-        </Tooltip> */}
+      <div className="flex items-center min-w-[150px] lg:w-[175px]">
+        <div className="hidden lg:flex">
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <p className="text-sm leading-none text-muted-foreground truncate tracking-tighter capitalize">
+                {row.original.full_name.toLocaleLowerCase()}
+              </p>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80 flex flex-col gap-2 p-4">
+              <p className="text-xl font-semibold">{row.original.full_name}</p>
+              <div className="grid grid-cols-2 gap-2 justify-between">
+                <Label className="text-sm">Matric No.</Label>
+                <Input
+                  type="text"
+                  className="text-sm"
+                  readOnly
+                  defaultValue={row.original.matric_no}
+                />
+                <Label className="text-sm">Phone</Label>
+                <Input
+                  type="text"
+                  className="text-sm"
+                  readOnly
+                  defaultValue={row.original.phone}
+                />
+              </div>
+            </HoverCardContent>
+          </HoverCard>
+        </div>
+        <div className="flex lg:hidden">
+          <Drawer>
+            <DrawerTrigger>
+              <p className="text-sm leading-none text-muted-foreground truncate tracking-tighter capitalize">
+                {row.original.full_name.toLocaleLowerCase()}
+              </p>
+            </DrawerTrigger>
+            <DrawerContent className="w-full min-h-1/2 lg:max-w-2xl mx-auto overflow-scroll">
+              <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
+                <DrawerTitle className="w-full flex flex-row justify-between py-6">
+                  {row.original.matric_no}
+                  <div className="flex flex-row gap-4">
+                    <Link
+                      href={`tel:6${row.original.phone.replace(/[-]/g, "")}`}
+                    >
+                      <Phone className="h-6 w-6 text-cyan-500" />
+                    </Link>
+                    <Link
+                      href={`https://wa.me/6${row.original.phone.replace(
+                        /[-]/g,
+                        ""
+                      )}`}
+                    >
+                      <MessageCircle className="h-6 w-6 text-green-500" />
+                    </Link>
+                    <Link href={`mailto:${row.original.email}`}>
+                      <Mail className="h-6 w-6 text-slate-500" />
+                    </Link>
+                  </div>
+                </DrawerTitle>
+                <p className="text-2xl font-bold line-clamp-2 ">
+                  {row.original.full_name}
+                </p>
+                <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                  <Label
+                    htmlFor="programme_code"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Programme Name
+                  </Label>
+                  <Input
+                    name="programme_code"
+                    readOnly
+                    value={row.original.programme_name}
+                  />
+                  <Label
+                    htmlFor="email"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Email
+                  </Label>
+                  <Input
+                    name="email"
+                    readOnly
+                    value={row.original.email.toLocaleLowerCase()}
+                  />
+                  <Label
+                    htmlFor="phone"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Phone No.
+                  </Label>
+                  <Input name="phone" readOnly value={row.original.phone} />
+                  <Label
+                    htmlFor="nationality"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Nationality
+                  </Label>
+                  <Input
+                    name="nationality"
+                    readOnly
+                    value={row.original.nationality}
+                  />
+                  <Label
+                    htmlFor="status"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Status
+                  </Label>
+                  <Input
+                    name="status"
+                    readOnly
+                    value={row.original.status}
+                    className={`w-full ${
+                      row.original.status === "Active"
+                        ? "text-green-500 font-bold"
+                        : "text-red-500 font-bold"
+                    }`}
+                  />
+
+                  <p className="text-md font-bold col-span-2">CN Activity</p>
+                  <Label
+                    htmlFor="lms_activity"
+                    className="text-xs italic text-slate-500"
+                  >
+                    W3 Course Progress
+                  </Label>
+                  <Input
+                    name="lms_activity"
+                    readOnly
+                    value={
+                      Math.round(
+                        row.original.lms_activity !== null
+                          ? row.original.lms_activity.course_progress * 100
+                          : 0
+                      ) + "% (as of 6/10/25)"
+                    } //row.original.lms_activity.course_progress * 100 + "%"}
+                    className={`w-full ${
+                      row.original.lms_activity &&
+                      row.original.lms_activity.course_progress < 0.2
+                        ? "text-red-500 font-bold"
+                        : ""
+                    }`}
+                  />
+                  <Label
+                    htmlFor="engagement"
+                    className="text-xs italic text-slate-500"
+                  >
+                    Tried Reaching Out
+                  </Label>
+                  <Input
+                    name="engagement"
+                    readOnly
+                    value={
+                      (row.original.engagements !== null
+                        ? row.original.engagements.length
+                        : 0) + " time(s)"
+                    }
+                    className={`w-full ${
+                      row.original.engagements &&
+                      row.original.engagements.length >= 0
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  />
+                </div>
+                <Link
+                  href={`/student/${row.original.matric_no}`}
+                  target="_blank"
+                >
+                  <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
+                    <p className="text-md group-hover:font-bold">
+                      Student Page
+                    </p>
+                    <div className="flex flex-row gap-2">
+                      <ArrowRightCircle className="w-6 h-6 text-orange-500 group-hover:text-orange-600" />
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
       </div>
     )
   },

@@ -98,7 +98,7 @@ export function StudentList({
             <DrawerTrigger asChild>
               <ArrowUpCircle className="min-w-6 min-h-6 text-purple-500" />
             </DrawerTrigger>
-            <DrawerContent className="w-full min-h-full lg:max-w-2xl mx-auto overflow-scroll ring">
+            <DrawerContent className="w-full min-h-full lg:max-w-2xl mx-auto overflow-scroll">
               <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
                 <DrawerTitle className="w-full flex flex-row justify-between py-6">
                   {student.matric_no}
