@@ -94,6 +94,13 @@ export default async function DemoPage() {
     (student) => student.faculty_code === "SIT"
   );
 
+  const db_students = 974;
+
+  const attrition_rate = (
+    (data_atrisk.length + data_lost.length) /
+    db_students
+  ).toFixed(2);
+
   return (
     <div className="container mx-auto py-10 space-y-4 max-w-md lg:max-w-5xl px-8">
       <div className="flex flex-col gap-2 lg:grid lg:grid-cols-2 lg:gap-10">
@@ -130,6 +137,17 @@ export default async function DemoPage() {
           </div>
           <p className="text-xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">
             {Math.round(averageWaitTime)} days
+          </p>
+        </div>
+        <div className="flex flex-row flex-nowrap justify-between items-center ">
+          <div className="flex flex-col gap-1">
+            <p className="text-2xl font-bold ">Attrition Rate:</p>
+            <p className="text-sm text-muted-foreground italic text-balance">
+              from Total Apps (974)
+            </p>
+          </div>
+          <p className="text-xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">
+            {Number(attrition_rate) * 100} %
           </p>
         </div>
       </div>
