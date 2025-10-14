@@ -4,10 +4,10 @@ import {
   Mail,
   ArrowUpCircle,
   ArrowRightCircle,
-  AlertCircle,
   CircleCheckBig,
   UserRoundX,
-  BookX
+  BookX,
+  CircleSlash
 } from "lucide-react";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -67,7 +67,7 @@ export function StudentList({
         {lms_activity && lms_activity.course_progress === 0 ? (
           <Tooltip>
             <TooltipTrigger>
-              <AlertCircle className="w-5 h-5 text-red-600" />
+              <CircleSlash className="w-5 h-5 text-red-600" />
             </TooltipTrigger>
             <TooltipContent>0% Course Progress</TooltipContent>
           </Tooltip>

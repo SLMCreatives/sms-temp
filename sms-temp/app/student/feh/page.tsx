@@ -259,7 +259,7 @@ export default async function FEHPage() {
         </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>
-            W4 (At Risk onle) - (13/10 - 17/10) by Level
+            W4 (At Risk only) - (13/10 - 17/10) by Level
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-y-2 gap-x-4 justify-between w-full mr-4">

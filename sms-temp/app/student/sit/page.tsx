@@ -29,32 +29,28 @@ async function getData(): Promise<Students[]> {
 
 export default async function SITPage() {
   const sit_data = await getData();
-  const sit_active = sit_data.filter((student) => student.status === "Active");
+  const sit_active = sit_data.filter(
+    (student) => student.status === "Active" || student.status === "At Risk"
+  );
   const uniqueProgrammesMaster = [
     ...new Set(
-      sit_data
-        .filter(
-          (student) =>
-            student.study_level === "Master" && student.status === "Active"
-        )
+      sit_active
+        .filter((student) => student.study_level === "Master")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesFoundation = [
     ...new Set(
-      sit_data
-        .filter(
-          (student) =>
-            student.study_level === "Foundation" && student.status === "Active"
-        )
+      sit_active
+        .filter((student) => student.study_level === "Foundation")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesDiploma = [
     ...new Set(
-      sit_data
+      sit_active
         .filter((student) => student.study_level === "Diploma")
         .map((item) => item.programme_name)
     )
@@ -62,11 +58,8 @@ export default async function SITPage() {
 
   const uniqueProgrammesBachelor = [
     ...new Set(
-      sit_data
-        .filter(
-          (student) =>
-            student.study_level === "Bachelor" && student.status === "Active"
-        )
+      sit_active
+        .filter((student) => student.study_level === "Bachelor")
         .map((item) => item.programme_name)
     )
   ];
@@ -92,38 +85,69 @@ export default async function SITPage() {
     (wthreeengaged.length / sit_active.length) * 100
   );
 
+  const wfourengaged = sit_active.filter((student) =>
+    student.engagements.some((item) => item.created_at >= "2025-10-13")
+  );
+
+  const wfourpercentage = Math.round(
+    (wfourengaged.length / sit_active.length) * 100
+  );
+
   const engagedPercentage = Math.round(
     (engaged.length / sit_active.length) * 100
   );
 
   const foundation = sit_active.filter(
-    (student) => student.study_level === "Foundation"
+    (student) =>
+      student.study_level === "Foundation" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at === null)
   );
   const master = sit_active.filter(
-    (student) => student.study_level === "Master"
+    (student) =>
+      student.study_level === "Master" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at === null)
   );
   const diploma = sit_active.filter(
-    (student) => student.study_level === "Diploma"
+    (student) =>
+      student.study_level === "Diploma" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at === null)
   );
   const bachelor = sit_active.filter(
-    (student) => student.study_level === "Bachelor"
+    (student) =>
+      student.study_level === "Bachelor" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at === null)
   );
 
   const foundationNotEngaged = foundation.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const masterNotEngaged = master.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const diplomaNotEngaged = diploma.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const bachelorNotEngaged = bachelor.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
+  );
+
+  const toengage = sit_active.filter(
+    (student) =>
+      student.lms_activity?.course_progress <= 0.2 ||
+      student.lms_activity?.last_login_at === null
+  );
+
+  const w4NotEngaged = toengage.filter(
+    (student) =>
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
 
   return (
@@ -188,15 +212,42 @@ export default async function SITPage() {
                 value={wthreepercentage}
                 className=" h-5"
               ></Progress>
+              <Label
+                htmlFor="week4engaged"
+                className="flex flex-row w-full justify-between"
+              >
+                W4 Engaged{" "}
+                <span className="italic text-muted-foreground">
+                  {wfourengaged.length} ({wfourpercentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="week3engaged"
+                value={wfourpercentage}
+                className=" h-5"
+              ></Progress>
             </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>
-            W3 Engagement (06/10 - 11/10) by Level
+            W4 (At Risk only) - (13/10 - 17/10) by Level
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-y-2 gap-x-4 justify-between w-full mr-4">
+              <Label className="flex flex-row w-full justify-between">
+                Total At Risk
+                <span className="italic text-muted-foreground">
+                  {toengage.length - w4NotEngaged.length}/{toengage.length}
+                </span>
+              </Label>
+              <Progress
+                value={
+                  ((toengage.length - w4NotEngaged.length) / toengage.length) *
+                  100
+                }
+                className=" h-5 "
+              ></Progress>
               <Label className="flex flex-row w-full justify-between">
                 Foundation
                 <span className="italic text-muted-foreground">

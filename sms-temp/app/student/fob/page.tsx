@@ -29,58 +29,45 @@ async function getData(): Promise<Students[]> {
 
 export default async function FoBPage() {
   const fob_data = await getData();
-  const fob_active = fob_data.filter((student) => student.status === "Active");
+  const fob_active = fob_data.filter(
+    (student) => student.status === "Active" || student.status === "At Risk"
+  );
   const uniqueProgrammesMaster = [
     ...new Set(
-      fob_data
-        .filter(
-          (student) =>
-            student.study_level === "Master" && student.status === "Active"
-        )
+      fob_active
+        .filter((student) => student.study_level === "Master")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesFoundation = [
     ...new Set(
-      fob_data
-        .filter(
-          (student) =>
-            student.study_level === "Foundation" && student.status === "Active"
-        )
+      fob_active
+        .filter((student) => student.study_level === "Foundation")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesDiploma = [
     ...new Set(
-      fob_data
-        .filter(
-          (student) =>
-            student.study_level === "Diploma" && student.status === "Active"
-        )
+      fob_active
+        .filter((student) => student.study_level === "Diploma")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesBachelor = [
     ...new Set(
-      fob_data
-        .filter(
-          (student) =>
-            student.study_level === "Bachelor" && student.status === "Active"
-        )
+      fob_active
+        .filter((student) => student.study_level === "Bachelor")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesDoctorate = [
     ...new Set(
-      fob_data
-        .filter(
-          (student) =>
-            student.study_level === "Doctorate" && student.status === "Active"
-        )
+      fob_active
+        .filter((student) => student.study_level === "Doctorate")
         .map((item) => item.programme_name)
     )
   ];
@@ -121,40 +108,66 @@ export default async function FoBPage() {
   );
 
   const foundation = fob_active.filter(
-    (student) => student.study_level === "Foundation"
+    (student) =>
+      student.study_level === "Foundation" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.course_progress == null)
   );
   const master = fob_active.filter(
-    (student) => student.study_level === "Master"
+    (student) =>
+      student.study_level === "Master" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.course_progress == null)
   );
   const diploma = fob_active.filter(
-    (student) => student.study_level === "Diploma"
+    (student) =>
+      student.study_level === "Diploma" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.course_progress == null)
   );
   const bachelor = fob_active.filter(
-    (student) => student.study_level === "Bachelor"
+    (student) =>
+      student.study_level === "Bachelor" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.course_progress == null)
   );
   const doctorate = fob_active.filter(
-    (student) => student.study_level === "Doctorate"
+    (student) =>
+      student.study_level === "Doctorate" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.course_progress == null)
   );
 
   const foundationNotEngaged = foundation.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-13")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const masterNotEngaged = master.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-13")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const diplomaNotEngaged = diploma.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-13")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const bachelorNotEngaged = bachelor.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-13")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const doctorateNotEngaged = doctorate.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-13")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
+  );
+
+  const toengage = fob_active.filter(
+    (student) =>
+      student.lms_activity?.course_progress <= 0.2 ||
+      student.lms_activity?.last_login_at === null
+  );
+
+  const w4NotEngaged = toengage.filter(
+    (student) =>
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
 
   return (
@@ -238,10 +251,23 @@ export default async function FoBPage() {
         </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>
-            W3 Engagement (06/10 - 11/10) by Level
+            W4 (At Risk only) - (13/10 - 17/10) by Level
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-y-2 gap-x-4 justify-between w-full mr-4">
+              <Label className="flex flex-row w-full justify-between">
+                Total At Risk
+                <span className="italic text-muted-foreground">
+                  {toengage.length - w4NotEngaged.length}/{toengage.length}
+                </span>
+              </Label>
+              <Progress
+                value={
+                  ((toengage.length - w4NotEngaged.length) / toengage.length) *
+                  100
+                }
+                className=" h-5 "
+              ></Progress>
               <Label className="flex flex-row w-full justify-between">
                 Foundation
                 <span className="italic text-muted-foreground">
