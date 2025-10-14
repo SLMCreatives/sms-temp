@@ -26,6 +26,10 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
     (student) => student.status === "Active" && student.lms_activity_w2
   );
 
+  const w3_active_students = db_students.filter(
+    (student) => student.status === "Active" && student.lms_activity_w3
+  );
+
   const not_logged_in = active_students.filter(
     (student) =>
       student.lms_activity && student.lms_activity.last_login_at === null
@@ -41,6 +45,10 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       student.lms_activity_w2 && student.lms_activity_w2.last_login_at === null
   );
 
+  const w3_notlogged_in = db_students.filter(
+    (student) =>
+      student.lms_activity_w3 && student.lms_activity_w3.last_login_at === null
+  );
   const zero_progress = db_students.filter(
     (student) =>
       student.lms_activity &&
@@ -60,6 +68,13 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       student.lms_activity_w2 &&
       student.lms_activity_w2.course_progress === 0 &&
       !w2_notlogged_in.includes(student)
+  );
+
+  const w3_zero_progress = db_students.filter(
+    (student) =>
+      student.lms_activity_w3 &&
+      student.lms_activity_w3.course_progress === 0 &&
+      !w3_notlogged_in.includes(student)
   );
 
   const low_progress = db_students.filter(
@@ -84,6 +99,14 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       student.lms_activity_w2.course_progress <= 0.2 &&
       !w2_zero_progress.includes(student) &&
       !w2_notlogged_in.includes(student)
+  );
+
+  const w3_low_progress = db_students.filter(
+    (student) =>
+      student.lms_activity_w3 &&
+      student.lms_activity_w3.course_progress <= 0.2 &&
+      !w3_zero_progress.includes(student) &&
+      !w3_notlogged_in.includes(student)
   );
 
   return (
@@ -121,6 +144,13 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               W2 - {w2_active_students.length} (
               {Math.round(
                 (w2_active_students.length / db_students.length) * 100
+              )}
+              % )
+            </p>
+            <p className="text-xs italic text-muted-foreground">
+              W3 - {w3_active_students.length} (
+              {Math.round(
+                (w3_active_students.length / db_students.length) * 100
               )}
               % )
             </p>
@@ -166,6 +196,13 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               )}
               %)
             </p>
+            <p className="text-xs italic text-muted-foreground">
+              W3 - {w3_notlogged_in.length} (
+              {Math.round(
+                (w3_notlogged_in.length / w3_active_students.length) * 100
+              )}
+              %)
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -208,6 +245,13 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               )}
               %)
             </p>
+            <p className="text-xs italic text-muted-foreground">
+              W3 - {w3_zero_progress.length} (
+              {Math.round(
+                (w3_zero_progress.length / w3_active_students.length) * 100
+              )}
+              %)
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -246,6 +290,13 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               W2 - {w2_low_progress.length} (
               {Math.round(
                 (w2_low_progress.length / w2_active_students.length) * 100
+              )}
+              %)
+            </p>
+            <p className="text-xs italic text-muted-foreground">
+              W3 - {w3_low_progress.length} (
+              {Math.round(
+                (w3_low_progress.length / w3_active_students.length) * 100
               )}
               %)
             </p>

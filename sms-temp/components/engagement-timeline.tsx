@@ -67,7 +67,6 @@ const filterNoReponseByDate = (
 };
 
 export default function EngagementTimeline({ data }: StudentChartProps) {
-  console.log(data);
   const db_students = data as Students[];
 
   const allEngagements = db_students.flatMap((student) => student.engagements);
@@ -172,7 +171,6 @@ export default function EngagementTimeline({ data }: StudentChartProps) {
     allEngagements,
     "2025-09-29"
   ).length;
-  console.log(no_response_monday);
   const no_response_tuesday = filterNoReponseByDate(
     allEngagements,
     "2025-09-30"

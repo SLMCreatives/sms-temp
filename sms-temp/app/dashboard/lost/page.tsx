@@ -97,9 +97,11 @@ export default async function DemoPage() {
   const db_students = 974;
 
   const attrition_rate = (
-    (data_atrisk.length + data_lost.length) /
-    db_students
+    ((data_atrisk.length + data_lost.length) / db_students) *
+    100
   ).toFixed(2);
+  const lost_rate = data_lost.length / db_students;
+  const atrisk_rate = data_atrisk.length / db_students;
 
   return (
     <div className="container mx-auto py-10 space-y-4 max-w-md lg:max-w-5xl px-8">
@@ -118,7 +120,7 @@ export default async function DemoPage() {
         </div>
         <div className="flex flex-row flex-nowrap justify-between items-center ">
           <div className="flex flex-col gap-1">
-            <p className="text-2xl font-bold ">Already Lost:</p>
+            <p className="text-2xl font-bold ">Total Lost:</p>
             <p className="text-sm text-muted-foreground italic text-balance">
               FOB - {fob_lost.length} | FEH - {feh_lost.length} | SIT -{" "}
               {sit_lost.length}
@@ -141,13 +143,14 @@ export default async function DemoPage() {
         </div>
         <div className="flex flex-row flex-nowrap justify-between items-center ">
           <div className="flex flex-col gap-1">
-            <p className="text-2xl font-bold ">Attrition Rate:</p>
+            <p className="text-2xl font-bold ">Actual Attrition Rate:</p>
             <p className="text-sm text-muted-foreground italic text-balance">
-              from Total Apps (974)
+              Total Apps (974) | Lost Rate {Math.round(lost_rate * 100)}% | At
+              Risk Rate {Math.round(atrisk_rate * 100)}%
             </p>
           </div>
           <p className="text-xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">
-            {Number(attrition_rate) * 100} %
+            {attrition_rate}%
           </p>
         </div>
       </div>

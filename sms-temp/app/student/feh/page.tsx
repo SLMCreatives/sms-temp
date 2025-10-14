@@ -29,62 +29,49 @@ async function getData(): Promise<Students[]> {
 
 export default async function FEHPage() {
   const feh_data = await getData();
-  const active = feh_data.filter((student) => student.status === "Active");
+  const active = feh_data.filter(
+    (student) => student.status === "Active" || student.status === "At Risk"
+  );
   /* const uniqueProgrames = [
     ...new Set(feh_data.map((item) => item.programme_name))
   ]; */
 
   const uniqueProgrammesMaster = [
     ...new Set(
-      feh_data
-        .filter(
-          (student) =>
-            student.study_level === "Master" && student.status === "Active"
-        )
+      active
+        .filter((student) => student.study_level === "Master")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesFoundation = [
     ...new Set(
-      feh_data
-        .filter(
-          (student) =>
-            student.study_level === "Foundation" && student.status === "Active"
-        )
+      active
+        .filter((student) => student.study_level === "Foundation")
         .map((item) => item.programme_name)
     )
   ];
 
   const unqueProgrammesDiploma = [
     ...new Set(
-      feh_data
-        .filter(
-          (student) =>
-            student.study_level === "Diploma" && student.status === "Active"
-        )
+      active
+        .filter((student) => student.study_level === "Diploma")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesBachelor = [
     ...new Set(
-      feh_data
-        .filter(
-          (student) =>
-            student.study_level === "Bachelor" && student.status === "Active"
-        )
+      active
+        .filter((student) => student.study_level === "Bachelor")
         .map((item) => item.programme_name)
     )
   ];
 
   const uniqueProgrammesDoctorate = [
     ...new Set(
-      feh_data
-        .filter(
-          (student) =>
-            student.study_level === "Doctorate" && student.status === "Active"
-        )
+      active
+        .filter((student) => student.study_level === "Doctorate")
         .map((item) => item.programme_name)
     )
   ];
@@ -105,6 +92,14 @@ export default async function FEHPage() {
 
   const w3percentage = Math.round((w3engaged.length / active.length) * 100);
 
+  const w4engaged = active.filter((student) =>
+    student.engagements.some(
+      (engagement) => engagement.created_at > "2025-10-13"
+    )
+  );
+
+  const w4percentage = Math.round((w4engaged.length / active.length) * 100);
+
   const woneengaged = active.filter((student) =>
     student.engagements.some(
       (engagement) => engagement.created_at <= "2025-09-28"
@@ -118,40 +113,70 @@ export default async function FEHPage() {
   const engagedPercentage = Math.round((engaged.length / active.length) * 100);
 
   const foundation = active.filter(
-    (student) => student.study_level === "Foundation"
+    (student) =>
+      student.study_level === "Foundation" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at == null)
   );
 
   const bachelor = active.filter(
-    (student) => student.study_level === "Bachelor"
+    (student) =>
+      student.study_level === "Bachelor" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at == null)
   );
 
-  const master = active.filter((student) => student.study_level === "Master");
+  const master = active.filter(
+    (student) =>
+      student.study_level === "Master" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at == null)
+  );
 
-  const diploma = active.filter((student) => student.study_level === "Diploma");
+  const diploma = active.filter(
+    (student) =>
+      student.study_level === "Diploma" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at == null)
+  );
 
   const doctorate = active.filter(
-    (student) => student.study_level === "Doctorate"
+    (student) =>
+      student.study_level === "Doctorate" &&
+      (student.lms_activity?.course_progress <= 0.2 ||
+        student.lms_activity?.last_login_at == null)
   );
 
   const foundationNotEngaged = foundation.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const masterNotEngaged = master.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const diplomaNotEngaged = diploma.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const bachelorNotEngaged = bachelor.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   const doctorateNotEngaged = doctorate.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
+  );
+
+  const toengage = active.filter(
+    (student) =>
+      student.lms_activity?.course_progress <= 0.2 ||
+      student.lms_activity?.last_login_at === null
+  );
+
+  const w4NotEngaged = toengage.filter(
+    (student) =>
+      !student.engagements.some((item) => item.created_at >= "2025-10-13")
   );
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
@@ -215,15 +240,42 @@ export default async function FEHPage() {
                 value={w3percentage}
                 className=" h-5"
               ></Progress>
+              <Label
+                htmlFor="week3engaged"
+                className="flex flex-row w-full justify-between"
+              >
+                W4 Engaged{" "}
+                <span className="italic text-muted-foreground">
+                  {w4engaged.length} ({w4percentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="week3engaged"
+                value={w4percentage}
+                className=" h-5"
+              ></Progress>
             </div>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>
-            W3 Engagement (6/10 - 11/10) by Level
+            W4 (At Risk onle) - (13/10 - 17/10) by Level
           </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-y-2 gap-x-4 justify-between w-full mr-4">
+              <Label className="flex flex-row w-full justify-between">
+                Total At Risk
+                <span className="italic text-muted-foreground">
+                  {toengage.length - w4NotEngaged.length}/{toengage.length}
+                </span>
+              </Label>
+              <Progress
+                value={
+                  ((toengage.length - w4NotEngaged.length) / toengage.length) *
+                  100
+                }
+                className=" h-5 "
+              ></Progress>
               <Label className="flex flex-row w-full justify-between">
                 Foundation
                 <span className="italic text-muted-foreground">
@@ -327,7 +379,7 @@ export default async function FEHPage() {
                 className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10 lg:grid grid-cols-2
               "
               >
-                {feh_data
+                {active
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
@@ -353,7 +405,7 @@ export default async function FEHPage() {
                 className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10 lg:grid grid-cols-2
               "
               >
-                {feh_data
+                {active
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
@@ -379,7 +431,7 @@ export default async function FEHPage() {
                 className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10 lg:grid grid-cols-2
               "
               >
-                {feh_data
+                {active
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
@@ -405,7 +457,7 @@ export default async function FEHPage() {
                 className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10 lg:grid grid-cols-2
               "
               >
-                {feh_data
+                {active
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList
@@ -431,7 +483,7 @@ export default async function FEHPage() {
                 className="flex flex-col gap-2 pb-4 border-b-2 border-b-foreground/10 lg:grid grid-cols-2
               "
               >
-                {feh_data
+                {active
                   .filter((student) => student.programme_name === programme)
                   .map((student, index) => (
                     <StudentList

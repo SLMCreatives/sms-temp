@@ -100,6 +100,14 @@ export default async function FoBPage() {
     (wthreeengaged.length / fob_active.length) * 100
   );
 
+  const wfourengaged = fob_active.filter((student) =>
+    student.engagements.some((item) => item.created_at > "2025-10-13")
+  );
+
+  const wfourpercentage = Math.round(
+    (wfourengaged.length / fob_active.length) * 100
+  );
+
   const woneengaged = fob_active.filter((student) =>
     student.engagements.some((item) => item.created_at <= "2025-09-28")
   );
@@ -130,23 +138,23 @@ export default async function FoBPage() {
 
   const foundationNotEngaged = foundation.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at > "2025-10-13")
   );
   const masterNotEngaged = master.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at > "2025-10-13")
   );
   const diplomaNotEngaged = diploma.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at > "2025-10-13")
   );
   const bachelorNotEngaged = bachelor.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at > "2025-10-13")
   );
   const doctorateNotEngaged = doctorate.filter(
     (student) =>
-      !student.engagements.some((item) => item.created_at > "2025-10-06")
+      !student.engagements.some((item) => item.created_at > "2025-10-13")
   );
 
   return (
@@ -209,6 +217,20 @@ export default async function FoBPage() {
               <Progress
                 id="week3engaged"
                 value={wthreepercentage}
+                className=" h-5"
+              ></Progress>
+              <Label
+                htmlFor="week3engaged"
+                className="flex flex-row w-full justify-between"
+              >
+                W4 Engaged{" "}
+                <span className="italic text-muted-foreground">
+                  {wfourengaged.length} ({wfourpercentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="week3engaged"
+                value={wfourpercentage}
                 className=" h-5"
               ></Progress>
             </div>

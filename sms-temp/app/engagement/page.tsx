@@ -73,7 +73,6 @@ export default async function EngagementPage() {
     return [];
   }
 
-  // console.log(engagements.length);
   // Now we can use the client methods
   const formatDate = (dateString: string) => {
     // convert date to locate string
