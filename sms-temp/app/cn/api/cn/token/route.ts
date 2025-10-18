@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const key = process.env.CN_CONSUMER_KEY!;
-  const secret = process.env.CN_SECRET_KEY!;
+  const key = process.env.NEXT_PUBLIC_CONSUMER_KEY!;
+  const secret = process.env.NEXT_PUBLIC_CONSUMER_SECRET!;
   const basic = Buffer.from(
     encodeURIComponent(key) + ":" + encodeURIComponent(secret)
   ).toString("base64");
 
-  const res = await fetch(`${process.env.CN_OAUTH_BASE}/token`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_CN_API_BASE}`, {
     method: "POST",
     headers: {
       Authorization: `Basic ${basic}`,

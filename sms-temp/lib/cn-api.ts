@@ -1,16 +1,9 @@
-/**
- * CN API Client for OAuth 2.0 Client Credentials flow
- */
-
-const CN_API_BASE_URL = "https://api.thecn.com/v1";
-const CN_TOKEN_URL = "https://www.thecn.com/oauth2/token"; // Adjust if different
-
-interface TokenResponse {
+/* interface TokenResponse {
   access_token: string;
   token_type: string;
   expires_in: number;
 }
-
+ */
 interface CNUser {
   id: string;
   cn_number: string;
@@ -36,52 +29,35 @@ interface CNAPIResponse<T> {
   code?: number;
 }
 
-let cachedToken: { token: string; expiresAt: number } | null = null;
+//let cachedToken: { token: string; expiresAt: number } | null = null;
 
 /**
  * Get OAuth 2.0 access token using client credentials
  */
-async function getAccessToken(): Promise<string> {
-  // Check if we have a valid cached token
-  if (cachedToken && cachedToken.expiresAt > Date.now()) {
-    return cachedToken.token;
-  }
+async function getAccessToken() {
+  const consumerKey = process.env.NEXT_PUBLIC_CONSUMER_KEY;
+  const consumerSecret = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
 
-  const clientId = process.env.CN_CLIENT_ID;
-  const clientSecret = process.env.CN_CLIENT_SECRET;
+  // Encode credentials
+  const credentials = `${consumerKey}:${consumerSecret}`;
+  const encodedCredentials = Buffer.from(credentials).toString("base64");
 
-  if (!clientId || !clientSecret) {
-    throw new Error("CN_CLIENT_ID and CN_CLIENT_SECRET must be set");
-  }
-  const basic = Buffer.from(
-    encodeURIComponent(clientId) + ":" + encodeURIComponent(clientSecret)
-  ).toString("base64");
-
-  console.log("Getting access token", basic);
-
-  const response = await fetch(CN_TOKEN_URL, {
+  // Make the request
+  const response = await fetch("https://www.thecn.com/oauth2/token", {
     method: "POST",
     headers: {
-      Authorization: `Basic ${basic}`,
+      Authorization: `Basic ${encodedCredentials}`,
       "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
     },
     body: "grant_type=client_credentials",
-    // token request should never be cached
     cache: "no-store"
   });
-  if (!response.ok) {
-    throw new Error(`Failed to get access token: ${response.statusText}`);
-  }
 
-  const data: TokenResponse = await response.json();
+  const data = await response.json();
 
-  // Cache the token (subtract 60 seconds for safety margin)
-  cachedToken = {
-    token: data.access_token,
-    expiresAt: Date.now() + (data.expires_in - 60) * 1000
+  return {
+    accessToken: data.access_token
   };
-
-  return data.access_token;
 }
 
 /**
@@ -92,15 +68,20 @@ async function cnApiRequest<T>(
   options: RequestInit = {}
 ): Promise<CNAPIResponse<T>> {
   const token = await getAccessToken();
+  console.log(token);
 
-  const response = await fetch(`${CN_API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_CN_API_BASE}${endpoint}`,
+    {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
     }
-  });
+  );
+  console.log(response);
 
   if (!response.ok) {
     throw new Error(`CN API request failed: ${response.statusText}`);

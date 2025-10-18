@@ -15,7 +15,7 @@ interface StudentMetricsProps {
 export function StudentMetrics({ data }: StudentMetricsProps) {
   const db_students = data as Students[];
   const active_students = db_students.filter(
-    (student) => student.status === "Active"
+    (student) => student.status === "Active" || student.status === "At Risk"
   );
 
   const w1_active_students = db_students.filter(
@@ -49,35 +49,35 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
     (student) =>
       student.lms_activity_w3 && student.lms_activity_w3.last_login_at === null
   );
-  const zero_progress = db_students.filter(
+  const zero_progress = active_students.filter(
     (student) =>
       student.lms_activity &&
       student.lms_activity.course_progress === 0 &&
       !not_logged_in.includes(student)
   );
 
-  const w1_zero_progress = db_students.filter(
+  const w1_zero_progress = active_students.filter(
     (student) =>
       student.lms_activity_w1 &&
       student.lms_activity_w1.course_progress === 0 &&
       !w1_notlogged_in.includes(student)
   );
 
-  const w2_zero_progress = db_students.filter(
+  const w2_zero_progress = active_students.filter(
     (student) =>
       student.lms_activity_w2 &&
       student.lms_activity_w2.course_progress === 0 &&
       !w2_notlogged_in.includes(student)
   );
 
-  const w3_zero_progress = db_students.filter(
+  const w3_zero_progress = active_students.filter(
     (student) =>
       student.lms_activity_w3 &&
       student.lms_activity_w3.course_progress === 0 &&
       !w3_notlogged_in.includes(student)
   );
 
-  const low_progress = db_students.filter(
+  const low_progress = active_students.filter(
     (student) =>
       student.lms_activity &&
       student.lms_activity.course_progress <= 0.2 &&
@@ -85,7 +85,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       !not_logged_in.includes(student)
   );
 
-  const w1_low_progress = db_students.filter(
+  const w1_low_progress = active_students.filter(
     (student) =>
       student.lms_activity_w1 &&
       student.lms_activity_w1.course_progress <= 0.2 &&
@@ -93,7 +93,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       !w1_notlogged_in.includes(student)
   );
 
-  const w2_low_progress = db_students.filter(
+  const w2_low_progress = active_students.filter(
     (student) =>
       student.lms_activity_w2 &&
       student.lms_activity_w2.course_progress <= 0.2 &&
@@ -101,7 +101,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       !w2_notlogged_in.includes(student)
   );
 
-  const w3_low_progress = db_students.filter(
+  const w3_low_progress = active_students.filter(
     (student) =>
       student.lms_activity_w3 &&
       student.lms_activity_w3.course_progress <= 0.2 &&
