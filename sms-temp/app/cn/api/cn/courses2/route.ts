@@ -29,6 +29,7 @@ const CN_API_BASE = process.env.NEXT_PUBLIC_CN_API_BASE;
 const consumerKeyCN = process.env.CN_CLIENT_ID;
 const consumerSecretCN = process.env.CN_CLIENT_SECRET;
 const clientNameCN = process.env.CLIENT_NAME;
+const oauthBaseURL = process.env.NEXT_PUBLIC_CN_OATH_BASE;
 
 export async function GET(request: NextRequest) {
   try {
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
       const encodedCredentials = Buffer.from(credentials).toString("base64");
 
       // Make the request
-      const response = await fetch(`${process.env.NEXT_PUBLIC_CN_OATH_BASE}`, {
+      const response = await fetch(`${oauthBaseURL}`, {
         method: "POST",
         headers: {
           Authorization: `Basic ${encodedCredentials}`,

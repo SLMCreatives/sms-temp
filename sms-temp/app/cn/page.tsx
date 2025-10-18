@@ -34,7 +34,7 @@ export default function CoursesPage() {
       try {
         setLoading(true);
         const res = await fetch(
-          `/cn/api/cn/courses2?limit=12&offset=${offset}`
+          `@/app/cn/api/cn/courses2?limit=12&offset=${offset}`
         );
         const json: ApiResp = await res.json();
         if (json.data) {
