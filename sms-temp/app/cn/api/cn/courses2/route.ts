@@ -24,12 +24,12 @@ interface CNEnrollment {
   updated_at: string;
 }
 
-const CN_API_BASE = process.env.NEXT_PUBLIC_CN_API_BASE;
+const CN_API_BASE = "https://api.thecn.com/v1";
 
-const consumerKeyCN = process.env.CN_CLIENT_ID;
-const consumerSecretCN = process.env.CN_CLIENT_SECRET;
-const clientNameCN = process.env.CLIENT_NAME;
-const oauthBaseURL = process.env.NEXT_PUBLIC_CN_OATH_BASE;
+const consumerKeyCN = "64db1c79e35314ba4507ac76";
+const consumerSecretCN = "3cd-0MFyQiHAtaa9cqi4iPgRgpMX23Jp";
+const clientNameCN = "UNITAR";
+const oauthBaseURL = "https://www.thecn.com/oauth2/token";
 
 export async function GET(request: NextRequest) {
   try {
