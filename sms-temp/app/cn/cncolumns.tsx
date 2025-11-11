@@ -1,12 +1,15 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type CNUsers = {
   id: string;
   cn_number: string;
+  institution_id: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -22,6 +25,10 @@ export const columns: ColumnDef<CNUsers>[] = [
     header: "CN Number"
   },
   {
+    accessorKey: "institution_id",
+    header: "Matric No"
+  },
+  {
     accessorKey: "first_name",
     header: "First Name"
   },
@@ -32,5 +39,19 @@ export const columns: ColumnDef<CNUsers>[] = [
   {
     accessorKey: "status",
     header: "Status"
+  },
+  {
+    header: "Action",
+    cell: ({ row }) => {
+      return (
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href={`/cn/${row.original.user_id}`} target="_blank">
+              View{" "}
+            </Link>
+          </Button>
+        </div>
+      );
+    }
   }
 ];

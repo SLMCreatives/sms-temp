@@ -60,6 +60,8 @@ export type Students = {
   lms_activity_w1: LMSActivity;
   lms_activity_w2: LMSActivity;
   lms_activity_w3: LMSActivity;
+  nov25_lms_activity: LMSActivity;
+  nov25_engagements: Engagements[];
 };
 
 export const studentColumns: ColumnDef<Students>[] = [

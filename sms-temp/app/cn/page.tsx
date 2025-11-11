@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 interface CNUser {
   id: string;
   cn_number: string;
+  institution_id: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -20,7 +21,7 @@ type dataType = {
   data: CNUser[];
 };
 
-type ApiResp = { data?: dataType; errs?: unknown };
+type ApiResp<T> = { data?: T; errs?: unknown };
 
 export default function CoursesPage() {
   const [loading, setLoading] = useState(false);
@@ -33,10 +34,8 @@ export default function CoursesPage() {
     async function load() {
       try {
         setLoading(true);
-        const res = await fetch(
-          `/cn/api/cn/courses2?limit=12&offset=${offset}`
-        );
-        const json: ApiResp = await res.json();
+        const res = await fetch(`/cn/api/cn/users?limit=12&offset=${offset}`);
+        const json: ApiResp<dataType> = await res.json();
         if (json.data) {
           setUserLists(json.data);
         }

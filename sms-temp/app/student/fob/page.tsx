@@ -17,8 +17,8 @@ const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
-    .from("students")
-    .select("*, lms_activity(*), engagements(*)")
+    .from("nov25_students")
+    .select("*, nov25_lms_activity(*), nov25_engagements(*)")
     .eq("faculty_code", "FOB");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -72,7 +72,15 @@ export default async function FoBPage() {
     )
   ];
 
-  const engaged = fob_active.filter((student) =>
+  const notloggedin = fob_active.filter(
+    (student) => student.nov25_lms_activity?.last_login_at === null
+  );
+
+  const notloggedinPercentage = Math.round(
+    (notloggedin.length / fob_active.length) * 100
+  );
+
+  /* const engaged = fob_active.filter((student) =>
     student.engagements.some(
       (item) =>
         item.created_at > "2025-09-28" && item.created_at <= "2025-10-05"
@@ -168,7 +176,7 @@ export default async function FoBPage() {
   const w4NotEngaged = toengage.filter(
     (student) =>
       !student.engagements.some((item) => item.created_at >= "2025-10-13")
-  );
+  ); */
 
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
@@ -191,6 +199,21 @@ export default async function FoBPage() {
               <Progress id="active" value={100} className=" h-5"></Progress>
 
               <Label
+                htmlFor="notloggedin"
+                className="flex flex-row w-full justify-between"
+              >
+                Not Logged In{" "}
+                <span className="italic text-muted-foreground">
+                  {notloggedin.length}
+                </span>
+              </Label>
+              <Progress
+                id="notloggedin"
+                value={notloggedinPercentage}
+                className=" h-5"
+              ></Progress>
+
+              {/* <Label
                 htmlFor="wonepercentage"
                 className="flex flex-row w-full justify-between"
               >
@@ -245,11 +268,11 @@ export default async function FoBPage() {
                 id="week3engaged"
                 value={wfourpercentage}
                 className=" h-5"
-              ></Progress>
+              ></Progress> */}
             </div>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="item-2">
+        {/* <AccordionItem value="item-2">
           <AccordionTrigger>
             W4 (At Risk only) - (13/10 - 17/10) by Level
           </AccordionTrigger>
@@ -346,7 +369,7 @@ export default async function FoBPage() {
               />
             </div>
           </AccordionContent>
-        </AccordionItem>
+        </AccordionItem> */}
       </Accordion>
       <div className="flex flex-col w-full">
         <StudentListLegend />

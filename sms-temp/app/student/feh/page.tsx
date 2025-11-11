@@ -17,8 +17,8 @@ const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
-    .from("students")
-    .select("*, lms_activity(*), engagements(*)")
+    .from("nov25_students")
+    .select("*, nov25_lms_activity(*), nov25_engagements(*)")
     .eq("faculty_code", "FEH");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -75,7 +75,7 @@ export default async function FEHPage() {
         .map((item) => item.programme_name)
     )
   ];
-
+  /* 
   const engaged = active.filter((student) =>
     student.engagements.some(
       (engagement) =>
@@ -177,7 +177,16 @@ export default async function FEHPage() {
   const w4NotEngaged = toengage.filter(
     (student) =>
       !student.engagements.some((item) => item.created_at >= "2025-10-13")
+  ); */
+
+  const notloggedin = active.filter(
+    (student) => student.nov25_lms_activity?.last_login_at === null
   );
+
+  const notloggedinPercentage = Math.round(
+    (notloggedin.length / active.length) * 100
+  );
+
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
       <p className="text-3xl italic font-bold">FEH</p>
@@ -197,8 +206,22 @@ export default async function FEHPage() {
                 </span>
               </Label>
               <Progress id="active" value={100} className=" h-5"></Progress>
-
               <Label
+                htmlFor="notloggedin"
+                className="flex flex-row w-full justify-between"
+              >
+                Not Logged In{" "}
+                <span className="italic text-muted-foreground">
+                  {notloggedin.length}
+                </span>
+              </Label>
+              <Progress
+                id="notloggedin"
+                value={notloggedinPercentage}
+                className=" h-5"
+              ></Progress>
+
+              {/* <Label
                 htmlFor="wonepercentage"
                 className="flex flex-row w-full justify-between"
               >
@@ -351,7 +374,7 @@ export default async function FEHPage() {
                 }
                 max={doctorate.length}
                 className="h-5"
-              />
+              /> */}
             </div>
           </AccordionContent>
         </AccordionItem>

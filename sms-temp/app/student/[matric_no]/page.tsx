@@ -21,8 +21,8 @@ export default function StudentPage({
     async function fetchStudent() {
       try {
         const { data, error } = await supabase
-          .from("students")
-          .select("*, engagements(*), lms_activity(*)")
+          .from("nov25_students")
+          .select("*, nov25_engagements(*), nov25_lms_activity(*)")
           .eq("matric_no", matric_no)
           .single();
 

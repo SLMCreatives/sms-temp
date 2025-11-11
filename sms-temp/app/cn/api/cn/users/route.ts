@@ -34,7 +34,7 @@ const oauthBaseURL = "https://www.thecn.com/oauth2/token";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const limit = Number.parseInt(searchParams.get("limit") || "10");
+    const limit = Number.parseInt(searchParams.get("limit") || "12");
     const offset = Number.parseInt(searchParams.get("offset") || "0");
 
     // Fetch institution users (which represent course participants)

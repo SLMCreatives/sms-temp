@@ -278,8 +278,8 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-2">
-                {studentData.engagements.length === 0 && "No activity yet"}
-                {studentData.engagements.length > 0 &&
+                {!studentData.engagements && "No activity yet"}
+                {studentData.engagements &&
                   studentData.engagements.map((engagement, index) => (
                     <Card key={index} className="relative">
                       <CardContent className="flex flex-col gap-2">

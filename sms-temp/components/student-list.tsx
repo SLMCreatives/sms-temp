@@ -83,7 +83,7 @@ export function StudentList({
           </Tooltip>
         ) : null}{" "}
         {student.status === "Active" &&
-        student.engagements.length > 0 &&
+        student.engagements &&
         student.engagements.some((item) => item.created_at > "2025-10-13") ? (
           <Tooltip>
             <TooltipTrigger>

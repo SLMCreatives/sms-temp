@@ -18,7 +18,7 @@ export function Hero() {
   useEffect(() => {
     async function fetchStudents() {
       const { data: students, error } = await supabase
-        .from("students")
+        .from("nov25_students")
         .select("*");
 
       if (error) {

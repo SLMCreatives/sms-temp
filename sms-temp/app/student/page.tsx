@@ -7,7 +7,9 @@ import Link from "next/link";
 const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
-  const { data: students, error } = await supabase.from("students").select("*");
+  const { data: students, error } = await supabase
+    .from("nov25_students")
+    .select("*");
   if (error) {
     console.log("Error fetching data:", error.message);
     return [];
@@ -35,7 +37,7 @@ export default async function DemoPage() {
       </div> */}
       <div className="flex flex-col gap-2 p-10">
         <h1 className="font-bold text-2xl mb-4 flex justify-between items-center">
-          New Student List <Badge>Sept 2025</Badge>
+          New Student List <Badge>November 2025</Badge>
         </h1>
         <p>
           UNITAR has {active} <span className="italic">active</span> new online
