@@ -209,7 +209,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                     LMS Activity
                   </CardTitle>
                   <CardDescription className="text-sm text-muted-foreground italic">
-                    Data as of: 06 Oct 2025
+                    Data as of: 10 Nov 2025
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 gap-3">
@@ -229,9 +229,9 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                       Course Progress
                     </p>
                     <p className="font-medium text-foreground text-sm md:text-base">
-                      {(studentData.lms_activity &&
+                      {(studentData.nov25_lms_activity &&
                         Math.round(
-                          studentData.lms_activity.course_progress * 100
+                          studentData.nov25_lms_activity.course_progress * 100
                         ) + "%") ||
                         "No record"}
                     </p>
@@ -240,9 +240,9 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Status</p>
                     <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.lms_activity === null ? "Unknown" : ""}
-                      {studentData.lms_activity &&
-                      studentData.lms_activity?.course_progress <= 0.2
+                      {studentData.nov25_lms_activity === null ? "Unknown" : ""}
+                      {studentData.nov25_lms_activity &&
+                      studentData.nov25_lms_activity?.course_progress <= 0.2
                         ? "⚠️ At Risk"
                         : "Engaged"}
                     </p>
@@ -253,9 +253,11 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                       Last Login
                     </p>
                     <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.lms_activity === null && "Unknown"}
-                      {(studentData.lms_activity &&
-                        dateFormated(studentData.lms_activity.last_login_at)) ||
+                      {studentData.nov25_lms_activity === null && "Unknown"}
+                      {(studentData.nov25_lms_activity &&
+                        dateFormated(
+                          studentData.nov25_lms_activity.last_login_at
+                        )) ||
                         "Unknown"}
                     </p>
                   </div>
@@ -278,9 +280,9 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-2">
-                {!studentData.engagements && "No activity yet"}
-                {studentData.engagements &&
-                  studentData.engagements.map((engagement, index) => (
+                {!studentData.nov25_engagements && "No activity yet"}
+                {studentData.nov25_engagements &&
+                  studentData.nov25_engagements.map((engagement, index) => (
                     <Card key={index} className="relative">
                       <CardContent className="flex flex-col gap-2">
                         <p className="text-xs text-muted-foreground">

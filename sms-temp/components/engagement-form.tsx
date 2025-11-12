@@ -55,7 +55,7 @@ interface EngagementFormProps {
 export function EngagementForm({ matric_no }: EngagementFormProps) {
   const [formData, setFormData] = useState<EngagementFormData>({
     matric_no: matric_no,
-    channel: "whatsapp",
+    channel: "",
     direction: "outbound",
     subject: "",
     body: "",
@@ -73,7 +73,7 @@ export function EngagementForm({ matric_no }: EngagementFormProps) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await supabase.from("engagements").insert([formData]);
+    await supabase.from("nov25_engagements").insert([formData]);
     // Simulate API call
     //await new Promise((resolve) => setTimeout(resolve, 1500));
 
@@ -168,7 +168,7 @@ export function EngagementForm({ matric_no }: EngagementFormProps) {
                       updateFormData("matric_no", e.target.value)
                     }
                     required
-                    className="w-full"
+                    className="w-full text-left"
                   />
                 </div>
 
@@ -184,7 +184,7 @@ export function EngagementForm({ matric_no }: EngagementFormProps) {
                     onChange={(e) =>
                       updateFormData("handled_by", e.target.value)
                     }
-                    className="w-full"
+                    className="w-full text-left"
                   />
                 </div>
               </div>
@@ -304,34 +304,6 @@ export function EngagementForm({ matric_no }: EngagementFormProps) {
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="subject" className="text-sm font-medium">
-                  Subject/Topic
-                </Label>
-                <Input
-                  id="subject"
-                  placeholder="Brief description of the topic discussed"
-                  value={formData.subject}
-                  required
-                  onChange={(e) => updateFormData("subject", e.target.value)}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="body" className="text-sm font-medium">
-                  Detailed Notes
-                </Label>
-                <Textarea
-                  id="body"
-                  placeholder="Provide detailed notes about the interaction, including key points discussed, student concerns, and any actions taken..."
-                  value={formData.body}
-                  required
-                  onChange={(e) => updateFormData("body", e.target.value)}
-                  className="min-h-[120px] w-full resize-none"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label className="text-sm font-medium">Sentiment</Label>
                 <Select
                   value={formData.sentiment}
@@ -365,6 +337,33 @@ export function EngagementForm({ matric_no }: EngagementFormProps) {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="subject" className="text-sm font-medium">
+                  Subject/Topic
+                </Label>
+                <Input
+                  id="subject"
+                  placeholder="E.g., Course Registration Issue"
+                  value={formData.subject}
+                  required
+                  onChange={(e) => updateFormData("subject", e.target.value)}
+                  className="w-full text-left"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="body" className="text-sm font-medium">
+                  Engagement Summary
+                </Label>
+                <Textarea
+                  id="body"
+                  placeholder="Write down student response and summary of the engagement. Include important details, student concerns, and any follow-up actions required."
+                  value={formData.body}
+                  required
+                  onChange={(e) => updateFormData("body", e.target.value)}
+                  className="min-h-[120px] w-full resize-none"
+                />
+              </div>
 
               <div className="grid grid-cols-1 gap-4 md:gap-6">
                 <div className="space-y-2">
@@ -377,20 +376,6 @@ export function EngagementForm({ matric_no }: EngagementFormProps) {
                       <SelectValue placeholder="Select outcome" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="resolved">
-                        <div className="flex items-center gap-2">
-                          <Badge className="bg-green-100 text-green-800 border-green-200">
-                            Resolved
-                          </Badge>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="followup">
-                        <div className="flex items-center gap-2">
-                          <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                            Follow-up Needed
-                          </Badge>
-                        </div>
-                      </SelectItem>
                       <SelectItem value="no_response">
                         <div className="flex items-center gap-2">
                           <Badge className="bg-gray-100 text-gray-800 border-gray-200">
@@ -398,10 +383,38 @@ export function EngagementForm({ matric_no }: EngagementFormProps) {
                           </Badge>
                         </div>
                       </SelectItem>
-                      <SelectItem value="escalated">
+                      <SelectItem value="no_issue">
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-green-100 text-green-800 border-green-200">
+                            No Issues
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="followup-ro">
                         <div className="flex items-center gap-2">
                           <Badge className="bg-orange-100 text-orange-800 border-orange-200">
-                            Escalated
+                            Follow-up (RO)
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="followup-sales">
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+                            Follow-up (Sales)
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="withdrawn">
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-red-100 text-red-800 border-red-200">
+                            Withdrawn
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="deferred">
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-red-100 text-red-800 border-red-200">
+                            Deferred
                           </Badge>
                         </div>
                       </SelectItem>
