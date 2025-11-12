@@ -72,6 +72,27 @@ export default async function SITPage() {
     (notloggedin.length / sit_active.length) * 100
   );
 
+  const zeroprogress = sit_active.filter(
+    (student) =>
+      !notloggedin.includes(student) &&
+      student.nov25_lms_activity?.course_progress === 0
+  );
+
+  const zeroprogressPercentage = Math.round(
+    (zeroprogress.length / sit_active.length) * 100
+  );
+
+  const less20progress = sit_active.filter(
+    (student) =>
+      !notloggedin.includes(student) &&
+      student.nov25_lms_activity?.course_progress !== 0 &&
+      student.nov25_lms_activity?.course_progress <= 0.2
+  );
+
+  const less20progressPercentage = Math.round(
+    (less20progress.length / sit_active.length) * 100
+  );
+
   /* const engaged = sit_active.filter((student) =>
     student.engagements.some((item) => item.created_at > "2025-09-28")
   );
@@ -183,7 +204,7 @@ export default async function SITPage() {
               >
                 Not Logged In{" "}
                 <span className="italic text-muted-foreground">
-                  {notloggedin.length}
+                  {notloggedin.length} ({notloggedinPercentage}%)
                 </span>
               </Label>
               <Progress
@@ -192,6 +213,34 @@ export default async function SITPage() {
                 className=" h-5"
               ></Progress>
 
+              <Label
+                htmlFor="zeroprogress"
+                className="flex flex-row w-full justify-between"
+              >
+                0% Progress{" "}
+                <span className="italic text-muted-foreground">
+                  {zeroprogress.length} ({zeroprogressPercentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="zeroprogress"
+                value={zeroprogressPercentage}
+                className=" h-5"
+              ></Progress>
+              <Label
+                htmlFor="less20progress"
+                className="flex flex-row w-full justify-between"
+              >
+                ≤20% Progress{" "}
+                <span className="italic text-muted-foreground">
+                  {less20progress.length} ({less20progressPercentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="less20progress"
+                value={less20progressPercentage}
+                className=" h-5"
+              ></Progress>
               {/* <Label
                 htmlFor="wonepercentage"
                 className="flex flex-row w-full justify-between"

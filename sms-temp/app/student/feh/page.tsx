@@ -187,6 +187,27 @@ export default async function FEHPage() {
     (notloggedin.length / active.length) * 100
   );
 
+  const zeroprogress = active.filter(
+    (student) =>
+      !notloggedin.includes(student) &&
+      student.nov25_lms_activity?.course_progress === 0
+  );
+
+  const zeroprogressPercentage = Math.round(
+    (zeroprogress.length / active.length) * 100
+  );
+
+  const less20progress = active.filter(
+    (student) =>
+      !notloggedin.includes(student) &&
+      student.nov25_lms_activity?.course_progress !== 0 &&
+      student.nov25_lms_activity?.course_progress <= 0.2
+  );
+
+  const less20progressPercentage = Math.round(
+    (less20progress.length / active.length) * 100
+  );
+
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
       <p className="text-3xl italic font-bold">FEH</p>
@@ -212,12 +233,41 @@ export default async function FEHPage() {
               >
                 Not Logged In{" "}
                 <span className="italic text-muted-foreground">
-                  {notloggedin.length}
+                  {notloggedin.length} ({notloggedinPercentage}%)
                 </span>
               </Label>
               <Progress
                 id="notloggedin"
                 value={notloggedinPercentage}
+                className=" h-5"
+              ></Progress>
+
+              <Label
+                htmlFor="zeroprogress"
+                className="flex flex-row w-full justify-between"
+              >
+                0% Progress{" "}
+                <span className="italic text-muted-foreground">
+                  {zeroprogress.length} ({zeroprogressPercentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="zeroprogress"
+                value={zeroprogressPercentage}
+                className=" h-5"
+              ></Progress>
+              <Label
+                htmlFor="less20progress"
+                className="flex flex-row w-full justify-between"
+              >
+                ≤20% Progress{" "}
+                <span className="italic text-muted-foreground">
+                  {less20progress.length} ({less20progressPercentage}%)
+                </span>
+              </Label>
+              <Progress
+                id="less20progress"
+                value={less20progressPercentage}
                 className=" h-5"
               ></Progress>
 
