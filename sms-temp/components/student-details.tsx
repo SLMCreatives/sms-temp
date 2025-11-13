@@ -253,12 +253,11 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                       Last Login
                     </p>
                     <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.nov25_lms_activity === null && "Unknown"}
-                      {(studentData.nov25_lms_activity &&
-                        dateFormated(
-                          studentData.nov25_lms_activity.last_login_at
-                        )) ||
-                        "Unknown"}
+                      {studentData.nov25_lms_activity.last_login_at
+                        ? dateFormated(
+                            studentData.nov25_lms_activity?.last_login_at
+                          )
+                        : "Not Logged In"}
                     </p>
                   </div>
                 </CardContent>

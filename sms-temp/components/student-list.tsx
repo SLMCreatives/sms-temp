@@ -20,20 +20,20 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 interface StudentCardProps {
   student: Students;
   lms_activity: LMSActivity;
+  nov25_lms_activity?: LMSActivity;
   index: number;
 }
 
 export function StudentList({
   student,
-  lms_activity,
+  nov25_lms_activity,
   index
 }: StudentCardProps) {
   return (
     <Card
       key={student.matric_no}
       className={`w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_50px] gap-0 py-2 ${
-        student.lms_activity?.last_login_at === null ||
-        student.lms_activity?.course_progress <= 0.2
+        student.nov25_lms_activity?.last_login_at === null
           ? "border-red-600 border-2"
           : ""
       }`}
@@ -42,8 +42,7 @@ export function StudentList({
         <div className="flex flex-col gap-2 px-0">
           <p
             className={`text-sm text-nowrap font-normal overflow-hidden capitalize truncate min-w-[200px] ${
-              student.lms_activity?.last_login_at === null ||
-              student.lms_activity?.course_progress <= 0.2
+              student.nov25_lms_activity?.last_login_at === null
                 ? "text-red-500 font-bold"
                 : ""
             }`}
@@ -54,9 +53,7 @@ export function StudentList({
         </div>
       </CardContent>
       <CardFooter className="w-full flex flex-row gap-1 justify-end h-full">
-        {lms_activity &&
-        lms_activity.course_progress === 0 &&
-        lms_activity.last_login_at === null ? (
+        {nov25_lms_activity && nov25_lms_activity.last_login_at === null ? (
           <Tooltip>
             <TooltipTrigger>
               <UserRoundX className="w-5 h-5 text-red-600" />
@@ -64,7 +61,7 @@ export function StudentList({
             <TooltipContent>Not Loged In</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {lms_activity && lms_activity.course_progress === 0 ? (
+        {nov25_lms_activity && nov25_lms_activity.course_progress === 0 ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleSlash className="w-5 h-5 text-red-600" />
@@ -72,9 +69,9 @@ export function StudentList({
             <TooltipContent>0% Course Progress</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {lms_activity &&
-        lms_activity.course_progress > 0 &&
-        lms_activity.course_progress <= 0.2 ? (
+        {nov25_lms_activity &&
+        nov25_lms_activity.course_progress > 0 &&
+        nov25_lms_activity.course_progress <= 0.1 ? (
           <Tooltip>
             <TooltipTrigger>
               <BookX className="w-5 h-5 text-red-600" />
@@ -82,9 +79,7 @@ export function StudentList({
             <TooltipContent>Less than 20% Course Progress</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {student.status === "Active" &&
-        student.engagements &&
-        student.engagements.some((item) => item.created_at > "2025-10-13") ? (
+        {student.status === "Active" && student.nov25_engagements.length > 0 ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleCheckBig className="w-5 h-5 text-green-500" />
@@ -96,8 +91,7 @@ export function StudentList({
           <DrawerTrigger asChild>
             <ArrowUpCircle
               className={`min-w-6 min-h-6  ${
-                student.lms_activity?.last_login_at === null ||
-                student.lms_activity?.course_progress <= 0.2
+                student.nov25_lms_activity?.last_login_at === null
                   ? "text-red-600"
                   : "text-purple-500"
               }`}
@@ -194,14 +188,42 @@ export function StudentList({
                   readOnly
                   value={
                     Math.round(
-                      student.lms_activity
-                        ? student.lms_activity.course_progress * 100
+                      student.nov25_lms_activity
+                        ? student.nov25_lms_activity.course_progress * 100
                         : 0
                     ) + "%"
-                  } //student.lms_activity.course_progress * 100 + "%"}
+                  } //student.nov25_lms_activity.course_progress * 100 + "%"}
                   className={`w-full ${
-                    student.lms_activity &&
-                    student.lms_activity.course_progress < 0.2
+                    student.nov25_lms_activity &&
+                    student.nov25_lms_activity.course_progress < 0.1
+                      ? "text-red-500 font-bold"
+                      : ""
+                  }`}
+                />
+                <Label
+                  htmlFor="last_login"
+                  className="text-xs italic text-slate-500"
+                >
+                  Last Login
+                </Label>
+                <Input
+                  name="last_login"
+                  readOnly
+                  value={
+                    student.nov25_lms_activity &&
+                    student.nov25_lms_activity.last_login_at
+                      ? new Date(
+                          student.nov25_lms_activity.last_login_at
+                        ).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric"
+                        })
+                      : "Never Logged In"
+                  }
+                  className={`w-full ${
+                    student.nov25_lms_activity &&
+                    student.nov25_lms_activity.last_login_at === null
                       ? "text-red-500 font-bold"
                       : ""
                   }`}
@@ -216,56 +238,19 @@ export function StudentList({
                   name="engagement"
                   readOnly
                   value={
-                    student.engagements && student.engagements.length >= 0
-                      ? `${student.engagements.length}`
+                    student.nov25_engagements &&
+                    student.nov25_engagements.length >= 0
+                      ? `${student.nov25_engagements.length}`
                       : "Not Engaged"
                   }
                   className={`w-full ${
-                    student.engagements && student.engagements.length >= 0
+                    student.nov25_engagements &&
+                    student.nov25_engagements.length >= 0
                       ? "text-green-500"
                       : "text-red-500"
                   }`}
                 />
-
-                {/*  <Label
-                        htmlFor="engagement"
-                        className="text-xs italic text-slate-500"
-                      >
-                        Last Engagement
-                      </Label>
-                      <Textarea
-                        name="engagement"
-                        readOnly
-                        value={
-                          student.engagements.length > 0 &&
-                          student.engagements[student.engagements.length - 1]
-                            .body
-                            ? student.engagements[
-                                student.engagements.length - 1
-                              ].body
-                            : student.engagements[0].body
-                        }
-                        className={`w-full line-clamp-3 resize-none h-16`}
-                      /> */}
               </div>
-
-              {/* <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
-                <p className="text-md group-hover:font-bold">Contact Student</p>
-                <div className="flex flex-row gap-4">
-                  <Link href={`tel:6${student.phone.replace(/[-]/g, "")}`}>
-                    <Phone className="h-6 w-6 text-cyan-500" />
-                  </Link>
-                  <Link
-                    href={`https://wa.me/6${student.phone.replace(/[-]/g, "")}`}
-                  >
-                    <MessageCircle className="h-6 w-6 text-green-500" />
-                  </Link>
-                  <Link href={`mailto:${student.email}`}>
-                    <Mail className="h-6 w-6 text-slate-500" />
-                  </Link>
-                </div>
-              </div> */}
-
               <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
                 <p className="text-md group-hover:font-bold">Add Engagement</p>
                 <div className="flex flex-row gap-2">

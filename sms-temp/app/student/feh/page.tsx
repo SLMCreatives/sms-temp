@@ -458,7 +458,7 @@ export default async function FEHPage() {
                     <StudentList
                       key={student.matric_no}
                       student={student}
-                      lms_activity={student.lms_activity}
+                      lms_activity={student.nov25_lms_activity}
                       index={index}
                     />
                   ))}

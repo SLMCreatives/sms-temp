@@ -8,39 +8,16 @@ import {
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import {
-  ArrowRightCircle,
-  ArrowUpCircle,
-  Mail,
-  MessageCircle,
-  Phone
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTitle,
-  DrawerTrigger
-} from "@/components/ui/drawer";
 import { Students } from "../student/studentColumns";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import CommentSection from "@/components/comment-section";
 //import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
-  const { data: students, error } = await supabase.from("students").select("*");
+  const { data: students, error } = await supabase
+    .from("nov25_students")
+    .select("*");
   if (error) {
     console.log("Error fetching data:", error.message);
     return [];
@@ -63,8 +40,8 @@ const n_sit = data.filter(
 export default async function EngagementPage() {
   // Create and await the client
   const { data: engagements, error } = await supabase
-    .from("engagements")
-    .select("*, students(*),comments(*)")
+    .from("nov25_engagements")
+    .select("*, nov25_students(*)")
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -92,8 +69,8 @@ export default async function EngagementPage() {
             {
               engagements.filter(
                 (engagement) =>
-                  engagement.students.faculty_code === "FOB" &&
-                  engagement.students.status === "Active"
+                  engagement.nov25_students.faculty_code === "FOB" &&
+                  engagement.nov25_students.status === "Active"
               ).length
             }{" "}
             / {n_fob}
@@ -103,11 +80,13 @@ export default async function EngagementPage() {
         <p className="text-xl text-center flex flex-col px-3">
           <span className="font-bold">FEH</span>
           <span className="text-xl md:text-2xl">
-            {engagements.filter(
-              (engagement) =>
-                engagement.students.faculty_code === "FEH" &&
-                engagement.students.status === "Active"
-            ).length + 37}{" "}
+            {
+              engagements.filter(
+                (engagement) =>
+                  engagement.nov25_students.faculty_code === "FEH" &&
+                  engagement.nov25_students.status === "Active"
+              ).length
+            }{" "}
             / {n_feh}
           </span>
           <span className="italic text-sm">students called</span>
@@ -118,8 +97,8 @@ export default async function EngagementPage() {
             {
               engagements.filter(
                 (engagement) =>
-                  engagement.students.faculty_code === "SIT" &&
-                  engagement.students.status === "Active"
+                  engagement.nov25_students.faculty_code === "SIT" &&
+                  engagement.nov25_students.status === "Active"
               ).length
             }{" "}
             / {n_sit}
@@ -141,8 +120,8 @@ export default async function EngagementPage() {
           <CardHeader>
             <CardTitle className="justify-between flex flex-row">
               <p className="text-xl text-nowrap">
-                {engagement.matric_no} [{engagement.students.faculty_code}{" "}
-                {engagement.students.study_level}]
+                {engagement.matric_no} [{engagement.nov25_students.faculty_code}{" "}
+                {engagement.nov25_students.study_level}]
               </p>
             </CardTitle>
             <CardDescription>
@@ -170,7 +149,7 @@ export default async function EngagementPage() {
                   {engagement.outcome.replace("_", " ")}
                 </Badge>
               </div>
-              <div className="flex flex-row gap-4 justify-end">
+              {/*  <div className="flex flex-row gap-4 justify-end">
                 {engagement.comments && (
                   <Dialog>
                     <DialogTrigger asChild>
@@ -329,7 +308,7 @@ export default async function EngagementPage() {
                     </div>
                   </DrawerContent>
                 </Drawer>
-              </div>
+              </div> */}
             </div>
           </CardFooter>
         </Card>

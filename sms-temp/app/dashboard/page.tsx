@@ -6,7 +6,7 @@ const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
-    .from("students")
+    .from("nov25_students")
     .select(
       "*, lms_activity(*), lms_activity_w1(*), lms_activity_w2(*), lms_activity_w3(*), engagements(*)"
     );

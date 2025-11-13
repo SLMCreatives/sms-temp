@@ -50,8 +50,8 @@ export default function EngagementsPage() {
   useEffect(() => {
     async function fetchData() {
       const { data, error } = await supabase
-        .from("students")
-        .select("*, engagements(*), lms_activity(*)");
+        .from("nov25_students")
+        .select("*, nov25_engagements(*), nov25_lms_activity(*)");
       if (error) {
         console.error("Error fetching data:", error);
       } else {
