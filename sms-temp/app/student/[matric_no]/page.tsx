@@ -3,7 +3,7 @@
 import StudentDetailsPage from "@/components/student-details";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState, use } from "react";
-import { Comments, Students } from "../studentColumns";
+import { Students } from "../studentColumns";
 
 const supabase = createClient();
 
@@ -38,9 +38,9 @@ export default function StudentPage({
     fetchStudent();
   }, [matric_no]);
 
-  const [comments, setComments] = useState<Comments[] | null>(null);
+  //const [comments, setComments] = useState<Comments[] | null>(null);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     async function fetchComments() {
       try {
         const { data, error } = await supabase
@@ -55,7 +55,7 @@ export default function StudentPage({
     }
 
     fetchComments();
-  }, [student]);
+  }, [student]); */
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -63,7 +63,7 @@ export default function StudentPage({
 
   return (
     <main className="container mx-auto relative">
-      <StudentDetailsPage studentData={student} comments={comments || []} />
+      <StudentDetailsPage studentData={student} />
     </main>
   );
 }

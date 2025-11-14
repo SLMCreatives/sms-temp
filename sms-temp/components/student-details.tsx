@@ -34,25 +34,14 @@ import {
 } from "./ui/sheet";
 import { Button } from "./ui/button";
 //import { createClient } from "@/lib/supabase/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "./ui/dialog";
-import CommentSection from "./comment-section";
-import { Comments, Students } from "@/app/student/studentColumns";
+//import CommentSection from "./comment-section";
+import { Students } from "@/app/student/studentColumns";
 import ChangeStatusForm from "./change-status";
 
 interface StudentDetailsProps {
   studentData: Students;
-  comments: Comments[];
 }
-const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
-  studentData,
-  comments
-}) => {
+const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
   const dateFormated = (dateString: string) => {
     // convert date to locate string
     const date = new Date(dateString);
@@ -299,7 +288,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
                         <p className="text-sm italic">{engagement.body}</p>
                       </CardContent>
                       <CardFooter className="">
-                        <Dialog>
+                        {/* <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="link" size={"sm"} className="px-0">
                               Comments ({comments.length})
@@ -312,7 +301,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({
 
                             <CommentSection engagementId={engagement.id} />
                           </DialogContent>
-                        </Dialog>
+                        </Dialog> */}
                       </CardFooter>
                     </Card>
                   ))}

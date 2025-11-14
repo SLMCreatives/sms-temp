@@ -55,7 +55,7 @@ interface EngagementFormProps {
 export function EngagementForm({ matric_no }: EngagementFormProps) {
   const [formData, setFormData] = useState<EngagementFormData>({
     matric_no: matric_no,
-    channel: "",
+    channel: "whatsapp",
     direction: "outbound",
     subject: "",
     body: "",
