@@ -55,7 +55,7 @@ export function UsersList() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
