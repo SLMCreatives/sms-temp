@@ -113,9 +113,11 @@ export default async function EngagementPage() {
           key={engagement.id}
           className={`bg-white ${
             engagement.sentiment === "negative" ? "bg-red-100" : ""
-          } ${engagement.outcome === "no_response" ? "bg-red-100" : ""} ${
-            engagement.outcome === "followup" ? "bg-yellow-100" : ""
-          }`}
+          } ${
+            engagement.outcome === "no_response"
+              ? "border-red-300 border-2"
+              : ""
+          } ${engagement.outcome === "followup_ro" ? "bg-yellow-100" : ""}`}
         >
           <CardHeader>
             <CardTitle className="justify-between flex flex-row">
@@ -140,13 +142,16 @@ export default async function EngagementPage() {
                 Outcome:{" "}
                 <Badge
                   variant={
-                    engagement.outcome === "followup"
+                    engagement.outcome === "deferred" ||
+                    engagement.outcome === "withdraw"
                       ? "destructive"
                       : "default"
                   }
                   className="capitalize"
                 >
-                  {engagement.outcome.replace("_", " ")}
+                  {engagement.outcome
+                    ? engagement.outcome.replace(/_/g, " ")
+                    : "N/A"}
                 </Badge>
               </div>
               {/*  <div className="flex flex-row gap-4 justify-end">

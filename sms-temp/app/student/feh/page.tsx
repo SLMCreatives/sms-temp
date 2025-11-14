@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 
 const supabase = createClient();
 
+export const revalidate = 60 * 10; // Revalidate every 10 minutes
+
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("nov25_students")
