@@ -44,7 +44,7 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
   const handleStatusChange = async (status: StudentStatus) => {
     try {
       const { error } = await supabase
-        .from("students")
+        .from("nov25_students")
         .update({ status: status })
         .eq("matric_no", student.matric_no)
         .select()
