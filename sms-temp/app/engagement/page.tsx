@@ -42,8 +42,7 @@ export default async function EngagementPage() {
   const { data: engagements, error } = await supabase
     .from("nov25_engagements")
     .select("*, nov25_students(*)")
-    .order("created_at", { ascending: false })
-    .limit(50);
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.log("Error fetching data:", error.message);
