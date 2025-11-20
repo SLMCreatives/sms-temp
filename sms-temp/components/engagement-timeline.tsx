@@ -41,10 +41,10 @@ interface StudentChartProps {
 }
 
 const filterEngagementsByDate = (
-  engagements: Engagements[],
+  nov25_engagements: Engagements[],
   targetDate: string
 ) => {
-  return engagements.filter((engagement) => {
+  return nov25_engagements.filter((engagement) => {
     const engagementDate = new Date(engagement.created_at)
       .toISOString()
       .split("T")[0];
@@ -53,10 +53,10 @@ const filterEngagementsByDate = (
 };
 
 const filterNoReponseByDate = (
-  engagements: Engagements[],
+  nov25_engagements: Engagements[],
   targetDate: string
 ) => {
-  return engagements.filter((engagement) => {
+  return nov25_engagements.filter((engagement) => {
     const engagementDate = new Date(engagement.created_at)
       .toISOString()
       .split("T")[0];
@@ -69,26 +69,28 @@ const filterNoReponseByDate = (
 export default function EngagementTimeline({ data }: StudentChartProps) {
   const db_students = data as Students[];
 
-  const allEngagements = db_students.flatMap((student) => student.engagements);
+  const allEngagements = db_students.flatMap(
+    (student) => student.nov25_engagements
+  );
 
   const engagementsOnW1Thursday = filterEngagementsByDate(
     allEngagements,
-    "2025-09-25"
+    "2025-11-03"
   );
 
   const engagementsOnW1Friday = filterEngagementsByDate(
     allEngagements,
-    "2025-09-26"
+    "2025-11-04"
   );
 
   const engagementsOnW1Saturday = filterEngagementsByDate(
     allEngagements,
-    "2025-09-27"
+    "2025-11-05"
   );
 
   const engagementsOnW1Sunday = filterEngagementsByDate(
     allEngagements,
-    "2025-09-28"
+    "2025-11-06"
   );
 
   const engagementsOnW2Monday = filterEngagementsByDate(
@@ -250,38 +252,38 @@ export default function EngagementTimeline({ data }: StudentChartProps) {
 
   const resolved_count = db_students.filter(
     (student) =>
-      student.engagements &&
-      student.engagements.some(
+      student.nov25_engagements &&
+      student.nov25_engagements.some(
         (engagement) => engagement.outcome === "resolved"
       )
   ).length;
 
   const no_response_count = db_students.filter(
     (student) =>
-      student.engagements &&
-      student.engagements.some(
+      student.nov25_engagements &&
+      student.nov25_engagements.some(
         (engagement) => engagement.outcome === "no_response"
       )
   ).length;
 
   const followups_count = db_students.filter(
     (student) =>
-      student.engagements &&
-      student.engagements.some(
+      student.nov25_engagements &&
+      student.nov25_engagements.some(
         (engagement) => engagement.outcome === "followup"
       )
   ).length;
 
   const escalated_count = db_students.filter(
     (student) =>
-      student.engagements &&
-      student.engagements.some(
+      student.nov25_engagements &&
+      student.nov25_engagements.some(
         (engagement) => engagement.outcome === "escalated"
       )
   ).length;
 
   const engaged_count = db_students.filter(
-    (student) => student.engagements
+    (student) => student.nov25_engagements
   ).length;
 
   return (

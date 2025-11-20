@@ -57,7 +57,7 @@ export default function EngagementsPage() {
       } else {
         setData({
           engagements: data
-            ?.flatMap((student) => student.engagements)
+            ?.flatMap((student) => student.nov25_engagements)
             .sort(
               (a, b) =>
                 new Date(b.created_at).getTime() -

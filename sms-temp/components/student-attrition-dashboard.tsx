@@ -5,7 +5,7 @@ import { StudentMetrics } from "@/components/student-metrics";
 import { Students } from "@/app/student/studentColumns";
 import { useState } from "react";
 import { StudentPieChart } from "./studentpie";
-import EngagementTimeline from "./engagement-timeline";
+//import EngagementTimeline from "./engagement-timeline";
 
 interface StudentMetricsProps {
   data: Students[];
@@ -61,7 +61,8 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
               <StudentPieChart data={db_students} />
             </div>
             {/* Engagement Timeline */}
-            <EngagementTimeline data={db_students} />
+            {/*             <EngagementTimeline data={db_students} />
+             */}{" "}
           </TabsContent>
 
           <TabsContent value="FOB" className="space-y-6">
@@ -70,7 +71,8 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
               <StudentMetrics data={db_fob} />
               <StudentPieChart data={db_fob} />
             </div>
-            <EngagementTimeline data={db_fob} />
+            {/*             <EngagementTimeline data={db_fob} />
+             */}{" "}
           </TabsContent>
 
           <TabsContent value="FEH" className="space-y-6">
@@ -79,7 +81,8 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
               <StudentMetrics data={db_feh} />
               <StudentPieChart data={db_feh} />
             </div>
-            <EngagementTimeline data={db_feh} />
+            {/*             <EngagementTimeline data={db_feh} />
+             */}{" "}
           </TabsContent>
 
           <TabsContent value="SIT" className="space-y-6">
@@ -88,7 +91,8 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
               <StudentMetrics data={db_sit} />
               <StudentPieChart data={db_sit} />
             </div>
-            <EngagementTimeline data={db_sit} />
+            {/*             <EngagementTimeline data={db_sit} />
+             */}{" "}
           </TabsContent>
         </Tabs>
       </main>

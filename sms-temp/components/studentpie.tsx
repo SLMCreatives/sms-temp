@@ -61,20 +61,21 @@ export function StudentPieChart({ data }: StudentChartProps) {
   );
   const not_logged_in = active_students.filter(
     (student) =>
-      student.lms_activity && student.lms_activity.last_login_at === null
+      student.nov25_lms_activity &&
+      student.nov25_lms_activity.last_login_at === null
   );
 
   const zero_progress = db_students.filter(
     (student) =>
-      student.lms_activity &&
-      student.lms_activity.course_progress === 0 &&
+      student.nov25_lms_activity &&
+      student.nov25_lms_activity.course_progress === 0 &&
       !not_logged_in.includes(student)
   );
 
   const low_progress = db_students.filter(
     (student) =>
-      student.lms_activity &&
-      student.lms_activity.course_progress <= 0.2 &&
+      student.nov25_lms_activity &&
+      student.nov25_lms_activity.course_progress <= 0.2 &&
       !zero_progress.includes(student) &&
       !not_logged_in.includes(student)
   );
@@ -86,29 +87,26 @@ export function StudentPieChart({ data }: StudentChartProps) {
   ); */
 
   const not_loggedin_engaged = not_logged_in.filter((student) =>
-    student.engagements.some(
+    student.nov25_engagements.some(
       (engagement) => engagement && engagement.created_at > "2025-09-22"
     )
   );
 
   const zero_engaged = zero_progress.filter((student) =>
-    student.engagements.some(
+    student.nov25_engagements.some(
       (engagement) => engagement && engagement.created_at > "2025-09-22"
     )
   );
 
   const low_engaged = low_progress.filter((student) =>
-    student.engagements.some(
+    student.nov25_engagements.some(
       (engagement) => engagement && engagement.created_at > "2025-09-22"
     )
   );
 
   const no_response = db_students.filter((student) =>
-    student.engagements.some(
-      (engagement) =>
-        engagement &&
-        engagement.created_at > "2025-09-22" &&
-        engagement.outcome === "no_response"
+    student.nov25_engagements.some(
+      (engagement) => engagement && engagement.outcome === "no_response"
     )
   );
 
