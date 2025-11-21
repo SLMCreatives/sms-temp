@@ -58,6 +58,34 @@ export default async function EngagementPage() {
     return `${localisedDate} ${localisedTime}`; // localisedDate localisedTime;
   };
 
+  const uniqueSITengagements = engagements.filter(
+    (engagement, index, self) =>
+      engagement.nov25_students.faculty_code === "SIT" &&
+      index ===
+        self.findIndex(
+          (e) =>
+            e.nov25_students.matric_no === engagement.nov25_students.matric_no
+        )
+  );
+  const uniqueFEHengagements = engagements.filter(
+    (engagement, index, self) =>
+      engagement.nov25_students.faculty_code === "FEH" &&
+      index ===
+        self.findIndex(
+          (e) =>
+            e.nov25_students.matric_no === engagement.nov25_students.matric_no
+        )
+  );
+  const uniqueFOBengagements = engagements.filter(
+    (engagement, index, self) =>
+      engagement.nov25_students.faculty_code === "FOB" &&
+      index ===
+        self.findIndex(
+          (e) =>
+            e.nov25_students.matric_no === engagement.nov25_students.matric_no
+        )
+  );
+
   return (
     <div className="flex flex-col gap-4 p-10 lg:grid grid-cols-3">
       <p className="text-2xl font-bold lg:col-span-3">Engagement Tracker</p>
@@ -65,42 +93,21 @@ export default async function EngagementPage() {
         <p className="text-xl text-center flex flex-col px-3">
           <span className="font-bold">FOB</span>
           <span className="text-xl md:text-2xl">
-            {
-              engagements.filter(
-                (engagement) =>
-                  engagement.nov25_students.faculty_code === "FOB" &&
-                  engagement.nov25_students.status === "Active"
-              ).length
-            }{" "}
-            / {n_fob}
+            {uniqueFOBengagements.length}/ {n_fob}
           </span>
           <span className="italic text-sm">students called</span>
         </p>
         <p className="text-xl text-center flex flex-col px-3">
           <span className="font-bold">FEH</span>
           <span className="text-xl md:text-2xl">
-            {
-              engagements.filter(
-                (engagement) =>
-                  engagement.nov25_students.faculty_code === "FEH" &&
-                  engagement.nov25_students.status === "Active"
-              ).length
-            }{" "}
-            / {n_feh}
+            {uniqueFEHengagements.length}/ {n_feh}
           </span>
           <span className="italic text-sm">students called</span>
         </p>
         <p className="text-xl text-center flex flex-col px-3">
           <span className="font-bold">SIT</span>
           <span className="text-xl md:text-2xl">
-            {
-              engagements.filter(
-                (engagement) =>
-                  engagement.nov25_students.faculty_code === "SIT" &&
-                  engagement.nov25_students.status === "Active"
-              ).length
-            }{" "}
-            / {n_sit}
+            {uniqueSITengagements.length} / {n_sit}
           </span>
           <span className="italic text-sm">students called</span>
         </p>
