@@ -9,6 +9,22 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Students } from "../student/studentColumns";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger
+} from "@/components/ui/drawer";
+import {
+  ArrowUpCircle,
+  Phone,
+  MessageCircle,
+  Mail,
+  ArrowRightCircle
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
 //import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -61,6 +77,7 @@ export default async function EngagementPage() {
   const uniqueSITengagements = engagements.filter(
     (engagement, index, self) =>
       engagement.nov25_students.faculty_code === "SIT" &&
+      engagement.nov25_students.status === "Active" &&
       index ===
         self.findIndex(
           (e) =>
@@ -70,6 +87,7 @@ export default async function EngagementPage() {
   const uniqueFEHengagements = engagements.filter(
     (engagement, index, self) =>
       engagement.nov25_students.faculty_code === "FEH" &&
+      engagement.nov25_students.status === "Active" &&
       index ===
         self.findIndex(
           (e) =>
@@ -79,6 +97,7 @@ export default async function EngagementPage() {
   const uniqueFOBengagements = engagements.filter(
     (engagement, index, self) =>
       engagement.nov25_students.faculty_code === "FOB" &&
+      engagement.nov25_students.status === "Active" &&
       index ===
         self.findIndex(
           (e) =>
@@ -177,6 +196,7 @@ export default async function EngagementPage() {
                     </DialogContent>
                   </Dialog>
                 )}
+                  
                 <Drawer>
                   <DrawerTrigger asChild>
                     <ArrowUpCircle className="min-w-6 min-h-6 text-purple-500 cursor-pointer" />
@@ -320,6 +340,152 @@ export default async function EngagementPage() {
                   </DrawerContent>
                 </Drawer>
               </div> */}
+
+              <Drawer>
+                <DrawerTrigger asChild>
+                  <ArrowUpCircle className="min-w-6 min-h-6 text-purple-500 cursor-pointer" />
+                </DrawerTrigger>
+                <DrawerContent className="w-full min-h-full lg:max-w-2xl mx-auto overflow-scroll">
+                  <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
+                    <DrawerTitle className="w-full flex flex-row justify-between">
+                      {engagement.nov25_students.matric_no}
+                      <div className="flex flex-row gap-4">
+                        <Link
+                          href={`tel:6${engagement.nov25_students.phone.replace(
+                            /[-]/g,
+                            ""
+                          )}`}
+                        >
+                          <Phone className="h-6 w-6 text-cyan-500" />
+                        </Link>
+                        <Link
+                          href={`https://wa.me/6${engagement.nov25_students.phone.replace(
+                            /[-]/g,
+                            ""
+                          )}`}
+                        >
+                          <MessageCircle className="h-6 w-6 text-green-500" />
+                        </Link>
+                        <Link
+                          href={`mailto:${engagement.nov25_students.email}`}
+                        >
+                          <Mail className="h-6 w-6 text-slate-500" />
+                        </Link>
+                      </div>
+                    </DrawerTitle>
+                    <p className="text-2xl font-bold line-clamp-2 ">
+                      {engagement.nov25_students.full_name}
+                    </p>
+                    <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
+                      <Label
+                        htmlFor="programme_code"
+                        className="text-xs italic text-slate-500"
+                      >
+                        Programme Name
+                      </Label>
+                      <Input
+                        name="programme_code"
+                        readOnly
+                        value={engagement.nov25_students.programme_name}
+                      />
+                      <Label
+                        htmlFor="email"
+                        className="text-xs italic text-slate-500"
+                      >
+                        Email
+                      </Label>
+                      <Input
+                        name="email"
+                        readOnly
+                        value={engagement.nov25_students.email.toLocaleLowerCase()}
+                      />
+                      <Label
+                        htmlFor="phone"
+                        className="text-xs italic text-slate-500"
+                      >
+                        Phone No.
+                      </Label>
+                      <Input
+                        name="phone"
+                        readOnly
+                        value={engagement.nov25_students.phone}
+                      />
+                      <Label
+                        htmlFor="nationality"
+                        className="text-xs italic text-slate-500"
+                      >
+                        Nationality
+                      </Label>
+                      <Input
+                        name="nationality"
+                        readOnly
+                        value={engagement.nov25_students.nationality}
+                      />
+                      {engagement.nov25_students.nov25_lms_activity && (
+                        <>
+                          <p className="text-md font-bold col-span-2">
+                            CN Activity
+                          </p>
+                          <Label
+                            htmlFor="lms_activity"
+                            className="text-xs italic text-slate-500"
+                          >
+                            SRB Progress
+                          </Label>
+                          <Input
+                            name="lms_activity"
+                            readOnly
+                            value={
+                              engagement.nov25_students.nov25_lms_activity
+                                .srb_progress + "%"
+                            }
+                            className={`w-full ${
+                              engagement.nov25_students.nov25_lms_activity
+                                .srb_progress === 0
+                                ? "text-red-500 font-bold"
+                                : ""
+                            }`}
+                          />
+                          <Label
+                            htmlFor="lms_activity"
+                            className="text-xs italic text-slate-500"
+                          >
+                            Course Progress
+                          </Label>
+                          <Input
+                            name="lms_activity"
+                            readOnly
+                            value={
+                              engagement.nov25_students.nov25_lms_activity
+                                .course_progress + "%"
+                            }
+                            className={`w-full ${
+                              engagement.nov25_students.nov25_lms_activity
+                                .course_progress === 0
+                                ? "text-red-500 font-bold"
+                                : ""
+                            }`}
+                          />
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">
+                      <p className="text-md group-hover:font-bold">
+                        View Student Page
+                      </p>
+                      <div className="flex flex-row gap-2">
+                        <Link
+                          href={`/student/${engagement.nov25_students.matric_no}`}
+                          target="_blank"
+                        >
+                          <ArrowRightCircle className="w-6 h-6 text-orange-500 group-hover:text-orange-600" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </DrawerContent>
+              </Drawer>
             </div>
           </CardFooter>
         </Card>
