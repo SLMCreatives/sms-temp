@@ -79,7 +79,7 @@ export function StudentList({
             <TooltipContent>Less than 20% Course Progress</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {student.status === "Active" && student.nov25_engagements.length > 0 ? (
+        {student.nov25_engagements.length > 0 ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleCheckBig className="w-5 h-5 text-green-500" />
