@@ -36,7 +36,7 @@ export function StudentList({
         student.nov25_lms_activity?.last_login_at === null
           ? "border-red-600 border-2"
           : ""
-      }`}
+      } ${student.status !== "Active" ? "border-red-100 border-2" : ""}`}
     >
       <CardContent className="pl-2 overflow-hidden">
         <div className="flex flex-col gap-2 px-0">
@@ -45,6 +45,8 @@ export function StudentList({
               student.nov25_lms_activity?.last_login_at === null
                 ? "text-red-500 font-bold"
                 : ""
+            } ${
+              student.status !== "Active" ? "text-gray-500 line-through" : ""
             }`}
           >
             <span className={`font-thin tracking-tighter  `}>{index + 1}.</span>{" "}
@@ -85,6 +87,14 @@ export function StudentList({
               <CircleCheckBig className="w-5 h-5 text-green-500" />
             </TooltipTrigger>
             <TooltipContent>Engaged</TooltipContent>
+          </Tooltip>
+        ) : null}
+        {student.status !== "Active" ? (
+          <Tooltip>
+            <TooltipTrigger>
+              <CircleSlash className="w-5 h-5 text-red-500" />
+            </TooltipTrigger>
+            <TooltipContent>No Need To Engage</TooltipContent>
           </Tooltip>
         ) : null}
         <Drawer>
