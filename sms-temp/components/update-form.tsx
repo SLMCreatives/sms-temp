@@ -72,7 +72,7 @@ export function UpdateForm({ onSuccess }: UpdateFormProps) {
     setIsSearching(true);
     try {
       const { data, error } = await supabase
-        .from("lms_activity")
+        .from("nov25_lms_activity")
         .select("*")
         .eq("matric_no", searchMatricNo.trim())
         .order("created_at", { ascending: false });
@@ -118,7 +118,7 @@ export function UpdateForm({ onSuccess }: UpdateFormProps) {
     setIsUpdating(true);
     try {
       const { error } = await supabase
-        .from("lms_activity")
+        .from("nov25_lms_activity")
         .update({
           student_name: formData.student_name,
           activity_type: formData.activity_type,

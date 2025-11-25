@@ -218,11 +218,11 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                       Course Progress
                     </p>
                     <p className="font-medium text-foreground text-sm md:text-base">
-                      {(studentData.nov25_lms_activity &&
-                        Math.round(
-                          studentData.nov25_lms_activity.course_progress * 100
-                        ) + "%") ||
-                        "No record"}
+                      {studentData.nov25_lms_activity
+                        ? Math.round(
+                            studentData.nov25_lms_activity.course_progress * 100
+                          ) + "%"
+                        : "No record"}
                     </p>
                   </div>
 
@@ -233,7 +233,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                       {studentData.nov25_lms_activity &&
                       studentData.nov25_lms_activity?.course_progress <= 0.2
                         ? "⚠️ At Risk"
-                        : "Engaged"}
+                        : "Active"}
                     </p>
                   </div>
 

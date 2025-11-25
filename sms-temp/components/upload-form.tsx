@@ -93,7 +93,7 @@ export function UploadForm({ onSuccess }: UploadFormProps) {
         try {
           // Check if record exists with this matric_no
           const { data: existing } = await supabase
-            .from("lms_activity")
+            .from("nov25_lms_activity")
             .select("id")
             .eq("matric_no", row.matric_no.toUpperCase())
             .single();
@@ -121,7 +121,7 @@ export function UploadForm({ onSuccess }: UploadFormProps) {
           if (existing) {
             // Update existing record
             const { error } = await supabase
-              .from("lms_activity")
+              .from("nov25_lms_activity")
               .update(recordData)
               .eq("matric_no", row.matric_no.toUpperCase());
 
@@ -129,7 +129,7 @@ export function UploadForm({ onSuccess }: UploadFormProps) {
             stats.updated++;
           } else {
             // Insert new record
-            const { error } = await supabase.from("lms_activity").insert([
+            const { error } = await supabase.from("nov25_lms_activity").insert([
               {
                 ...newrecordData
               }
