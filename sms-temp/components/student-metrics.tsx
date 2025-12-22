@@ -15,11 +15,11 @@ interface StudentMetricsProps {
 export function StudentMetrics({ data }: StudentMetricsProps) {
   const db_students = data as Students[];
   const active_students = db_students.filter(
-    (student) => student.status === "Active" || student.status === "At Risk"
+    (student) => student.status === "Active"
   );
 
   const w1_active_students = db_students.filter(
-    (student) => student.status === "Active" && student.nov25_lms_activity_w1
+    (student) => student.status === "Active"
   );
 
   /*  const w2_active_students = db_students.filter(
@@ -141,7 +141,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               {Math.round(
                 (w1_active_students.length / db_students.length) * 100
               )}
-              % )
+              %)
             </p>
             <p className="text-xs italic text-muted-foreground">
               W2 - {active_students.length} (
