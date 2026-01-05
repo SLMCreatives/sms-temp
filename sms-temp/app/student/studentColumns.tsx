@@ -67,6 +67,22 @@ export type Students = {
   lms_activity_union_all: LMSActivity;
 };
 
+export type ProgressionStudents = {
+  matric_no: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  faculty_code: string;
+  nationality: string;
+  study_mode: string;
+  study_level: string;
+  programme_name: string;
+  ec_name: string;
+  ec_number: string;
+  engagement_status: string;
+  registration_status: string;
+};
+
 export const studentColumns: ColumnDef<Students>[] = [
   {
     header: "No.",

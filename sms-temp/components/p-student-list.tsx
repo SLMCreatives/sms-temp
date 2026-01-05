@@ -1,13 +1,13 @@
-import { Phone, MessageCircle, Mail, ArrowUpCircle } from "lucide-react";
+import { Phone, MessageCircle, Mail, ArrowUpCircle, X } from "lucide-react";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { Input } from "./ui/input";
 import Link from "next/link";
-import { Students } from "@/app/student/studentColumns";
+import { ProgressionStudents } from "@/app/student/studentColumns";
 
 interface StudentCardProps {
-  student: Students;
+  student: ProgressionStudents;
   index: number;
 }
 
@@ -20,9 +20,13 @@ export function PStudentList({ student, index }: StudentCardProps) {
       <CardContent className="pl-2 overflow-hidden">
         <div className="flex flex-col gap-2 px-0">
           <p
-            className={`text-sm text-nowrap font-normal overflow-hidden capitalize truncate min-w-[200px] `}
+            className={`text-sm text-nowrap font-normal overflow-hidden capitalize truncate min-w-[200px] ${
+              student.registration_status === "Registered for 2026"
+                ? "line-through text-red-500"
+                : ""
+            } `}
           >
-            <span className={`font-thin tracking-tighter  `}>{index + 1}.</span>{" "}
+            <span className={`font-thin tracking-tighter`}>{index + 1}.</span>{" "}
             {student.full_name.toLowerCase()}
           </p>
         </div>
@@ -30,7 +34,11 @@ export function PStudentList({ student, index }: StudentCardProps) {
       <CardFooter className="w-full flex flex-row gap-1 justify-end h-full">
         <Drawer>
           <DrawerTrigger asChild>
-            <ArrowUpCircle className={`min-w-6 min-h-6  `} />
+            {student.registration_status === "Registered for 2026" ? (
+              <X className={`min-w-6 min-h-6 text-red-500 `} />
+            ) : (
+              <ArrowUpCircle className={`min-w-6 min-h-6 text-green-500 `} />
+            )}
           </DrawerTrigger>
           <DrawerContent className="w-full min-h-full lg:max-w-2xl mx-auto overflow-scroll">
             <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
@@ -103,9 +111,9 @@ export function PStudentList({ student, index }: StudentCardProps) {
                 <Input
                   name="status"
                   readOnly
-                  value={student.status}
+                  value={student.registration_status}
                   className={`w-full ${
-                    student.status === "Active"
+                    student.registration_status === "Registered for 2026"
                       ? "text-green-500 font-bold"
                       : "text-red-500 font-bold"
                   }`}
