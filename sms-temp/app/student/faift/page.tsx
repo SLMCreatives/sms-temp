@@ -17,9 +17,9 @@ const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
-    .from("nov25_students")
-    .select("*, nov25_lms_activity(*), nov25_engagements(*)")
-    .eq("faculty_code", "SIT");
+    .from("jan26_students")
+    .select("*, jan26_lms_activity(*), jan26_engagements(*)")
+    .eq("faculty_code", "FAiFT");
   if (error) {
     console.log("Error fetching data:", error.message);
     return [];
@@ -65,7 +65,7 @@ export default async function SITPage() {
   ];
 
   const notloggedin = sit_active.filter(
-    (student) => student.nov25_lms_activity?.last_login_at === null
+    (student) => student.jan26_lms_activity?.last_login_at === null
   );
 
   const notloggedinPercentage = Math.round(
@@ -75,7 +75,7 @@ export default async function SITPage() {
   const zeroprogress = sit_active.filter(
     (student) =>
       !notloggedin.includes(student) &&
-      student.nov25_lms_activity?.course_progress === 0
+      student.jan26_lms_activity?.course_progress === 0
   );
 
   const zeroprogressPercentage = Math.round(
@@ -85,8 +85,8 @@ export default async function SITPage() {
   const less20progress = sit_active.filter(
     (student) =>
       !notloggedin.includes(student) &&
-      student.nov25_lms_activity?.course_progress !== 0 &&
-      student.nov25_lms_activity?.course_progress <= 0.2
+      student.jan26_lms_activity?.course_progress !== 0 &&
+      student.jan26_lms_activity?.course_progress <= 0.2
   );
 
   const less20progressPercentage = Math.round(
@@ -181,7 +181,7 @@ export default async function SITPage() {
 
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
-      <p className="text-3xl italic font-bold">SIT </p>
+      <p className="text-3xl italic font-bold">FAiFT</p>
       <p className="text-lg font-bold">Engagement Progress</p>
       <Accordion type="multiple" className="w-full" defaultValue={["item-1"]}>
         <AccordionItem value="item-1">

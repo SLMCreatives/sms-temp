@@ -17,8 +17,8 @@ const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
-    .from("nov25_students")
-    .select("*, nov25_lms_activity(*), nov25_engagements(*)")
+    .from("jan26_students")
+    .select("*, jan26_lms_activity(*), jan26_engagements(*)")
     .eq("faculty_code", "FOB");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -73,7 +73,7 @@ export default async function FoBPage() {
   ];
 
   const notloggedin = fob_active.filter(
-    (student) => student.nov25_lms_activity?.last_login_at === null
+    (student) => student.jan26_lms_activity?.last_login_at === null
   );
 
   const notloggedinPercentage = Math.round(
@@ -83,7 +83,7 @@ export default async function FoBPage() {
   const zeroprogress = fob_active.filter(
     (student) =>
       !notloggedin.includes(student) &&
-      student.nov25_lms_activity?.course_progress === 0
+      student.jan26_lms_activity?.course_progress === 0
   );
 
   const zeroprogressPercentage = Math.round(
@@ -93,8 +93,8 @@ export default async function FoBPage() {
   const less20progress = fob_active.filter(
     (student) =>
       !notloggedin.includes(student) &&
-      student.nov25_lms_activity?.course_progress !== 0 &&
-      student.nov25_lms_activity?.course_progress <= 0.2
+      student.jan26_lms_activity?.course_progress !== 0 &&
+      student.jan26_lms_activity?.course_progress <= 0.2
   );
 
   const less20progressPercentage = Math.round(

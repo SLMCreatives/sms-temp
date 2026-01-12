@@ -65,12 +65,12 @@ export function NavMenuAuth() {
               </NavigationMenuLink>
               <NavigationMenuLink asChild>
                 <Link
-                  href="/student/sit"
+                  href="/student/faift"
                   className="flex flex-row flex-nowrap justify-between w-full"
                 >
                   <p className="flex flex-row gap-4 items-center justify-start">
                     <Cpu className="h-5 w-5" />
-                    SIT
+                    FAiFT
                   </p>
                 </Link>
               </NavigationMenuLink>

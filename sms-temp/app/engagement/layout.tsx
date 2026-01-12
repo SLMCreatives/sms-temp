@@ -35,7 +35,7 @@ export default function ProtectedLayout({
                           <Link href="/student/feh">FEH</Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link href="/student/sit">SIT</Link>
+                          <Link href="/student/faift">FAiFT</Link>
                         </NavigationMenuLink>
                       </div>
                     </NavigationMenuContent>

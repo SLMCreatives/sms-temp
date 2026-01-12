@@ -42,13 +42,13 @@ interface StudentDetailsProps {
   studentData: Students;
 }
 const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
-  const dateFormated = (dateString: string) => {
+  /*  const dateFormated = (dateString: string) => {
     // convert date to locate string
     const date = new Date(dateString);
     const localisedDate = date.toLocaleDateString("en-MY");
     const localisedTime = date.toLocaleTimeString("en-MY");
     return `${localisedDate} ${localisedTime}`;
-  };
+  }; */
 
   return (
     <div className="min-h-screen bg-background w-full">
@@ -197,9 +197,9 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                     <GraduationCap className="w-5 h-5" />
                     LMS Activity
                   </CardTitle>
-                  <CardDescription className="text-sm text-muted-foreground italic">
+                  {/*  <CardDescription className="text-sm text-muted-foreground italic">
                     Data as of: 10 Nov 2025
-                  </CardDescription>
+                  </CardDescription> */}
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 gap-3">
                   {/* <div className="">
@@ -218,9 +218,9 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                       Course Progress
                     </p>
                     <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.nov25_lms_activity
+                      {studentData.jan26_lms_activity
                         ? Math.round(
-                            studentData.nov25_lms_activity.course_progress * 100
+                            studentData.jan26_lms_activity.course_progress * 100
                           ) + "%"
                         : "No record"}
                     </p>
@@ -229,26 +229,27 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Status</p>
                     <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.nov25_lms_activity === null ? "Unknown" : ""}
-                      {studentData.nov25_lms_activity &&
-                      studentData.nov25_lms_activity?.course_progress <= 0.2
+                      {/*  {studentData.jan26_lms_activity === null ? "Unknown" : ""} */}
+                      {studentData.jan26_lms_activity &&
+                      studentData.jan26_lms_activity?.course_progress <= 0.2
                         ? "⚠️ At Risk"
                         : "Active"}
                     </p>
                   </div>
 
-                  <div className="col-span-2">
+                  {/* <div className="col-span-2">
                     <p className="text-sm text-muted-foreground mb-1">
                       Last Login
                     </p>
                     <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.nov25_lms_activity.last_login_at
+                      {studentData.jan26_lms_activity.last_login_at &&
+                      studentData.jan26_lms_activity.last_login_at
                         ? dateFormated(
-                            studentData.nov25_lms_activity?.last_login_at
+                            studentData.jan26_lms_activity?.last_login_at
                           )
                         : "Not Logged In"}
                     </p>
-                  </div>
+                  </div> */}
                 </CardContent>
               </Card>
             </div>
@@ -268,9 +269,9 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-2">
-                {!studentData.nov25_engagements && "No activity yet"}
-                {studentData.nov25_engagements &&
-                  studentData.nov25_engagements.map((engagement, index) => (
+                {!studentData.jan26_engagements && "No activity yet"}
+                {studentData.jan26_engagements &&
+                  studentData.jan26_engagements.map((engagement, index) => (
                     <Card key={index} className="relative">
                       <CardContent className="flex flex-col gap-2">
                         <p className="text-xs text-muted-foreground">

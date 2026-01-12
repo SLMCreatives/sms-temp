@@ -20,20 +20,20 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 interface StudentCardProps {
   student: Students;
   lms_activity: LMSActivity;
-  nov25_lms_activity?: LMSActivity;
+  jan26_lms_activity?: LMSActivity;
   index: number;
 }
 
 export function StudentList({
   student,
-  nov25_lms_activity,
+  jan26_lms_activity,
   index
 }: StudentCardProps) {
   return (
     <Card
       key={student.matric_no}
       className={`w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_50px] gap-0 py-2 ${
-        student.nov25_lms_activity?.last_login_at === null
+        student.jan26_lms_activity?.last_login_at === null
           ? "border-red-600 border-2"
           : ""
       } ${student.status !== "Active" ? "border-red-100 border-2" : ""}`}
@@ -42,7 +42,7 @@ export function StudentList({
         <div className="flex flex-col gap-2 px-0">
           <p
             className={`text-sm text-nowrap font-normal overflow-hidden capitalize truncate min-w-[200px] ${
-              student.nov25_lms_activity?.last_login_at === null
+              student.jan26_lms_activity?.last_login_at === null
                 ? "text-red-500 font-bold"
                 : ""
             } ${
@@ -55,7 +55,7 @@ export function StudentList({
         </div>
       </CardContent>
       <CardFooter className="w-full flex flex-row gap-1 justify-end h-full">
-        {nov25_lms_activity && nov25_lms_activity.last_login_at === null ? (
+        {jan26_lms_activity && jan26_lms_activity.last_login_at === null ? (
           <Tooltip>
             <TooltipTrigger>
               <UserRoundX className="w-5 h-5 text-red-600" />
@@ -63,7 +63,7 @@ export function StudentList({
             <TooltipContent>Not Loged In</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {nov25_lms_activity && nov25_lms_activity.course_progress === 0 ? (
+        {jan26_lms_activity && jan26_lms_activity.course_progress === 0 ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleSlash className="w-5 h-5 text-red-600" />
@@ -71,9 +71,9 @@ export function StudentList({
             <TooltipContent>0% Course Progress</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {nov25_lms_activity &&
-        nov25_lms_activity.course_progress > 0 &&
-        nov25_lms_activity.course_progress <= 0.1 ? (
+        {jan26_lms_activity &&
+        jan26_lms_activity.course_progress > 0 &&
+        jan26_lms_activity.course_progress <= 0.1 ? (
           <Tooltip>
             <TooltipTrigger>
               <BookX className="w-5 h-5 text-red-600" />
@@ -81,7 +81,7 @@ export function StudentList({
             <TooltipContent>Less than 20% Course Progress</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {student.nov25_engagements.length > 0 ? (
+        {student.jan26_engagements.length > 0 ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleCheckBig className="w-5 h-5 text-green-500" />
@@ -101,7 +101,7 @@ export function StudentList({
           <DrawerTrigger asChild>
             <ArrowUpCircle
               className={`min-w-6 min-h-6  ${
-                student.nov25_lms_activity?.last_login_at === null
+                student.jan26_lms_activity?.last_login_at === null
                   ? "text-red-600"
                   : "text-purple-500"
               }`}
@@ -198,14 +198,14 @@ export function StudentList({
                   readOnly
                   value={
                     Math.round(
-                      student.nov25_lms_activity
-                        ? student.nov25_lms_activity.course_progress * 100
+                      student.jan26_lms_activity
+                        ? student.jan26_lms_activity.course_progress * 100
                         : 0
                     ) + "%"
-                  } //student.nov25_lms_activity.course_progress * 100 + "%"}
+                  } //student.jan26_lms_activity.course_progress * 100 + "%"}
                   className={`w-full ${
-                    student.nov25_lms_activity &&
-                    student.nov25_lms_activity.course_progress < 0.1
+                    student.jan26_lms_activity &&
+                    student.jan26_lms_activity.course_progress < 0.1
                       ? "text-red-500 font-bold"
                       : ""
                   }`}
@@ -220,10 +220,10 @@ export function StudentList({
                   name="last_login"
                   readOnly
                   value={
-                    student.nov25_lms_activity &&
-                    student.nov25_lms_activity.last_login_at
+                    student.jan26_lms_activity &&
+                    student.jan26_lms_activity.last_login_at
                       ? new Date(
-                          student.nov25_lms_activity.last_login_at
+                          student.jan26_lms_activity.last_login_at
                         ).toLocaleDateString("en-GB", {
                           day: "2-digit",
                           month: "2-digit",
@@ -232,8 +232,8 @@ export function StudentList({
                       : "Never Logged In"
                   }
                   className={`w-full ${
-                    student.nov25_lms_activity &&
-                    student.nov25_lms_activity.last_login_at === null
+                    student.jan26_lms_activity &&
+                    student.jan26_lms_activity.last_login_at === null
                       ? "text-red-500 font-bold"
                       : ""
                   }`}
@@ -248,14 +248,14 @@ export function StudentList({
                   name="engagement"
                   readOnly
                   value={
-                    student.nov25_engagements &&
-                    student.nov25_engagements.length >= 0
-                      ? `${student.nov25_engagements.length}`
+                    student.jan26_engagements &&
+                    student.jan26_engagements.length >= 0
+                      ? `${student.jan26_engagements.length}`
                       : "Not Engaged"
                   }
                   className={`w-full ${
-                    student.nov25_engagements &&
-                    student.nov25_engagements.length >= 0
+                    student.jan26_engagements &&
+                    student.jan26_engagements.length >= 0
                       ? "text-green-500"
                       : "text-red-500"
                   }`}

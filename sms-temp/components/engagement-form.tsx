@@ -73,7 +73,7 @@ export function EngagementForm({ matric_no }: EngagementFormProps) {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await supabase.from("nov25_engagements").insert([formData]);
+    await supabase.from("jan26_engagements").insert([formData]);
     // Simulate API call
     //await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsSubmitting(false);

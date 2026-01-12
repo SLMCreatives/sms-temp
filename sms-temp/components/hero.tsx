@@ -18,7 +18,7 @@ export function Hero() {
   useEffect(() => {
     async function fetchStudents() {
       const { data: students, error } = await supabase
-        .from("nov25_students")
+        .from("jan26_students")
         .select("*");
 
       if (error) {
@@ -36,7 +36,7 @@ export function Hero() {
       ).length;
       const sit_length = students.filter(
         (student) =>
-          student.faculty_code === "SIT" && student.status === "Active"
+          student.faculty_code === "FAiFT" && student.status === "Active"
       ).length;
 
       setStudentCounts({
@@ -51,7 +51,7 @@ export function Hero() {
   return (
     <div className="flex flex-col gap-16 items-center">
       <div className="flex flex-col gap-4 justify-center items-center text-center text-balance">
-        <p className="text-3xl font-bold">Are We Ready For C3?</p>
+        <p className="text-3xl font-bold">Are We Ready For C1?</p>
         <p>
           We have enrolled a total of{" "}
           <span className="font-bold text-lg">
@@ -81,7 +81,7 @@ export function Hero() {
           <Card>
             <CardContent>
               <div className="flex flex-col gap-2">
-                <p className="text-xl font-normal">SIT</p>
+                <p className="text-xl font-normal">FAiFT</p>
                 <p className="text-4xl font-bold">{studentCounts.sit}</p>
                 <p>online students</p>
               </div>
