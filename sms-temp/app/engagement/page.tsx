@@ -32,7 +32,7 @@ const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
-    .from("nov25_students")
+    .from("jan26_students")
     .select("*");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -50,14 +50,14 @@ const n_feh = data.filter(
   (student) => student.faculty_code === "FEH" && student.status === "Active"
 ).length;
 const n_sit = data.filter(
-  (student) => student.faculty_code === "SIT" && student.status === "Active"
+  (student) => student.faculty_code === "FAiFT" && student.status === "Active"
 ).length;
 
 export default async function EngagementPage() {
   // Create and await the client
   const { data: engagements, error } = await supabase
-    .from("nov25_engagements")
-    .select("*, nov25_students(*)")
+    .from("jan26_engagements")
+    .select("*, jan26_students(*)")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -76,32 +76,32 @@ export default async function EngagementPage() {
 
   const uniqueSITengagements = engagements.filter(
     (engagement, index, self) =>
-      engagement.nov25_students.faculty_code === "SIT" &&
-      engagement.nov25_students.status === "Active" &&
+      engagement.jan26_students.faculty_code === "FAiFT" &&
+      engagement.jan26_students.status === "Active" &&
       index ===
         self.findIndex(
           (e) =>
-            e.nov25_students.matric_no === engagement.nov25_students.matric_no
+            e.jan26_students.matric_no === engagement.jan26_students.matric_no
         )
   );
   const uniqueFEHengagements = engagements.filter(
     (engagement, index, self) =>
-      engagement.nov25_students.faculty_code === "FEH" &&
-      engagement.nov25_students.status === "Active" &&
+      engagement.jan26_students.faculty_code === "FEH" &&
+      engagement.jan26_students.status === "Active" &&
       index ===
         self.findIndex(
           (e) =>
-            e.nov25_students.matric_no === engagement.nov25_students.matric_no
+            e.jan26_students.matric_no === engagement.jan26_students.matric_no
         )
   );
   const uniqueFOBengagements = engagements.filter(
     (engagement, index, self) =>
-      engagement.nov25_students.faculty_code === "FOB" &&
-      engagement.nov25_students.status === "Active" &&
+      engagement.jan26_students.faculty_code === "FOB" &&
+      engagement.jan26_students.status === "Active" &&
       index ===
         self.findIndex(
           (e) =>
-            e.nov25_students.matric_no === engagement.nov25_students.matric_no
+            e.jan26_students.matric_no === engagement.jan26_students.matric_no
         )
   );
 
@@ -124,7 +124,7 @@ export default async function EngagementPage() {
           <span className="italic text-sm">students called</span>
         </p>
         <p className="text-xl text-center flex flex-col px-3">
-          <span className="font-bold">SIT</span>
+          <span className="font-bold">FAiFT</span>
           <span className="text-xl md:text-2xl">
             {uniqueSITengagements.length} / {n_sit}
           </span>
@@ -147,8 +147,8 @@ export default async function EngagementPage() {
           <CardHeader>
             <CardTitle className="justify-between flex flex-row">
               <p className="text-xl text-nowrap">
-                {engagement.matric_no} [{engagement.nov25_students.faculty_code}{" "}
-                {engagement.nov25_students.study_level}]
+                {engagement.matric_no} [{engagement.jan26_students.faculty_code}{" "}
+                {engagement.jan26_students.study_level}]
               </p>
             </CardTitle>
             <CardDescription>
@@ -348,10 +348,10 @@ export default async function EngagementPage() {
                 <DrawerContent className="w-full min-h-full lg:max-w-2xl mx-auto overflow-scroll">
                   <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
                     <DrawerTitle className="w-full flex flex-row justify-between">
-                      {engagement.nov25_students.matric_no}
+                      {engagement.jan26_students.matric_no}
                       <div className="flex flex-row gap-4">
                         <Link
-                          href={`tel:6${engagement.nov25_students.phone.replace(
+                          href={`tel:6${engagement.jan26_students.phone.replace(
                             /[-]/g,
                             ""
                           )}`}
@@ -359,7 +359,7 @@ export default async function EngagementPage() {
                           <Phone className="h-6 w-6 text-cyan-500" />
                         </Link>
                         <Link
-                          href={`https://wa.me/6${engagement.nov25_students.phone.replace(
+                          href={`https://wa.me/6${engagement.jan26_students.phone.replace(
                             /[-]/g,
                             ""
                           )}`}
@@ -367,14 +367,14 @@ export default async function EngagementPage() {
                           <MessageCircle className="h-6 w-6 text-green-500" />
                         </Link>
                         <Link
-                          href={`mailto:${engagement.nov25_students.email}`}
+                          href={`mailto:${engagement.jan26_students.email}`}
                         >
                           <Mail className="h-6 w-6 text-slate-500" />
                         </Link>
                       </div>
                     </DrawerTitle>
                     <p className="text-2xl font-bold line-clamp-2 ">
-                      {engagement.nov25_students.full_name}
+                      {engagement.jan26_students.full_name}
                     </p>
                     <div className="grid grid-cols-[120px_1fr] gap-2 gap-x-3 py-2 w-full">
                       <Label
@@ -386,7 +386,7 @@ export default async function EngagementPage() {
                       <Input
                         name="programme_code"
                         readOnly
-                        value={engagement.nov25_students.programme_name}
+                        value={engagement.jan26_students.programme_name}
                       />
                       <Label
                         htmlFor="email"
@@ -397,7 +397,7 @@ export default async function EngagementPage() {
                       <Input
                         name="email"
                         readOnly
-                        value={engagement.nov25_students.email.toLocaleLowerCase()}
+                        value={engagement.jan26_students.email.toLocaleLowerCase()}
                       />
                       <Label
                         htmlFor="phone"
@@ -408,7 +408,7 @@ export default async function EngagementPage() {
                       <Input
                         name="phone"
                         readOnly
-                        value={engagement.nov25_students.phone}
+                        value={engagement.jan26_students.phone}
                       />
                       <Label
                         htmlFor="nationality"
@@ -419,9 +419,9 @@ export default async function EngagementPage() {
                       <Input
                         name="nationality"
                         readOnly
-                        value={engagement.nov25_students.nationality}
+                        value={engagement.jan26_students.nationality}
                       />
-                      {engagement.nov25_students.nov25_lms_activity && (
+                      {engagement.jan26_students.jan26_lms_activity && (
                         <>
                           <p className="text-md font-bold col-span-2">
                             CN Activity
@@ -436,11 +436,11 @@ export default async function EngagementPage() {
                             name="lms_activity"
                             readOnly
                             value={
-                              engagement.nov25_students.nov25_lms_activity
+                              engagement.jan26_students.jan26_lms_activity
                                 .srb_progress + "%"
                             }
                             className={`w-full ${
-                              engagement.nov25_students.nov25_lms_activity
+                              engagement.jan26_students.jan26_lms_activity
                                 .srb_progress === 0
                                 ? "text-red-500 font-bold"
                                 : ""
@@ -456,11 +456,11 @@ export default async function EngagementPage() {
                             name="lms_activity"
                             readOnly
                             value={
-                              engagement.nov25_students.nov25_lms_activity
+                              engagement.jan26_students.jan26_lms_activity
                                 .course_progress + "%"
                             }
                             className={`w-full ${
-                              engagement.nov25_students.nov25_lms_activity
+                              engagement.jan26_students.jan26_lms_activity
                                 .course_progress === 0
                                 ? "text-red-500 font-bold"
                                 : ""
@@ -476,7 +476,7 @@ export default async function EngagementPage() {
                       </p>
                       <div className="flex flex-row gap-2">
                         <Link
-                          href={`/student/${engagement.nov25_students.matric_no}`}
+                          href={`/student/${engagement.jan26_students.matric_no}`}
                           target="_blank"
                         >
                           <ArrowRightCircle className="w-6 h-6 text-orange-500 group-hover:text-orange-600" />
