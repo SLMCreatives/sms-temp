@@ -43,6 +43,7 @@ export default function EngagementsPage() {
   const [outcomeFilter, setOutcomeFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [dateRange, setDateRange] = useState<string>("all");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [data, setData] = useState<{ engagements: Engagements[] }>({
     engagements: []
   });
@@ -50,20 +51,14 @@ export default function EngagementsPage() {
   useEffect(() => {
     async function fetchData() {
       const { data, error } = await supabase
-        .from("nov25_students")
-        .select("*, nov25_engagements(*), nov25_lms_activity(*)");
+        .from("all_engagements") // Changed from nov25_students
+        .select("*")
+        .order("created_at", { ascending: false });
+
       if (error) {
         console.error("Error fetching data:", error);
       } else {
-        setData({
-          engagements: data
-            ?.flatMap((student) => student.nov25_engagements)
-            .sort(
-              (a, b) =>
-                new Date(b.created_at).getTime() -
-                new Date(a.created_at).getTime()
-            )
-        });
+        setData({ engagements: data || [] });
       }
     }
     fetchData();
@@ -73,6 +68,8 @@ export default function EngagementsPage() {
     return data.engagements.filter((engagement: Engagements) => {
       // Search filter
       const searchLower = searchQuery.toLowerCase();
+      const matchesSource =
+        sourceFilter === "all" || engagement.source === sourceFilter;
       const matchesSearch =
         !searchQuery ||
         engagement.matric_no.toLowerCase().includes(searchLower) ||
@@ -112,12 +109,17 @@ export default function EngagementsPage() {
       if (!matchesDateRange) return false;
 
       return (
-        matchesSearch && matchesChannel && matchesSentiment && matchesOutcome
+        matchesSearch &&
+        matchesChannel &&
+        matchesSentiment &&
+        matchesOutcome &&
+        matchesSource // Added source check
       );
     });
   }, [
     data.engagements,
     searchQuery,
+    sourceFilter,
     channelFilter,
     sentimentFilter,
     outcomeFilter,
@@ -138,6 +140,7 @@ export default function EngagementsPage() {
     setChannelFilter("all");
     setSentimentFilter("all");
     setOutcomeFilter("all");
+    setSourceFilter("all"); // Added this
     setCurrentPage(1);
     setDateRange("all");
   };
@@ -193,6 +196,27 @@ export default function EngagementsPage() {
             className="pl-10 text-left"
           />
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-6">
+        {[
+          "all",
+          "sept25_engagements",
+          "nov25_engagements",
+          "jan26_engagements"
+        ].map((source) => (
+          <Button
+            key={source}
+            variant={sourceFilter === source ? "default" : "outline"}
+            onClick={() => {
+              setSourceFilter(source);
+              setCurrentPage(1);
+            }}
+            className="capitalize"
+          >
+            {source === "all" ? "All Sources" : source}
+          </Button>
+        ))}
       </div>
 
       {/* Filters Section */}
