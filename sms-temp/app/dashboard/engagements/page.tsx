@@ -262,6 +262,13 @@ export default function EngagementsPage() {
                 <SelectItem value="no_response">No Response</SelectItem>
                 <SelectItem value="followup">Follow-up</SelectItem>
                 <SelectItem value="escalated">Escalated</SelectItem>
+                <SelectItem value="no_issue">No Issue</SelectItem>
+                <SelectItem value="followup_ro">Follow Up (RO)</SelectItem>
+                <SelectItem value="followup_sales">
+                  Follow Up (SALES)
+                </SelectItem>
+                <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                <SelectItem value="deferred">Deferred</SelectItem>
               </SelectContent>
             </Select>
             <Select value={dateRange} onValueChange={setDateRange}>
