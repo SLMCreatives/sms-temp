@@ -263,8 +263,8 @@ export default function EngagementsPage() {
                 <SelectItem value="followup">Follow-up</SelectItem>
                 <SelectItem value="escalated">Escalated</SelectItem>
                 <SelectItem value="no_issue">No Issue</SelectItem>
-                <SelectItem value="followup_ro">Follow Up (RO)</SelectItem>
-                <SelectItem value="followup_sales">
+                <SelectItem value="followup-ro">Follow Up (RO)</SelectItem>
+                <SelectItem value="followup-sales">
                   Follow Up (SALES)
                 </SelectItem>
                 <SelectItem value="withdrawn">Withdrawn</SelectItem>
