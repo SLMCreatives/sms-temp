@@ -24,7 +24,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
   );
 
   const db_sit = db_students?.filter(
-    (student) => student.faculty_code === "SIT"
+    (student) => student.faculty_code === "FAiFT"
   );
 
   return (
@@ -51,7 +51,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
             <TabsTrigger value="all">Overall</TabsTrigger>
             <TabsTrigger value="FOB">FOB</TabsTrigger>
             <TabsTrigger value="FEH">FEH</TabsTrigger>
-            <TabsTrigger value="SIT">SIT</TabsTrigger>
+            <TabsTrigger value="FAiFT">FAiFT</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-6">
@@ -85,7 +85,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
              */}{" "}
           </TabsContent>
 
-          <TabsContent value="SIT" className="space-y-6">
+          <TabsContent value="FAiFT" className="space-y-6">
             <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6">
               {/* Key Metrics */}
               <StudentMetrics data={db_sit} />

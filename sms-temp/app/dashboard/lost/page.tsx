@@ -9,8 +9,8 @@ const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
-    .from("students")
-    .select("*, lms_activity(*), engagements(*)")
+    .from("jan26_students")
+    .select("*, jan26_lms_activity(*), jan26_engagements(*)")
     .neq("status", "Active");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -72,7 +72,7 @@ export default async function DemoPage() {
     formattedaddDates(date)
   );
 
-  const orientationDay = new Date("2025-09-13");
+  const orientationDay = new Date("2026-01-10");
 
   const daysBetween = (date1: Date, date2: Date) =>
     Math.floor((date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24));

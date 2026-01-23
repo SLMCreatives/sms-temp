@@ -168,14 +168,15 @@ export const columns: ColumnDef<Students>[] = [
                     readOnly
                     value={
                       Math.round(
-                        row.original.lms_activity !== null
-                          ? row.original.lms_activity.course_progress * 100
+                        row.original.jan26_lms_activity !== null
+                          ? row.original.jan26_lms_activity.course_progress *
+                              100
                           : 0
                       ) + "% (as of 6/10/25)"
                     } //row.original.lms_activity.course_progress * 100 + "%"}
                     className={`w-full ${
-                      row.original.lms_activity &&
-                      row.original.lms_activity.course_progress < 0.2
+                      row.original.jan26_lms_activity &&
+                      row.original.jan26_lms_activity.course_progress < 0.2
                         ? "text-red-500 font-bold"
                         : ""
                     }`}
@@ -190,13 +191,13 @@ export const columns: ColumnDef<Students>[] = [
                     name="engagement"
                     readOnly
                     value={
-                      (row.original.engagements !== null
-                        ? row.original.engagements.length
+                      (row.original.jan26_engagements !== null
+                        ? row.original.jan26_engagements.length
                         : 0) + " time(s)"
                     }
                     className={`w-full ${
-                      row.original.engagements &&
-                      row.original.engagements.length >= 0
+                      row.original.jan26_engagements &&
+                      row.original.jan26_engagements.length >= 0
                         ? "text-green-500"
                         : "text-red-500"
                     }`}

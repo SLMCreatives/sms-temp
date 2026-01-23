@@ -23,29 +23,29 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
   );
 
   /*  const w2_active_students = db_students.filter(
-    (student) => student.status === "Active" && student.nov25_lms_activity_w2
+    (student) => student.status === "Active" && student.jan26_lms_activity_w2
   );
 
   const w3_active_students = db_students.filter(
-    (student) => student.status === "Active" && student.nov25_lms_activity_w3
+    (student) => student.status === "Active" && student.jan26_lms_activity_w3
   ); */
 
   const not_logged_in = active_students.filter(
     (student) =>
-      student.nov25_lms_activity &&
-      student.nov25_lms_activity.last_login_at === null
+      student.jan26_lms_activity &&
+      student.jan26_lms_activity.last_login_at === null
   );
 
   const w1_notlogged_in = active_students.filter(
     (student) =>
-      student.nov25_lms_activity_w1 &&
-      student.nov25_lms_activity_w1.last_login_at === null
+      student.jan26_lms_activity_w1 &&
+      student.jan26_lms_activity_w1.last_login_at === null
   );
 
   const w2_notlogged_in = active_students.filter(
     (student) =>
-      student.nov25_lms_activity &&
-      student.nov25_lms_activity.last_login_at === null
+      student.jan26_lms_activity &&
+      student.jan26_lms_activity.last_login_at === null
   );
   /*
   const w3_notlogged_in = db_students.filter(
@@ -54,22 +54,22 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
   ); */
   const zero_progress = active_students.filter(
     (student) =>
-      student.nov25_lms_activity &&
-      student.nov25_lms_activity.course_progress === 0 &&
+      student.jan26_lms_activity &&
+      student.jan26_lms_activity.course_progress === 0 &&
       !not_logged_in.includes(student)
   );
 
   const w1_zero_progress = active_students.filter(
     (student) =>
-      student.nov25_lms_activity_w1 &&
-      student.nov25_lms_activity_w1.course_progress === 0 &&
+      student.jan26_lms_activity_w1 &&
+      student.jan26_lms_activity_w1.course_progress === 0 &&
       !w1_notlogged_in.includes(student)
   );
 
   const w2_zero_progress = active_students.filter(
     (student) =>
-      student.nov25_lms_activity &&
-      student.nov25_lms_activity.course_progress === 0 &&
+      student.jan26_lms_activity &&
+      student.jan26_lms_activity.course_progress === 0 &&
       !w2_notlogged_in.includes(student)
   );
   /*
@@ -82,24 +82,24 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
  */
   const low_progress = active_students.filter(
     (student) =>
-      student.nov25_lms_activity &&
-      student.nov25_lms_activity.course_progress <= 0.2 &&
+      student.jan26_lms_activity &&
+      student.jan26_lms_activity.course_progress <= 0.2 &&
       !zero_progress.includes(student) &&
       !not_logged_in.includes(student)
   );
 
   const w1_low_progress = active_students.filter(
     (student) =>
-      student.nov25_lms_activity_w1 &&
-      student.nov25_lms_activity_w1.course_progress <= 0.2 &&
+      student.jan26_lms_activity_w1 &&
+      student.jan26_lms_activity_w1.course_progress <= 0.2 &&
       !w1_zero_progress.includes(student) &&
       !w1_notlogged_in.includes(student)
   );
 
   const w2_low_progress = active_students.filter(
     (student) =>
-      student.nov25_lms_activity &&
-      student.nov25_lms_activity.course_progress <= 0.2 &&
+      student.jan26_lms_activity &&
+      student.jan26_lms_activity.course_progress <= 0.2 &&
       !w2_zero_progress.includes(student) &&
       !w2_notlogged_in.includes(student)
   );
