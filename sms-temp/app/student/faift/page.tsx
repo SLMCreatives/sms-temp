@@ -18,7 +18,7 @@ const supabase = createClient();
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("jan26_students")
-    .select("*, jan26_lms_activity(*), jan26_engagements(*)")
+    .select("*, jan26_lms_activity(*), jan26_engagements(*), jan26_payment(*)")
     .eq("faculty_code", "FAiFT");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -93,6 +93,11 @@ export default async function SITPage() {
     (less20progress.length / sit_active.length) * 100
   );
 
+  const ptptn = sit_active.filter(
+    (student) => student.jan26_payment?.payment_mode === "PTPTN"
+  );
+
+  const ptptnPercentage = Math.round((ptptn.length / sit_active.length) * 100);
   /* const engaged = sit_active.filter((student) =>
     student.engagements.some((item) => item.created_at > "2025-09-28")
   );
@@ -239,6 +244,21 @@ export default async function SITPage() {
               <Progress
                 id="less20progress"
                 value={less20progressPercentage}
+                className=" h-5"
+              ></Progress>
+
+              <Label
+                htmlFor="ptptn"
+                className="flex flex-row w-full justify-between"
+              >
+                PTPTN Students{" "}
+                <span className="italic text-muted-foreground">
+                  {ptptn.length}
+                </span>
+              </Label>
+              <Progress
+                id="ptptn"
+                value={ptptnPercentage}
                 className=" h-5"
               ></Progress>
               {/* <Label

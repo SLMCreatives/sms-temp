@@ -22,7 +22,9 @@ export default function StudentPage({
       try {
         const { data, error } = await supabase
           .from("jan26_students")
-          .select("*, jan26_engagements(*), jan26_lms_activity(*)")
+          .select(
+            "*, jan26_engagements(*), jan26_lms_activity(*), jan26_payment(*)"
+          )
           .eq("matric_no", matric_no)
           .single();
 

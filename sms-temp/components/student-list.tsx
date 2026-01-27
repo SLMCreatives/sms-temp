@@ -5,23 +5,25 @@ import {
   ArrowUpCircle,
   ArrowRightCircle,
   CircleCheckBig,
-  UserRoundX,
   BookX,
-  CircleSlash
+  CircleSlash,
+  HandCoins
 } from "lucide-react";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { Input } from "./ui/input";
 import Link from "next/link";
-import { LMSActivity, Students } from "@/app/student/studentColumns";
+import { LMSActivity, Students, Payment } from "@/app/student/studentColumns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Textarea } from "./ui/textarea";
 
 interface StudentCardProps {
   student: Students;
   lms_activity: LMSActivity;
   jan26_lms_activity?: LMSActivity;
   index: number;
+  jan26_payment?: Payment;
 }
 
 export function StudentList({
@@ -36,7 +38,7 @@ export function StudentList({
         student.jan26_lms_activity?.last_login_at === null
           ? "border-red-600 border-2"
           : ""
-      } ${student.status !== "Active" ? "border-red-100 border-2" : ""}`}
+      } ${student.status !== "Active" ? "border-red-100 border-2" : ""}  `}
     >
       <CardContent className="pl-2 overflow-hidden">
         <div className="flex flex-col gap-2 px-0">
@@ -47,6 +49,11 @@ export function StudentList({
                 : ""
             } ${
               student.status !== "Active" ? "text-gray-500 line-through" : ""
+            } 
+            ${
+              student.jan26_payment?.payment_mode === "PTPTN"
+                ? "font-black uppercase"
+                : ""
             }`}
           >
             <span className={`font-thin tracking-tighter  `}>{index + 1}.</span>{" "}
@@ -55,12 +62,13 @@ export function StudentList({
         </div>
       </CardContent>
       <CardFooter className="w-full flex flex-row gap-1 justify-end h-full">
-        {jan26_lms_activity && jan26_lms_activity.last_login_at === null ? (
+        {student.jan26_payment &&
+        student.jan26_payment.payment_mode === "PTPTN" ? (
           <Tooltip>
             <TooltipTrigger>
-              <UserRoundX className="w-5 h-5 text-red-600" />
+              <HandCoins className="w-5 h-5 text-blue-600" />
             </TooltipTrigger>
-            <TooltipContent>Not Loged In</TooltipContent>
+            <TooltipContent>PTPTN Payment Mode</TooltipContent>
           </Tooltip>
         ) : null}{" "}
         {jan26_lms_activity && jan26_lms_activity.course_progress === 0 ? (
@@ -259,6 +267,44 @@ export function StudentList({
                       ? "text-green-500"
                       : "text-red-500"
                   }`}
+                />
+                <Label
+                  htmlFor="payment"
+                  className="text-xs italic text-slate-500"
+                >
+                  Payment Mode
+                </Label>
+                <Input
+                  name="payment"
+                  readOnly
+                  value={
+                    student.jan26_payment && student.jan26_payment.payment_mode
+                      ? student.jan26_payment.payment_mode
+                      : "N/A"
+                  }
+                  className={`w-full ${
+                    student.jan26_payment &&
+                    student.jan26_payment.payment_mode === "PTPTN"
+                      ? "text-blue-500 font-bold"
+                      : ""
+                  }`}
+                />
+                <Label
+                  htmlFor="payment_status"
+                  className="text-xs italic text-slate-500"
+                >
+                  Payment Status
+                </Label>
+                <Textarea
+                  name="payment_status"
+                  readOnly
+                  value={
+                    student.jan26_payment &&
+                    student.jan26_payment.payment_status
+                      ? student.jan26_payment.payment_status
+                      : "N/A"
+                  }
+                  className={`w-full text-right text-sm`}
                 />
               </div>
               <div className="flex flex-row gap-2 justify-between w-full py-8 group hover:cursor-pointer">

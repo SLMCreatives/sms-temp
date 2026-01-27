@@ -41,6 +41,13 @@ export type LMSActivity = {
   updated_at: string;
 };
 
+export type Payment = {
+  id: string;
+  matric_no: string;
+  payment_mode: string;
+  payment_status: string;
+};
+
 export type Students = {
   matric_no: string;
   full_name: string;
@@ -68,6 +75,12 @@ export type Students = {
   nov25_engagements: Engagements[];
   engagements_union_all: Engagements[];
   lms_activity_union_all: LMSActivity;
+  jan26_payment: {
+    id: string;
+    matric_no: string;
+    payment_mode: string;
+    payment_status: string;
+  };
 };
 
 export type ProgressionStudents = {

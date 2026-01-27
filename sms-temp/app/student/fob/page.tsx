@@ -18,7 +18,7 @@ const supabase = createClient();
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("jan26_students")
-    .select("*, jan26_lms_activity(*), jan26_engagements(*)")
+    .select("*, jan26_lms_activity(*), jan26_engagements(*), jan26_payment(*)")
     .eq("faculty_code", "FOB");
   if (error) {
     console.log("Error fetching data:", error.message);
@@ -100,6 +100,18 @@ export default async function FoBPage() {
   const less20progressPercentage = Math.round(
     (less20progress.length / fob_active.length) * 100
   );
+
+  const ptptn = fob_active.filter(
+    (student) => student.jan26_payment?.payment_mode === "PTPTN"
+  );
+  const ptptnPercentage = Math.round((ptptn.length / fob_active.length) * 100);
+  //console.log("FOB PTPTN Students:", ptptn.length);
+
+  /*   const ptptn = fob_active.filter(
+    (student) => student.jan26_payment?.payment_mode === "PTPTN"
+  );
+
+  console.log("FOB PTPTN Students:", ptptn.length); */
 
   /* const engaged = fob_active.filter((student) =>
     student.engagements.some(
@@ -261,6 +273,20 @@ export default async function FoBPage() {
               <Progress
                 id="less20progress"
                 value={less20progressPercentage}
+                className=" h-5"
+              ></Progress>
+              <Label
+                htmlFor="ptptn"
+                className="flex flex-row w-full justify-between"
+              >
+                PTPTN Students{" "}
+                <span className="italic text-muted-foreground">
+                  {ptptn.length}
+                </span>
+              </Label>
+              <Progress
+                id="ptptn"
+                value={ptptnPercentage}
                 className=" h-5"
               ></Progress>
 
@@ -450,6 +476,7 @@ export default async function FoBPage() {
                       student={student}
                       lms_activity={student.lms_activity}
                       index={index}
+                      jan26_lms_activity={student.jan26_lms_activity}
                     />
                   ))}
               </div>
