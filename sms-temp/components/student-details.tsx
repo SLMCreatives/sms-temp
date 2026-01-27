@@ -19,7 +19,9 @@ import {
   BookOpen,
   Globe,
   FileText,
-  CheckCircle
+  CheckCircle,
+  BanknoteArrowUp,
+  FolderCheck
 } from "lucide-react";
 //import { Comments, Students } from "@/app/student/studentColumns";
 import { EngagementForm } from "./engagement-form";
@@ -134,6 +136,32 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                         </p>
                         <p className="font-medium text-sm md:text-base">
                           {studentData.study_mode}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <BanknoteArrowUp className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Payment Mode
+                        </p>
+                        <p className="font-medium text-sm md:text-base">
+                          {studentData.jan26_payment
+                            ? studentData.jan26_payment.payment_mode
+                            : "No record"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Payment Status
+                        </p>
+                        <p className="font-medium text-sm md:text-base">
+                          {studentData.jan26_payment
+                            ? studentData.jan26_payment.payment_status
+                            : "No record"}
                         </p>
                       </div>
                     </div>
