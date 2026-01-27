@@ -104,6 +104,7 @@ export default async function FoBPage() {
   const ptptn = fob_active.filter(
     (student) => student.jan26_payment?.payment_mode === "PTPTN"
   );
+
   const ptptnPercentage = Math.round((ptptn.length / fob_active.length) * 100);
   //console.log("FOB PTPTN Students:", ptptn.length);
 

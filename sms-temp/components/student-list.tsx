@@ -166,7 +166,7 @@ export function StudentList({
                   Phone No.
                 </Label>
                 <Input name="phone" readOnly value={student.phone} />
-                <Label
+                {/* <Label
                   htmlFor="nationality"
                   className="text-xs italic text-slate-500"
                 >
@@ -176,8 +176,8 @@ export function StudentList({
                   name="nationality"
                   readOnly
                   value={student.nationality}
-                />
-                <Label
+                /> */}
+                {/*  <Label
                   htmlFor="status"
                   className="text-xs italic text-slate-500"
                 >
@@ -192,7 +192,7 @@ export function StudentList({
                       ? "text-green-500 font-bold"
                       : "text-red-500 font-bold"
                   }`}
-                />
+                /> */}
 
                 <p className="text-md font-bold col-span-2">CN Activity</p>
                 <Label
@@ -246,7 +246,7 @@ export function StudentList({
                       : ""
                   }`}
                 />
-                <Label
+                {/* <Label
                   htmlFor="engagement"
                   className="text-xs italic text-slate-500"
                 >
@@ -267,7 +267,7 @@ export function StudentList({
                       ? "text-green-500"
                       : "text-red-500"
                   }`}
-                />
+                /> */}
                 <Label
                   htmlFor="payment"
                   className="text-xs italic text-slate-500"
