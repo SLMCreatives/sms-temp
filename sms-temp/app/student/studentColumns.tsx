@@ -67,6 +67,7 @@ export type Students = {
   lms_activity_w1: LMSActivity;
   lms_activity_w2: LMSActivity;
   lms_activity_w3: LMSActivity;
+  lms_activity_w4: LMSActivity;
   jan26_lms_activity: LMSActivity;
   jan26_lms_activity_w1: LMSActivity;
   jan26_lms_activity_w2: LMSActivity;
@@ -74,6 +75,7 @@ export type Students = {
   nov25_lms_activity: LMSActivity;
   nov25_lms_activity_w1: LMSActivity;
   nov25_engagements: Engagements[];
+  sept25_engagements: Engagements[];
   engagements_union_all: Engagements[];
   lms_activity_union_all: LMSActivity;
   jan26_payment: {

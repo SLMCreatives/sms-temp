@@ -1,10 +1,10 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StudentMetrics } from "@/components/student-metrics";
+import { StudentMetrics } from "@/components/student-metrics-c325";
 import { Students } from "@/app/student/studentColumns";
 import { useState } from "react";
-import { StudentPieChart } from "./studentpie";
+import { StudentPieChart } from "./studentpie-c325";
 //import EngagementTimeline from "./engagement-timeline";
 
 interface StudentMetricsProps {
@@ -24,7 +24,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
   );
 
   const db_sit = db_students?.filter(
-    (student) => student.faculty_code === "FAiFT"
+    (student) => student.faculty_code === "SIT"
   );
 
   return (
@@ -35,7 +35,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-foreground">
-                Online Student Health | C1 2026
+                Online Student Health | C3 2025
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Monitor student engagement and identify at-risk students
@@ -51,7 +51,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
             <TabsTrigger value="all">Overall</TabsTrigger>
             <TabsTrigger value="FOB">FOB</TabsTrigger>
             <TabsTrigger value="FEH">FEH</TabsTrigger>
-            <TabsTrigger value="FAiFT">FAiFT</TabsTrigger>
+            <TabsTrigger value="SIT">SIT</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-6">
@@ -85,7 +85,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
              */}{" "}
           </TabsContent>
 
-          <TabsContent value="FAiFT" className="space-y-6">
+          <TabsContent value="SIT" className="space-y-6">
             <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6">
               {/* Key Metrics */}
               <StudentMetrics data={db_sit} />
