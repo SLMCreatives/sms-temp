@@ -33,7 +33,7 @@ export default async function DemoPage() {
     (student) => student.faculty_code === "FEH"
   );
   const sit_atrisk = data_atrisk.filter(
-    (student) => student.faculty_code === "SIT"
+    (student) => student.faculty_code === "FAiFT"
   );
 
   const fob_data = data.filter(
@@ -43,7 +43,7 @@ export default async function DemoPage() {
     (student) => student.faculty_code === "FEH" && student.status !== "Active"
   );
   const sit_data = data.filter(
-    (student) => student.faculty_code === "SIT" && student.status !== "Active"
+    (student) => student.faculty_code === "FAiFT" && student.status !== "Active"
   );
 
   const uniqueprogramesfob = [
@@ -91,10 +91,10 @@ export default async function DemoPage() {
     (student) => student.faculty_code === "FEH"
   );
   const sit_lost = data_lost.filter(
-    (student) => student.faculty_code === "SIT"
+    (student) => student.faculty_code === "FAiFT"
   );
 
-  const db_students = 974;
+  const db_students = data.length;
 
   const attrition_rate = (
     ((data_atrisk.length + data_lost.length) / db_students) *
@@ -110,7 +110,7 @@ export default async function DemoPage() {
           <div className="flex flex-col gap-1">
             <p className="text-2xl font-bold ">Total At Risk:</p>
             <p className="text-sm text-muted-foreground italic text-balance">
-              FOB - {fob_atrisk.length} | FEH - {feh_atrisk.length} | SIT -{" "}
+              FOB - {fob_atrisk.length} | FEH - {feh_atrisk.length} | FAiFT -{" "}
               {sit_atrisk.length}
             </p>
           </div>
@@ -122,7 +122,7 @@ export default async function DemoPage() {
           <div className="flex flex-col gap-1">
             <p className="text-2xl font-bold ">Total Lost:</p>
             <p className="text-sm text-muted-foreground italic text-balance">
-              FOB - {fob_lost.length} | FEH - {feh_lost.length} | SIT -{" "}
+              FOB - {fob_lost.length} | FEH - {feh_lost.length} | FAiFT -{" "}
               {sit_lost.length}
             </p>
           </div>
@@ -134,7 +134,7 @@ export default async function DemoPage() {
           <div className="flex flex-col gap-1">
             <p className="text-2xl font-bold ">Average Wait Time:</p>
             <p className="text-sm text-muted-foreground italic text-balance">
-              From Application to Orientation (13 Sept 2025)
+              From Application to Orientation (10 Jan 2026)
             </p>
           </div>
           <p className="text-xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">
@@ -145,8 +145,9 @@ export default async function DemoPage() {
           <div className="flex flex-col gap-1">
             <p className="text-2xl font-bold ">Actual Attrition Rate:</p>
             <p className="text-sm text-muted-foreground italic text-balance">
-              Total Apps (974) | Lost Rate {Math.round(lost_rate * 100)}% | At
-              Risk Rate {Math.round(atrisk_rate * 100)}%
+              Total Apps ({db_students}) | Lost Rate{" "}
+              {Math.round(lost_rate * 100)}% | At Risk Rate{" "}
+              {Math.round(atrisk_rate * 100)}%
             </p>
           </div>
           <p className="text-xl font-bold text-nowrap p-4 bg-stone-200 rounded-lg">

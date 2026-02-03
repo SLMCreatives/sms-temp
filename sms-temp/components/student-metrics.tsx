@@ -15,12 +15,10 @@ interface StudentMetricsProps {
 export function StudentMetrics({ data }: StudentMetricsProps) {
   const db_students = data as Students[];
   const active_students = db_students.filter(
-    (student) => student.status === "Active"
+    (student) => student.status === "Active" || student.status === "At Risk"
   );
 
-  const w1_active_students = db_students.filter(
-    (student) => student.status === "Active"
-  );
+  //const w1_active_students = db_students.filter((student) => student.status);
 
   /*  const w2_active_students = db_students.filter(
     (student) => student.status === "Active" && student.jan26_lms_activity_w2
@@ -44,8 +42,8 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
 
   const w2_notlogged_in = active_students.filter(
     (student) =>
-      student.jan26_lms_activity &&
-      student.jan26_lms_activity.last_login_at === null
+      student.jan26_lms_activity_w2 &&
+      student.jan26_lms_activity_w2.last_login_at === null
   );
   /*
   const w3_notlogged_in = db_students.filter(
@@ -68,8 +66,8 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
 
   const w2_zero_progress = active_students.filter(
     (student) =>
-      student.jan26_lms_activity &&
-      student.jan26_lms_activity.course_progress === 0 &&
+      student.jan26_lms_activity_w2 &&
+      student.jan26_lms_activity_w2.course_progress === 0 &&
       !w2_notlogged_in.includes(student)
   );
   /*
@@ -98,8 +96,8 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
 
   const w2_low_progress = active_students.filter(
     (student) =>
-      student.jan26_lms_activity &&
-      student.jan26_lms_activity.course_progress <= 0.2 &&
+      student.jan26_lms_activity_w2 &&
+      student.jan26_lms_activity_w2.course_progress <= 0.2 &&
       !w2_zero_progress.includes(student) &&
       !w2_notlogged_in.includes(student)
   );
@@ -135,28 +133,6 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               {Math.round((active_students.length / db_students.length) * 100)}%
             </span>
           </div>
-          <div className="flex flex-col gap-0 items-end lg:items-start text-sm">
-            <p className="text-xs italic text-muted-foreground">
-              W1 - {w1_active_students.length} (
-              {Math.round(
-                (w1_active_students.length / db_students.length) * 100
-              )}
-              %)
-            </p>
-            <p className="text-xs italic text-muted-foreground">
-              W2 - {active_students.length} (
-              {Math.round((active_students.length / db_students.length) * 100)}%
-              )
-            </p>
-            {/* 
-            <p className="text-xs italic text-muted-foreground">
-              W3 - {w3_active_students.length} (
-              {Math.round(
-                (w3_active_students.length / db_students.length) * 100
-              )}
-              % )
-            </p> */}
-          </div>
         </CardContent>
       </Card>
 
@@ -167,7 +143,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
               Not Logged In
             </CardTitle>
             <CardDescription className="text-xs italic ">
-              As of 6th Oct 2025
+              As of 3rd Feb 2026
             </CardDescription>
           </div>
           <UserX className="h-4 w-4 text-warning" />
@@ -187,7 +163,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
             <p className="text-xs italic text-muted-foreground">
               W1 - {w1_notlogged_in.length} (
               {Math.round(
-                (w1_notlogged_in.length / w1_active_students.length) * 100
+                (w1_notlogged_in.length / active_students.length) * 100
               )}
               %)
             </p>
@@ -237,7 +213,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
             <p className="text-xs italic text-muted-foreground">
               W1 - {w1_zero_progress.length} (
               {Math.round(
-                (w1_zero_progress.length / w1_active_students.length) * 100
+                (w1_zero_progress.length / active_students.length) * 100
               )}
               %)
             </p>
@@ -285,7 +261,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
             <p className="text-xs italic text-muted-foreground">
               W1 - {w1_low_progress.length} (
               {Math.round(
-                (w1_low_progress.length / w1_active_students.length) * 100
+                (w1_low_progress.length / active_students.length) * 100
               )}
               %)
             </p>

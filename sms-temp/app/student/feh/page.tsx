@@ -482,6 +482,7 @@ export default async function FEHPage() {
                       student={student}
                       lms_activity={student.jan26_lms_activity}
                       index={index}
+                      jan26_lms_activity={student.jan26_lms_activity}
                     />
                   ))}
               </div>
@@ -508,6 +509,7 @@ export default async function FEHPage() {
                       student={student}
                       lms_activity={student.lms_activity}
                       index={index}
+                      jan26_lms_activity={student.jan26_lms_activity}
                     />
                   ))}
               </div>
@@ -534,6 +536,7 @@ export default async function FEHPage() {
                       student={student}
                       lms_activity={student.lms_activity}
                       index={index}
+                      jan26_lms_activity={student.jan26_lms_activity}
                     />
                   ))}
               </div>
@@ -560,6 +563,7 @@ export default async function FEHPage() {
                       student={student}
                       lms_activity={student.lms_activity}
                       index={index}
+                      jan26_lms_activity={student.jan26_lms_activity}
                     />
                   ))}
               </div>
@@ -586,6 +590,7 @@ export default async function FEHPage() {
                       student={student}
                       lms_activity={student.lms_activity}
                       index={index}
+                      jan26_lms_activity={student.jan26_lms_activity}
                     />
                   ))}
               </div>

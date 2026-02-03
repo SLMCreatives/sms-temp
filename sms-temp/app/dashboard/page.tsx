@@ -7,7 +7,9 @@ const supabase = createClient();
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
     .from("jan26_students")
-    .select("*, jan26_lms_activity(*), jan26_engagements(*)");
+    .select(
+      "*, jan26_lms_activity(*), jan26_engagements(*), jan26_lms_activity_w1(*), jan26_lms_activity_w2(*)"
+    );
   if (error) {
     console.log("Error fetching data:", error.message);
     return [];

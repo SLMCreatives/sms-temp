@@ -267,7 +267,7 @@ export const columns: ColumnDef<Students>[] = [
       const registrationDate = new Date(
         `${properregDate.year}-${properregDate.month}-${properregDate.day}`
       );
-      const orientationDate = new Date("2025-09-13");
+      const orientationDate = new Date("2026-01-10");
 
       const diffTime = () => {
         if (registrationDate > orientationDate) {
