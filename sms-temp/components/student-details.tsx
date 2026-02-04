@@ -39,6 +39,7 @@ import { Button } from "./ui/button";
 //import CommentSection from "./comment-section";
 import { Students } from "@/app/student/studentColumns";
 import ChangeStatusForm from "./change-status";
+import { Switch } from "./ui/switch";
 
 interface StudentDetailsProps {
   studentData: Students;
@@ -152,19 +153,43 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Payment Status
-                        </p>
-                        <p className="font-medium text-sm md:text-base">
-                          {studentData.jan26_payment
-                            ? studentData.jan26_payment.payment_status
-                            : "No record"}
-                        </p>
+                    {studentData.jan26_payment.payment_mode !== "PTPTN" && (
+                      <div className="flex items-center gap-3">
+                        <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Payment Status
+                          </p>
+                          <p className="font-medium text-sm md:text-base">
+                            {studentData.jan26_payment
+                              ? studentData.jan26_payment.payment_status
+                              : "No record"}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )}
+                    {studentData.jan26_payment.payment_mode === "PTPTN" && (
+                      <div className="flex items-center gap-3">
+                        <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Proof of PTPTN
+                          </p>
+                          <div className="flex flex-row gap-2">
+                            <p className="font-medium text-sm md:text-base">
+                              {studentData.jan26_payment
+                                ? studentData.jan26_payment.proof
+                                : "No record"}
+                            </p>
+                            <Switch
+                              checked={
+                                studentData.jan26_payment?.proof === "TRUE"
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
