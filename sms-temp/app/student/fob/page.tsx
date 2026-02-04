@@ -105,8 +105,18 @@ export default async function FoBPage() {
     (student) => student.jan26_payment?.payment_mode === "PTPTN"
   );
 
-  const ptptnPercentage = Math.round((ptptn.length / fob_active.length) * 100);
+  //const ptptnPercentage = Math.round((ptptn.length / fob_active.length) * 100);
   //console.log("FOB PTPTN Students:", ptptn.length);
+
+  const ptptnFalse = fob_active.filter(
+    (student) =>
+      student.jan26_payment?.payment_mode === "PTPTN" &&
+      student.jan26_payment.proof === "FALSE"
+  );
+
+  const ptptnFalsePercentage = Math.round(
+    (ptptnFalse.length / ptptn.length) * 100
+  );
 
   /*   const ptptn = fob_active.filter(
     (student) => student.jan26_payment?.payment_mode === "PTPTN"
@@ -280,14 +290,14 @@ export default async function FoBPage() {
                 htmlFor="ptptn"
                 className="flex flex-row w-full justify-between"
               >
-                PTPTN Students{" "}
+                PTPTN No Proof
                 <span className="italic text-muted-foreground">
-                  {ptptn.length}
+                  {ptptnFalse.length}/{ptptn.length}
                 </span>
               </Label>
               <Progress
                 id="ptptn"
-                value={ptptnPercentage}
+                value={ptptnFalsePercentage}
                 className=" h-5"
               ></Progress>
 

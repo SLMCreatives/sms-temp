@@ -38,7 +38,7 @@ export function StudentList({
         student.jan26_lms_activity?.last_login_at === null
           ? "border-red-600 border-2"
           : ""
-      } ${student.status !== "Active" ? "border-red-100 border-2" : ""}  `}
+      } ${student.status !== "Active" ? "border-red-100 border-2" : ""} ${student.jan26_payment?.payment_mode === "PTPTN" && student.jan26_payment.proof === "FALSE" ? "border-blue-600 border-2" : ""} `}
     >
       <CardContent className="pl-2 overflow-hidden">
         <div className="flex flex-col gap-2 px-0">
@@ -51,8 +51,9 @@ export function StudentList({
               student.status !== "Active" ? "text-gray-500 line-through" : ""
             } 
             ${
-              student.jan26_payment?.payment_mode === "PTPTN"
-                ? "font-black uppercase"
+              student.jan26_payment?.payment_mode === "PTPTN" &&
+              student.jan26_payment.proof === "FALSE"
+                ? "text-blue-600 uppercase"
                 : ""
             }`}
           >

@@ -80,7 +80,14 @@ export default async function FEHPage() {
     (student) => student.jan26_payment?.payment_mode === "PTPTN"
   );
 
-  const ptptnPercentage = Math.round((ptptn.length / active.length) * 100);
+  const ptptnFalse = active.filter(
+    (student) =>
+      student.jan26_payment?.payment_mode === "PTPTN" &&
+      student.jan26_payment.proof === "FALSE"
+  );
+
+  const ptptnPercentage = Math.round((ptptnFalse.length / ptptn.length) * 100);
+  //const ptptnPercentage = Math.round((ptptn.length / active.length) * 100);
 
   /* 
   const engaged = active.filter((student) =>
@@ -282,9 +289,9 @@ export default async function FEHPage() {
                 htmlFor="ptptn"
                 className="flex flex-row w-full justify-between"
               >
-                PTPTN Students{" "}
+                PTPTN No Proof
                 <span className="italic text-muted-foreground">
-                  {ptptn.length}
+                  {ptptnFalse.length}/{ptptn.length}
                 </span>
               </Label>
               <Progress

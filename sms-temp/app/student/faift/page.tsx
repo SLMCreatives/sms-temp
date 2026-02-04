@@ -97,7 +97,15 @@ export default async function SITPage() {
     (student) => student.jan26_payment?.payment_mode === "PTPTN"
   );
 
-  const ptptnPercentage = Math.round((ptptn.length / sit_active.length) * 100);
+  const ptptnFalse = sit_active.filter(
+    (student) =>
+      student.jan26_payment?.payment_mode === "PTPTN" &&
+      student.jan26_payment.proof === "FALSE"
+  );
+
+  const ptptnPercentage = Math.round((ptptnFalse.length / ptptn.length) * 100);
+
+  //const ptptnPercentage = Math.round((ptptn.length / sit_active.length) * 100);
   /* const engaged = sit_active.filter((student) =>
     student.engagements.some((item) => item.created_at > "2025-09-28")
   );
@@ -251,9 +259,9 @@ export default async function SITPage() {
                 htmlFor="ptptn"
                 className="flex flex-row w-full justify-between"
               >
-                PTPTN Students{" "}
+                PTPTN No Proof{" "}
                 <span className="italic text-muted-foreground">
-                  {ptptn.length}
+                  {ptptnFalse.length}/{ptptn.length}
                 </span>
               </Label>
               <Progress

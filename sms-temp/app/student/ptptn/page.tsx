@@ -1,23 +1,24 @@
 import { createClient } from "@/lib/supabase/client";
-import { Payment } from "../studentColumns";
-//import { StudentList } from "@/components/student-list";
+import { Students } from "@/app/student/studentColumns";
 
 const supabase = createClient();
 
 async function getData() {
   const { data: students, error } = await supabase
-    .from("jan26_payment")
-    .select("*, jan26_students(*)");
+    .from("jan26_students")
+    .select("*, jan26_payments (*), jan26_lms_activity (*)");
   if (error) {
     console.log("Error fetching data:", error.message);
     return [];
   }
-  return students as Payment[];
+  return students as Students[];
 }
 
 export default async function PTPTNpage() {
   const data = await getData();
-  const ptptn = data.filter((student) => student.payment_mode === "PTPTN");
+  const ptptn = data.filter(
+    (student) => student.jan26_payment.payment_mode === "PTPTN"
+  );
   console.log(ptptn.length);
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6 ring">

@@ -46,6 +46,7 @@ export type Payment = {
   matric_no: string;
   payment_mode: string;
   payment_status: string;
+  proof: string;
 };
 
 export type Students = {
@@ -83,6 +84,7 @@ export type Students = {
     matric_no: string;
     payment_mode: string;
     payment_status: string;
+    proof: string;
   };
 };
 
