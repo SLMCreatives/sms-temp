@@ -297,7 +297,8 @@ export function StudentList({
                 >
                   Payment Status
                 </Label>
-                {student.jan26_payment.payment_mode === "PTPTN" ? (
+                {student.jan26_payment &&
+                student.jan26_payment.payment_mode === "PTPTN" ? (
                   <Input
                     name="payment_status"
                     readOnly
@@ -312,7 +313,7 @@ export function StudentList({
                   <Textarea
                     name="payment_status"
                     readOnly
-                    value={student.jan26_payment.payment_status}
+                    value={student.jan26_payment?.payment_status || "N/A"}
                     className={`w-full text-right text-sm`}
                   />
                 )}
