@@ -39,7 +39,8 @@ import { Button } from "./ui/button";
 //import CommentSection from "./comment-section";
 import { Students } from "@/app/student/studentColumns";
 import ChangeStatusForm from "./change-status";
-import { Switch } from "./ui/switch";
+//import { Switch } from "./ui/switch";
+import ChangeStatusPTPTNForm from "./change-status-ptptn";
 
 interface StudentDetailsProps {
   studentData: Students;
@@ -176,7 +177,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                             Proof of PTPTN
                           </p>
                           <div className="flex flex-row gap-2">
-                            <p className="font-medium text-sm md:text-base">
+                            {/*  <p className="font-medium text-sm md:text-base">
                               {studentData.jan26_payment
                                 ? studentData.jan26_payment.proof
                                 : "No record"}
@@ -185,7 +186,8 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                               checked={
                                 studentData.jan26_payment?.proof === "TRUE"
                               }
-                            />
+                            /> */}
+                            <ChangeStatusPTPTNForm student={studentData} />
                           </div>
                         </div>
                       </div>
