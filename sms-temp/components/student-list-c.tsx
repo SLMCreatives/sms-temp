@@ -4,8 +4,6 @@ import {
   Mail,
   ArrowUpCircle,
   ArrowRightCircle,
-  CircleCheckBig,
-  BookX,
   CircleSlash,
   HandCoins
 } from "lucide-react";
@@ -14,46 +12,32 @@ import { Card, CardContent, CardFooter } from "./ui/card";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { Input } from "./ui/input";
 import Link from "next/link";
-import { LMSActivity, Students, Payment } from "@/app/student/studentColumns";
+import { Students, Payment } from "@/app/student/studentColumns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Textarea } from "./ui/textarea";
 //import ChangeStatusPTPTNForm from "./change-status-ptptn";
 
 interface StudentCardProps {
   student: Students;
-  lms_activity: LMSActivity;
-  jan26_lms_activity?: LMSActivity;
   index: number;
-  jan26_payment?: Payment;
+  jan26_c_payment?: Payment;
 }
 
-export function StudentList({
-  student,
-  jan26_lms_activity,
-  index
-}: StudentCardProps) {
+export function StudentListConven({ student, index }: StudentCardProps) {
   return (
     <Card
       key={student.matric_no}
-      className={`w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_50px] gap-0 py-2 ${
-        student.jan26_lms_activity?.last_login_at === null
-          ? "border-red-600 border-2"
-          : ""
-      } ${student.status !== "Active" ? "border-red-100 border-2" : ""} ${student.jan26_payment?.payment_mode === "PTPTN" && student.jan26_payment.proof === "FALSE" ? "border-blue-600 border-2" : ""} `}
+      className={`w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_50px] gap-0 py-2  ${student.status !== "Active" ? "border-red-100 border-2" : ""} ${student.jan26_c_payment?.payment_mode === "PTPTN" && student.jan26_c_payment.proof === "FALSE" ? "border-blue-600 border-2" : ""} `}
     >
       <CardContent className="pl-2 overflow-hidden">
         <div className="flex flex-col gap-2 px-0">
           <p
-            className={`text-sm text-nowrap font-normal overflow-hidden capitalize truncate min-w-[200px] ${
-              student.jan26_lms_activity?.last_login_at === null
-                ? "text-red-500 font-bold"
-                : ""
-            } ${
+            className={`text-sm text-nowrap font-normal overflow-hidden capitalize truncate min-w-[200px]  ${
               student.status !== "Active" ? "text-gray-500 line-through" : ""
             } 
             ${
-              student.jan26_payment?.payment_mode === "PTPTN" &&
-              student.jan26_payment.proof === "FALSE"
+              student.jan26_c_payment?.payment_mode === "PTPTN" &&
+              student.jan26_c_payment.proof === "FALSE"
                 ? "text-blue-600 uppercase"
                 : ""
             }`}
@@ -64,8 +48,8 @@ export function StudentList({
         </div>
       </CardContent>
       <CardFooter className="w-full flex flex-row gap-1 justify-end h-full">
-        {student.jan26_payment &&
-        student.jan26_payment.payment_mode === "PTPTN" ? (
+        {student.jan26_c_payment &&
+        student.jan26_c_payment.payment_mode === "PTPTN" ? (
           <Tooltip>
             <TooltipTrigger>
               <HandCoins className="w-5 h-5 text-blue-600" />
@@ -73,32 +57,6 @@ export function StudentList({
             <TooltipContent>PTPTN Payment Mode</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {jan26_lms_activity && jan26_lms_activity.course_progress === 0 ? (
-          <Tooltip>
-            <TooltipTrigger>
-              <CircleSlash className="w-5 h-5 text-red-600" />
-            </TooltipTrigger>
-            <TooltipContent>0% Course Progress</TooltipContent>
-          </Tooltip>
-        ) : null}{" "}
-        {jan26_lms_activity &&
-        jan26_lms_activity.course_progress > 0 &&
-        jan26_lms_activity.course_progress <= 0.1 ? (
-          <Tooltip>
-            <TooltipTrigger>
-              <BookX className="w-5 h-5 text-red-600" />
-            </TooltipTrigger>
-            <TooltipContent>Less than 20% Course Progress</TooltipContent>
-          </Tooltip>
-        ) : null}{" "}
-        {student.jan26_engagements.length > 0 ? (
-          <Tooltip>
-            <TooltipTrigger>
-              <CircleCheckBig className="w-5 h-5 text-green-500" />
-            </TooltipTrigger>
-            <TooltipContent>Engaged</TooltipContent>
-          </Tooltip>
-        ) : null}
         {student.status !== "Active" ? (
           <Tooltip>
             <TooltipTrigger>
@@ -280,13 +238,14 @@ export function StudentList({
                   name="payment"
                   readOnly
                   value={
-                    student.jan26_payment && student.jan26_payment.payment_mode
-                      ? student.jan26_payment.payment_mode
+                    student.jan26_c_payment &&
+                    student.jan26_c_payment.payment_mode
+                      ? student.jan26_c_payment.payment_mode
                       : "N/A"
                   }
                   className={`w-full ${
-                    student.jan26_payment &&
-                    student.jan26_payment.payment_mode === "PTPTN"
+                    student.jan26_c_payment &&
+                    student.jan26_c_payment.payment_mode === "PTPTN"
                       ? "text-blue-500 font-bold"
                       : ""
                   }`}
@@ -297,12 +256,12 @@ export function StudentList({
                 >
                   Payment Status
                 </Label>
-                {student.jan26_payment.payment_mode === "PTPTN" ? (
+                {student.jan26_c_payment.payment_mode === "PTPTN" ? (
                   <Input
                     name="payment_status"
                     readOnly
                     value={
-                      student.jan26_payment.proof === "TRUE"
+                      student.jan26_c_payment.proof === "TRUE"
                         ? "Submitted with proof"
                         : "No Proof Submitted"
                     }
@@ -312,7 +271,7 @@ export function StudentList({
                   <Textarea
                     name="payment_status"
                     readOnly
-                    value={student.jan26_payment.payment_status}
+                    value={student.jan26_c_payment.payment_status}
                     className={`w-full text-right text-sm`}
                   />
                 )}
