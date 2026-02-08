@@ -2,7 +2,7 @@ import { StudentListConven } from "@/components/student-list-c";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "@/app/student/studentColumns";
-import { ChevronRight } from "lucide-react";
+//import { ChevronRight } from "lucide-react";
 import StudentListLegend from "@/components/legend";
 import {
   Accordion,
@@ -26,21 +26,30 @@ async function getData(): Promise<Students[]> {
   return students as Students[];
 }
 
-export default async function SITPage() {
-  const sit_data = await getData();
-  const sit_active = sit_data.filter((student) => student.status === "Active");
+export default async function Jan26CPage() {
+  const ptptn_data = await getData();
+  const ptptn_active = ptptn_data.filter(
+    (student) => student.status === "Active"
+  );
+  const ptptn = ptptn_active
+    .filter((student) => student.jan26_c_payment?.payment_mode === "PTPTN")
+    .toSorted((a, b) =>
+      a.jan26_c_payment.proof === "FALSE"
+        ? -1
+        : b.jan26_c_payment.proof === "FALSE"
+          ? 1
+          : 0
+    );
 
-  /* const uniqueProgrammesMaster = [
-    ...new Set(
-      sit_active
-        .filter((student) => student.study_level === "Master")
-        .map((item) => item.programme_name)
-    )
-  ]; */
+  const amirul_ptptn = ptptn.filter((student) => student.sst_id === 1);
+  const farzana_ptptn = ptptn.filter((student) => student.sst_id === 2);
+  const najwa_ptptn = ptptn.filter((student) => student.sst_id === 3);
+  const ayu_ptptn = ptptn.filter((student) => student.sst_id === 4);
+  /* 
 
   const uniqueProgrammesFoundation = [
     ...new Set(
-      sit_active
+      ptptn
         .filter((student) => student.study_level === "Foundation")
         .map((item) => item.programme_name)
     )
@@ -48,7 +57,7 @@ export default async function SITPage() {
 
   const uniqueProgrammesDiploma = [
     ...new Set(
-      sit_active
+      ptptn
         .filter((student) => student.study_level === "Diploma")
         .map((item) => item.programme_name)
     )
@@ -56,139 +65,25 @@ export default async function SITPage() {
 
   const uniqueProgrammesBachelor = [
     ...new Set(
-      sit_active
+      ptptn
         .filter((student) => student.study_level === "Bachelor")
         .map((item) => item.programme_name)
     )
   ];
+ */
+  /* const ptptn_amirul = ptptn_active.filter(
+      (student) =>
+        student.jan26_c_payment?.payment_mode === "PTPTN" &&
+        student.jan26_c_payment.proof === "TRUE"
+    ); */
 
-  const notloggedin = sit_active.filter(
-    (student) => student.jan26_lms_activity?.last_login_at === null
-  );
-
-  const notloggedinPercentage = Math.round(
-    (notloggedin.length / sit_active.length) * 100
-  );
-
-  const zeroprogress = sit_active.filter(
+  const ptptnFalse = ptptn_active.filter(
     (student) =>
-      !notloggedin.includes(student) &&
-      student.jan26_lms_activity?.course_progress === 0
-  );
-
-  const zeroprogressPercentage = Math.round(
-    (zeroprogress.length / sit_active.length) * 100
-  );
-
-  const less20progress = sit_active.filter(
-    (student) =>
-      !notloggedin.includes(student) &&
-      student.jan26_lms_activity?.course_progress !== 0 &&
-      student.jan26_lms_activity?.course_progress <= 0.2
-  );
-
-  const less20progressPercentage = Math.round(
-    (less20progress.length / sit_active.length) * 100
-  );
-
-  const ptptn = sit_active.filter(
-    (student) => student.jan26_payment?.payment_mode === "PTPTN"
-  );
-
-  const ptptnFalse = sit_active.filter(
-    (student) =>
-      student.jan26_payment?.payment_mode === "PTPTN" &&
-      student.jan26_payment.proof === "FALSE"
+      student.jan26_c_payment?.payment_mode === "PTPTN" &&
+      student.jan26_c_payment.proof === "FALSE"
   );
 
   const ptptnPercentage = Math.round((ptptnFalse.length / ptptn.length) * 100);
-
-  //const ptptnPercentage = Math.round((ptptn.length / sit_active.length) * 100);
-  /* const engaged = sit_active.filter((student) =>
-    student.engagements.some((item) => item.created_at > "2025-09-28")
-  );
-
-  const woneengaged = sit_active.filter(
-    (student) =>
-      !student.engagements.some((item) => item.created_at <= "2025-09-28")
-  );
-
-  const wonepercentage = Math.round(
-    (woneengaged.length / sit_active.length) * 100
-  );
-
-  const wthreeengaged = sit_active.filter((student) =>
-    student.engagements.some((item) => item.created_at >= "2025-10-06")
-  );
-
-  const wthreepercentage = Math.round(
-    (wthreeengaged.length / sit_active.length) * 100
-  );
-
-  const wfourengaged = sit_active.filter((student) =>
-    student.engagements.some((item) => item.created_at >= "2025-10-13")
-  );
-
-  const wfourpercentage = Math.round(
-    (wfourengaged.length / sit_active.length) * 100
-  );
-
-  const engagedPercentage = Math.round(
-    (engaged.length / sit_active.length) * 100
-  );
-
-  const foundation = sit_active.filter(
-    (student) =>
-      student.study_level === "Foundation" &&
-      (student.lms_activity?.course_progress <= 0.2 ||
-        student.lms_activity?.last_login_at === null)
-  );
-  const master = sit_active.filter(
-    (student) =>
-      student.study_level === "Master" &&
-      (student.lms_activity?.course_progress <= 0.2 ||
-        student.lms_activity?.last_login_at === null)
-  );
-  const diploma = sit_active.filter(
-    (student) =>
-      student.study_level === "Diploma" &&
-      (student.lms_activity?.course_progress <= 0.2 ||
-        student.lms_activity?.last_login_at === null)
-  );
-  const bachelor = sit_active.filter(
-    (student) =>
-      student.study_level === "Bachelor" &&
-      (student.lms_activity?.course_progress <= 0.2 ||
-        student.lms_activity?.last_login_at === null)
-  );
-
-  const foundationNotEngaged = foundation.filter(
-    (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-13")
-  );
-  const masterNotEngaged = master.filter(
-    (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-13")
-  );
-  const diplomaNotEngaged = diploma.filter(
-    (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-13")
-  );
-  const bachelorNotEngaged = bachelor.filter(
-    (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-13")
-  );
-
-  const toengage = sit_active.filter(
-    (student) =>
-      student.lms_activity?.course_progress <= 0.2 ||
-      student.lms_activity?.last_login_at === null
-  );
-
-  const w4NotEngaged = toengage.filter(
-    (student) =>
-      !student.engagements.some((item) => item.created_at >= "2025-10-13")
-  ); */
 
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
@@ -205,54 +100,10 @@ export default async function SITPage() {
               >
                 Active Students{" "}
                 <span className="italic text-muted-foreground">
-                  {sit_active.length}
+                  {ptptn_active.length}
                 </span>
               </Label>
               <Progress id="active" value={100} className=" h-5"></Progress>
-              <Label
-                htmlFor="notloggedin"
-                className="flex flex-row w-full justify-between"
-              >
-                Not Logged In{" "}
-                <span className="italic text-muted-foreground">
-                  {notloggedin.length} ({notloggedinPercentage}%)
-                </span>
-              </Label>
-              <Progress
-                id="notloggedin"
-                value={notloggedinPercentage}
-                className=" h-5"
-              ></Progress>
-
-              <Label
-                htmlFor="zeroprogress"
-                className="flex flex-row w-full justify-between"
-              >
-                0% Progress{" "}
-                <span className="italic text-muted-foreground">
-                  {zeroprogress.length} ({zeroprogressPercentage}%)
-                </span>
-              </Label>
-              <Progress
-                id="zeroprogress"
-                value={zeroprogressPercentage}
-                className=" h-5"
-              ></Progress>
-              <Label
-                htmlFor="less20progress"
-                className="flex flex-row w-full justify-between"
-              >
-                ≤20% Progress{" "}
-                <span className="italic text-muted-foreground">
-                  {less20progress.length} ({less20progressPercentage}%)
-                </span>
-              </Label>
-              <Progress
-                id="less20progress"
-                value={less20progressPercentage}
-                className=" h-5"
-              ></Progress>
-
               <Label
                 htmlFor="ptptn"
                 className="flex flex-row w-full justify-between"
@@ -267,144 +118,6 @@ export default async function SITPage() {
                 value={ptptnPercentage}
                 className=" h-5"
               ></Progress>
-              {/* <Label
-                htmlFor="wonepercentage"
-                className="flex flex-row w-full justify-between"
-              >
-                W1 Engaged{" "}
-                <span className="italic text-muted-foreground">
-                  {woneengaged.length} ({wonepercentage}%)
-                </span>
-              </Label>
-              <Progress
-                id="wonepercentage"
-                value={wonepercentage}
-                className=" h-5"
-              ></Progress>
-              <Label
-                htmlFor="week2engaged"
-                className="flex flex-row w-full justify-between"
-              >
-                W2 Engaged{" "}
-                <span className="italic text-muted-foreground">
-                  {engaged.length} ({engagedPercentage}%)
-                </span>
-              </Label>
-              <Progress
-                id="week2engaged"
-                value={engagedPercentage}
-                className=" h-5"
-              ></Progress>
-              <Label
-                htmlFor="week3engaged"
-                className="flex flex-row w-full justify-between"
-              >
-                W3 Engaged{" "}
-                <span className="italic text-muted-foreground">
-                  {wthreeengaged.length} ({wthreepercentage}%)
-                </span>
-              </Label>
-              <Progress
-                id="week3engaged"
-                value={wthreepercentage}
-                className=" h-5"
-              ></Progress>
-              <Label
-                htmlFor="week4engaged"
-                className="flex flex-row w-full justify-between"
-              >
-                W4 Engaged{" "}
-                <span className="italic text-muted-foreground">
-                  {wfourengaged.length} ({wfourpercentage}%)
-                </span>
-              </Label>
-              <Progress
-                id="week3engaged"
-                value={wfourpercentage}
-                className=" h-5"
-              ></Progress>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="item-2">
-          <AccordionTrigger>
-            W4 (At Risk only) - (13/10 - 17/10) by Level
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-y-2 gap-x-4 justify-between w-full mr-4">
-              <Label className="flex flex-row w-full justify-between">
-                Total At Risk
-                <span className="italic text-muted-foreground">
-                  {toengage.length - w4NotEngaged.length}/{toengage.length}
-                </span>
-              </Label>
-              <Progress
-                value={
-                  ((toengage.length - w4NotEngaged.length) / toengage.length) *
-                  100
-                }
-                className=" h-5 "
-              ></Progress>
-              <Label className="flex flex-row w-full justify-between">
-                Foundation
-                <span className="italic text-muted-foreground">
-                  {foundation.length - foundationNotEngaged.length}/
-                  {foundation.length}
-                </span>
-              </Label>
-              <Progress
-                value={
-                  ((foundation.length - foundationNotEngaged.length) /
-                    foundation.length) *
-                  100
-                }
-                className=" h-5 "
-              ></Progress>
-              <Label className="flex flex-row w-full justify-between">
-                Diploma
-                <span className="italic text-muted-foreground">
-                  {diploma.length - diplomaNotEngaged.length}/{diploma.length}
-                </span>
-              </Label>
-              <Progress
-                value={
-                  ((diploma.length - diplomaNotEngaged.length) /
-                    diploma.length) *
-                  100
-                }
-                max={diploma.length}
-                className=" h-5 "
-              />
-              <Label className="flex flex-row w-full justify-between">
-                Bachelor
-                <span className="italic text-muted-foreground">
-                  {bachelor.length - bachelorNotEngaged.length}/
-                  {bachelor.length}
-                </span>
-              </Label>
-              <Progress
-                value={
-                  ((bachelor.length - bachelorNotEngaged.length) /
-                    bachelor.length) *
-                  100
-                }
-                max={bachelor.length}
-                className=" h-5"
-              />
-              <Label className="flex flex-row w-full justify-between">
-                Master
-                <span className="italic text-muted-foreground">
-                  {master.length - masterNotEngaged.length}/{master.length}
-                </span>
-              </Label>
-              <Progress
-                value={
-                  ((master.length - masterNotEngaged.length) / master.length) *
-                  100
-                }
-                max={master.length}
-                className=" h-5 "
-              /> */}
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -412,77 +125,70 @@ export default async function SITPage() {
       <div className="flex flex-col w-full">
         <StudentListLegend />
       </div>
-      <Tabs className="w-full" defaultValue="foundation">
+      <Tabs className="w-full" defaultValue="ptptn">
         <TabsList className="w-full">
-          <TabsTrigger value="foundation">FDT</TabsTrigger>
-          <TabsTrigger value="diploma">DIP</TabsTrigger>
-          <TabsTrigger value="bachelor">BAC</TabsTrigger>
+          <TabsTrigger value="ptptn">PTPTN</TabsTrigger>
+          <TabsTrigger value="amirul">Amirul</TabsTrigger>
+          <TabsTrigger value="ayu">Ayu</TabsTrigger>
+          <TabsTrigger value="farzana">Farzana</TabsTrigger>
+          <TabsTrigger value="najwa">Najwa</TabsTrigger>
         </TabsList>
-        <TabsContent value="foundation" className="flex flex-col gap-4">
-          <p className="text-sm italic font-bold ">Foundation Students</p>
-          {uniqueProgrammesFoundation.map((programme, index) => (
-            <div key={index}>
-              <p className="text-md font-bold py-2">
-                <ChevronRight className="min-w-4 min-h-4 inline-block" />
-                {programme}
-              </p>
-              <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
-                {sit_data
-                  .filter((student) => student.programme_name === programme)
-                  .map((student, index) => (
-                    <StudentListConven
-                      key={student.matric_no}
-                      student={student}
-                      index={index}
-                    />
-                  ))}
-              </div>
-            </div>
+        <TabsContent value="ptptn" className="flex flex-col gap-4">
+          <p className="text-sm italic font-bold ">PTPTN Students</p>
+          {ptptn.map((student, index) => (
+            <StudentListConven
+              key={student.matric_no}
+              student={student}
+              index={index}
+            />
           ))}
         </TabsContent>
-        <TabsContent value="diploma" className="flex flex-col gap-4 ">
-          <p className="text-sm italic font-bold ">Diploma Students</p>
-          {uniqueProgrammesDiploma.map((programme, index) => (
-            <div key={index}>
-              <p className="text-md font-bold py-2">
-                <ChevronRight className="min-w-4 min-h-4 inline-block" />
-                {programme}
-              </p>
-              <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
-                {sit_data
-                  .filter((student) => student.programme_name === programme)
-                  .map((student, index) => (
-                    <StudentListConven
-                      key={student.matric_no}
-                      student={student}
-                      index={index}
-                    />
-                  ))}
-              </div>
-            </div>
-          ))}
+        <TabsContent value="amirul" className="flex flex-col gap-4">
+          <p className="text-sm italic font-bold ">Amirul</p>
+
+          <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
+            {amirul_ptptn.map((student, index) => (
+              <StudentListConven key={index} student={student} index={index} />
+            ))}
+          </div>
         </TabsContent>
-        <TabsContent value="bachelor" className="flex flex-col gap-4">
-          <p className="text-sm italic font-bold ">Bachelor Students</p>
-          {uniqueProgrammesBachelor.map((programme, index) => (
-            <div key={index}>
-              <p className="text-md font-bold py-2">
-                <ChevronRight className="min-w-4 min-h-4 inline-block" />
-                {programme}
-              </p>
-              <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
-                {sit_data
-                  .filter((student) => student.programme_name === programme)
-                  .map((student, index) => (
-                    <StudentListConven
-                      key={student.matric_no}
-                      student={student}
-                      index={index}
-                    />
-                  ))}
-              </div>
-            </div>
-          ))}
+        <TabsContent value="ayu" className="flex flex-col gap-4 ">
+          <p className="text-sm italic font-bold ">Ayu</p>
+          <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
+            {ayu_ptptn.map((student, index) => (
+              <StudentListConven
+                key={student.matric_no}
+                student={student}
+                index={index}
+              />
+            ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="farzana" className="flex flex-col gap-4">
+          <p className="text-sm italic font-bold ">Farzana</p>
+
+          <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
+            {farzana_ptptn.map((student, index) => (
+              <StudentListConven
+                key={student.matric_no}
+                student={student}
+                index={index}
+              />
+            ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="najwa" className="flex flex-col gap-4">
+          <p className="text-sm italic font-bold ">Najwa</p>
+
+          <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
+            {najwa_ptptn.map((student, index) => (
+              <StudentListConven
+                key={student.matric_no}
+                student={student}
+                index={index}
+              />
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

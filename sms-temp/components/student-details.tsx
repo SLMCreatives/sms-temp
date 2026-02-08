@@ -148,36 +148,42 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                           Payment Mode
                         </p>
                         <p className="font-medium text-sm md:text-base">
-                          {studentData.jan26_payment
-                            ? studentData.jan26_payment.payment_mode
+                          {studentData.jan26_payment ||
+                          studentData.jan26_c_payment
+                            ? studentData.jan26_payment?.payment_mode ||
+                              studentData.jan26_c_payment.payment_mode
                             : "No record"}
                         </p>
                       </div>
                     </div>
-                    {studentData.jan26_payment.payment_mode !== "PTPTN" && (
-                      <div className="flex items-center gap-3">
-                        <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <div>
-                          <p className="text-sm text-muted-foreground">
-                            Payment Status
-                          </p>
-                          <p className="font-medium text-sm md:text-base">
-                            {studentData.jan26_payment
-                              ? studentData.jan26_payment.payment_status
-                              : "No record"}
-                          </p>
+                    {studentData.jan26_payment?.payment_mode !== "PTPTN" ||
+                      (studentData.jan26_c_payment.payment_mode !== "PTPTN" && (
+                        <div className="flex items-center gap-3">
+                          <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Payment Status
+                            </p>
+                            <p className="font-medium text-sm md:text-base">
+                              {studentData.jan26_payment ||
+                              studentData.jan26_c_payment
+                                ? studentData.jan26_payment?.payment_status ||
+                                  studentData.jan26_c_payment?.payment_status
+                                : "No record"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {studentData.jan26_payment.payment_mode === "PTPTN" && (
-                      <div className="flex items-center gap-3">
-                        <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <div>
-                          <p className="text-sm text-muted-foreground">
-                            Proof of PTPTN
-                          </p>
-                          <div className="flex flex-row gap-2">
-                            {/*  <p className="font-medium text-sm md:text-base">
+                      ))}
+                    {studentData.jan26_payment?.payment_mode === "PTPTN" ||
+                      (studentData.jan26_c_payment.payment_mode === "PTPTN" && (
+                        <div className="flex items-center gap-3">
+                          <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Proof of PTPTN
+                            </p>
+                            <div className="flex flex-row gap-2">
+                              {/*  <p className="font-medium text-sm md:text-base">
                               {studentData.jan26_payment
                                 ? studentData.jan26_payment.proof
                                 : "No record"}
@@ -187,11 +193,11 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                                 studentData.jan26_payment?.proof === "TRUE"
                               }
                             /> */}
-                            <ChangeStatusPTPTNForm student={studentData} />
+                              <ChangeStatusPTPTNForm student={studentData} />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      ))}
                   </div>
                 </div>
               </CardContent>

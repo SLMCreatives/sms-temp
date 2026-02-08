@@ -23,7 +23,7 @@ import { Badge } from "./ui/badge";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
-type StudentStatus = "Active" | "At-Risk" | "Withdrawn" | "Deferred";
+type PTPTNStatus = "TRUE" | "FALSE";
 
 interface ChangeStatusFormProps {
   student: Students;
@@ -31,9 +31,11 @@ interface ChangeStatusFormProps {
 
 const supabase = createClient();
 
-export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
-  const [status, setStatus] = useState<StudentStatus>(
-    student.status as StudentStatus
+export default function ChangeStatusPTPTNForm({
+  student
+}: ChangeStatusFormProps) {
+  const [status, setStatus] = useState<PTPTNStatus>(
+    student.jan26_c_payment.proof as PTPTNStatus
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,30 +43,17 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
     await handleStatusChange(status);
   };
 
-  const handleStatusChange = async (status: StudentStatus) => {
+  const handleStatusChange = async (status: PTPTNStatus) => {
     try {
       const { error } = await supabase
-        .from("jan26_students")
-        .update({ status: status })
+        .from("jan26_c_payment")
+        .update({ proof: status })
         .eq("matric_no", student.matric_no)
         .select()
         .single();
-      if (error) {
-        // Try updating jan26_c_students if not found in jan26_students
-        const { error } = await supabase
-          .from("jan26_c_students")
-          .update({ status: status })
-          .eq("matric_no", student.matric_no)
-          .select()
-          .single();
-        if (error) throw error;
-        toast.success("Student status updated to " + status);
-        setStatus(status); // Update local state to reflect the change
-        return;
-      }
 
       if (error) {
-        toast.error("Error updating status: " + error);
+        toast.error("Error updating status: " + error.message);
       } else {
         toast.success("Student status updated to " + status);
         setStatus(status); // Update local state to reflect the change
@@ -82,7 +71,7 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
         <Badge
           variant="default"
           className={`${
-            status !== "Active" && "bg-red-600"
+            status !== "TRUE" && "bg-red-600"
           } px-3 py-1 cursor-pointer hover:opacity-80 transition`}
         >
           {status}
@@ -90,7 +79,7 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
       </DialogTrigger>
       <DialogContent className="w-fit">
         <DialogHeader>
-          <DialogTitle>Change Student Status</DialogTitle>
+          <DialogTitle>Change PTPTN Status</DialogTitle>
           <DialogDescription className="hidden">
             Change happens in database
           </DialogDescription>
@@ -98,17 +87,15 @@ export default function ChangeStatusForm({ student }: ChangeStatusFormProps) {
 
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <Select
-            onValueChange={(status) => setStatus(status as StudentStatus)}
+            onValueChange={(status) => setStatus(status as PTPTNStatus)}
             defaultValue={status}
           >
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Withdraw">Withdraw</SelectItem>
-              <SelectItem value="Deferred">Deferred</SelectItem>
-              <SelectItem value="At Risk">At Risk</SelectItem>
+              <SelectItem value="TRUE">True</SelectItem>
+              <SelectItem value="FALSE">False</SelectItem>
             </SelectContent>
           </Select>
           <DialogClose asChild>

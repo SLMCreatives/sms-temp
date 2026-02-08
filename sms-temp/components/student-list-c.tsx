@@ -3,9 +3,9 @@ import {
   MessageCircle,
   Mail,
   ArrowUpCircle,
-  ArrowRightCircle,
   CircleSlash,
-  HandCoins
+  HandCoins,
+  ArrowRightCircle
 } from "lucide-react";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -15,6 +15,7 @@ import Link from "next/link";
 import { Students, Payment } from "@/app/student/studentColumns";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Textarea } from "./ui/textarea";
+import ChangeStatusPTPTNForm from "./change-status-ptptn-c";
 //import ChangeStatusPTPTNForm from "./change-status-ptptn";
 
 interface StudentCardProps {
@@ -67,13 +68,7 @@ export function StudentListConven({ student, index }: StudentCardProps) {
         ) : null}
         <Drawer>
           <DrawerTrigger asChild>
-            <ArrowUpCircle
-              className={`min-w-6 min-h-6  ${
-                student.jan26_lms_activity?.last_login_at === null
-                  ? "text-red-600"
-                  : "text-purple-500"
-              }`}
-            />
+            <ArrowUpCircle className={`min-w-6 min-h-6  text-purple-500`} />
           </DrawerTrigger>
           <DrawerContent className="w-full min-h-full lg:max-w-2xl mx-auto overflow-scroll">
             <div className="w-full mx-auto p-8 flex flex-col gap-2 overflow-visible min-h-full">
@@ -257,16 +252,19 @@ export function StudentListConven({ student, index }: StudentCardProps) {
                   Payment Status
                 </Label>
                 {student.jan26_c_payment.payment_mode === "PTPTN" ? (
-                  <Input
-                    name="payment_status"
-                    readOnly
-                    value={
-                      student.jan26_c_payment.proof === "TRUE"
-                        ? "Submitted with proof"
-                        : "No Proof Submitted"
-                    }
-                    className={`w-full text-right text-sm`}
-                  />
+                  <div className="flex flex-col gap-2 justify-end">
+                    <Input
+                      name="payment_status"
+                      readOnly
+                      value={
+                        student.jan26_c_payment.proof === "TRUE"
+                          ? "Submitted with proof"
+                          : "No Proof Submitted"
+                      }
+                      className={`w-full text-right text-sm`}
+                    />
+                    <ChangeStatusPTPTNForm student={student} />
+                  </div>
                 ) : (
                   <Textarea
                     name="payment_status"

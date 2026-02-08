@@ -35,7 +35,8 @@ export default function ChangeStatusPTPTNForm({
   student
 }: ChangeStatusFormProps) {
   const [status, setStatus] = useState<PTPTNStatus>(
-    student.jan26_payment.proof as PTPTNStatus
+    (student.jan26_payment?.proof as PTPTNStatus) ||
+      (student.jan26_c_payment.proof as PTPTNStatus)
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -53,7 +54,21 @@ export default function ChangeStatusPTPTNForm({
         .single();
 
       if (error) {
-        toast.error("Error updating status: " + error.message);
+        // Try updating jan26_c_payment if not found in jan26_payment
+        const { error } = await supabase
+          .from("jan26_c_payment")
+          .update({ proof: status })
+          .eq("matric_no", student.matric_no)
+          .select()
+          .single();
+        if (error) throw error;
+        toast.success("Student status updated to " + status);
+        setStatus(status); // Update local state to reflect the change
+        return;
+      }
+
+      if (error) {
+        toast.error("Error updating status: " + error);
       } else {
         toast.success("Student status updated to " + status);
         setStatus(status); // Update local state to reflect the change

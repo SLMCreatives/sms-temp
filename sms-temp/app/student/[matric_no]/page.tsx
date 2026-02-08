@@ -27,7 +27,17 @@ export default function StudentPage({
           )
           .eq("matric_no", matric_no)
           .single();
-
+        if (error) {
+          // Try fetching from jan26_c_students if not found in jan26_students
+          const { data, error } = await supabase
+            .from("jan26_c_students")
+            .select("*, jan26_c_payment(*)")
+            .eq("matric_no", matric_no)
+            .single();
+          if (error) throw error;
+          setStudent(data);
+          return;
+        }
         if (error) throw error;
         setStudent(data);
       } catch (err) {

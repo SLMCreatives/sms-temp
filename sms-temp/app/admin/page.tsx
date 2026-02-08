@@ -41,6 +41,27 @@ export default function SSTManagement() {
     }
     setLoading(false);
   };
+  const handleInitialAssignmentC = async () => {
+    if (
+      !confirm(
+        "This will distribute all the unassigned students to active SST members. Proceed?"
+      )
+    )
+      return;
+
+    setLoading(true);
+    const { error } = await supabase.rpc("jan26_c_auto_assign_sst");
+
+    if (error) {
+      setMessage({ text: `Error: ${error.message}`, type: "error" });
+    } else {
+      setMessage({
+        text: "Successfully assigned students to SST members.",
+        type: "success"
+      });
+    }
+    setLoading(false);
+  };
 
   const handleGenerateTasks = async () => {
     setLoading(true);
@@ -77,13 +98,22 @@ export default function SSTManagement() {
           <p className="mb-4">
             Distribute unassigned students to active SST members.
           </p>
-          <Button
-            onClick={handleInitialAssignment}
-            disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? "Processing..." : "Assign Students"}
-          </Button>
+          <div className="flex flex-row gap-4">
+            <Button
+              onClick={handleInitialAssignment}
+              disabled={loading}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? "Processing..." : "Assign Online Students"}
+            </Button>
+            <Button
+              onClick={handleInitialAssignmentC}
+              disabled={loading}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? "Processing..." : "Assign Conventional Students"}
+            </Button>
+          </div>
         </div>
 
         {/* Weekly Task Generation Section */}

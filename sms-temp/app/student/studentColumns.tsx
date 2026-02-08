@@ -49,6 +49,18 @@ export type Payment = {
   proof: string;
 };
 
+export type SSTMember = {
+  id: string;
+  full_name: string;
+  is_active: boolean;
+  email: string;
+  phone: string;
+  role: string;
+  max_load: number;
+  nickname: string;
+  current_week_count: number;
+};
+
 export type Students = {
   matric_no: string;
   full_name: string;
@@ -58,6 +70,7 @@ export type Students = {
   programme_name: string;
   faculty_code: string;
   status: string;
+  sst_id: number;
   admission_date: string;
   nationality: string;
   entry_type: string;
