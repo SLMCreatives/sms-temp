@@ -16,15 +16,13 @@ import {
   Phone,
   Calendar,
   GraduationCap,
-  BookOpen,
   Globe,
-  FileText,
   CheckCircle,
   BanknoteArrowUp,
   FolderCheck
 } from "lucide-react";
 //import { Comments, Students } from "@/app/student/studentColumns";
-import { EngagementForm } from "./engagement-form";
+//import { EngagementForm } from "./engagement-form";
 //import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 //import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import {
@@ -41,11 +39,14 @@ import { Students } from "@/app/student/studentColumns";
 import ChangeStatusForm from "./change-status";
 //import { Switch } from "./ui/switch";
 import ChangeStatusPTPTNForm from "./change-status-ptptn";
+import { EngagementFormC } from "./engagement-form-c";
 
 interface StudentDetailsProps {
   studentData: Students;
 }
-const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
+const StudentDetailsPageC: React.FC<StudentDetailsProps> = ({
+  studentData
+}) => {
   /*  const dateFormated = (dateString: string) => {
     // convert date to locate string
     const date = new Date(dateString);
@@ -119,7 +120,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3">
+                    {/* <div className="flex items-center gap-3">
                       <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                       <div>
                         <p className="text-sm text-muted-foreground">
@@ -129,8 +130,8 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                           {studentData.entry_type}
                         </p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
+                    </div> */}
+                    {/* <div className="flex items-center gap-3">
                       <BookOpen className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                       <div>
                         <p className="text-sm text-muted-foreground">
@@ -140,7 +141,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                           {studentData.study_mode}
                         </p>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="flex items-center gap-3">
                       <BanknoteArrowUp className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                       <div>
@@ -148,36 +149,42 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                           Payment Mode
                         </p>
                         <p className="font-medium text-sm md:text-base">
-                          {studentData.jan26_payment
-                            ? studentData.jan26_payment?.payment_mode
+                          {studentData.jan26_payment ||
+                          studentData.jan26_c_payment
+                            ? studentData.jan26_payment?.payment_mode ||
+                              studentData.jan26_c_payment.payment_mode
                             : "No record"}
                         </p>
                       </div>
                     </div>
-                    {studentData.jan26_payment?.payment_mode !== "PTPTN" && (
-                      <div className="flex items-center gap-3">
-                        <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <div>
-                          <p className="text-sm text-muted-foreground">
-                            Payment Status
-                          </p>
-                          <p className="font-medium text-sm md:text-base">
-                            {studentData.jan26_payment
-                              ? studentData.jan26_payment?.payment_status
-                              : "No record"}
-                          </p>
+                    {studentData.jan26_payment?.payment_mode !== "PTPTN" ||
+                      (studentData.jan26_c_payment.payment_mode !== "PTPTN" && (
+                        <div className="flex items-center gap-3">
+                          <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Payment Status
+                            </p>
+                            <p className="font-medium text-sm md:text-base">
+                              {studentData.jan26_payment ||
+                              studentData.jan26_c_payment
+                                ? studentData.jan26_payment?.payment_status ||
+                                  studentData.jan26_c_payment?.payment_status
+                                : "No record"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {studentData.jan26_payment?.payment_mode === "PTPTN" && (
-                      <div className="flex items-center gap-3">
-                        <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <div>
-                          <p className="text-sm text-muted-foreground">
-                            Proof of PTPTN
-                          </p>
-                          <div className="flex flex-row gap-2">
-                            {/*  <p className="font-medium text-sm md:text-base">
+                      ))}
+                    {studentData.jan26_payment?.payment_mode === "PTPTN" ||
+                      (studentData.jan26_c_payment.payment_mode === "PTPTN" && (
+                        <div className="flex items-center gap-3">
+                          <FolderCheck className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Proof of PTPTN
+                            </p>
+                            <div className="flex flex-row gap-2">
+                              {/*  <p className="font-medium text-sm md:text-base">
                               {studentData.jan26_payment
                                 ? studentData.jan26_payment.proof
                                 : "No record"}
@@ -187,11 +194,11 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                                 studentData.jan26_payment?.proof === "TRUE"
                               }
                             /> */}
-                            <ChangeStatusPTPTNForm student={studentData} />
+                              <ChangeStatusPTPTNForm student={studentData} />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      ))}
                   </div>
                 </div>
               </CardContent>
@@ -226,7 +233,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                       {studentData.programme_name}
                     </p>
                   </div>
-                  <div className="">
+                  {/*  <div className="">
                     <p className="text-sm text-muted-foreground mb-1">
                       Faculty
                     </p>
@@ -234,7 +241,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                       {" "}
                       {studentData.faculty_code}
                     </p>
-                  </div>
+                  </div> */}
 
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">
@@ -244,67 +251,6 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                       {studentData.study_level}
                     </p>
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="shadow-sm">
-                <CardHeader className="">
-                  <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5" />
-                    LMS Activity
-                  </CardTitle>
-                  {/*  <CardDescription className="text-sm text-muted-foreground italic">
-                    Data as of: 10 Nov 2025
-                  </CardDescription> */}
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-3">
-                  {/* <div className="">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      SRB Progress
-                    </p>
-                    <p className="font-medium text-foreground text-sm md:text-base">
-                      {" "}
-                      {(studentData.lms_activity &&
-                        studentData.lms_activity.srb_progress + "%") ||
-                        "No record"}
-                    </p>
-                  </div> */}
-                  <div className="">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Course Progress
-                    </p>
-                    <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.jan26_lms_activity
-                        ? Math.round(
-                            studentData.jan26_lms_activity.course_progress * 100
-                          ) + "%"
-                        : "No record"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Status</p>
-                    <p className="font-medium text-foreground text-sm md:text-base">
-                      {/*  {studentData.jan26_lms_activity === null ? "Unknown" : ""} */}
-                      {studentData.jan26_lms_activity &&
-                      studentData.jan26_lms_activity?.course_progress <= 0.2
-                        ? "⚠️ At Risk"
-                        : "Active"}
-                    </p>
-                  </div>
-
-                  {/* <div className="col-span-2">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Last Login
-                    </p>
-                    <p className="font-medium text-foreground text-sm md:text-base">
-                      {studentData.jan26_lms_activity.last_login_at &&
-                      studentData.jan26_lms_activity.last_login_at
-                        ? dateFormated(
-                            studentData.jan26_lms_activity?.last_login_at
-                          )
-                        : "Not Logged In"}
-                    </p>
-                  </div> */}
                 </CardContent>
               </Card>
             </div>
@@ -324,9 +270,9 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-2">
-                {!studentData.jan26_engagements && "No activity yet"}
-                {studentData.jan26_engagements &&
-                  studentData.jan26_engagements.map((engagement, index) => (
+                {!studentData.jan26_c_engagements && "No activity yet"}
+                {studentData.jan26_c_engagements &&
+                  studentData.jan26_c_engagements.map((engagement, index) => (
                     <Card key={index} className="relative">
                       <CardContent className="flex flex-col gap-2">
                         <p className="text-xs text-muted-foreground">
@@ -374,7 +320,7 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                     <SheetHeader>
                       <SheetTitle>Add Engagement</SheetTitle>
                     </SheetHeader>
-                    <EngagementForm matric_no={studentData.matric_no} />
+                    <EngagementFormC matric_no={studentData.matric_no} />
                   </SheetContent>
                 </Sheet>
               </CardFooter>
@@ -386,4 +332,4 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
   );
 };
 
-export default StudentDetailsPage;
+export default StudentDetailsPageC;

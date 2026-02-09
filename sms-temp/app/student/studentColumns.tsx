@@ -86,6 +86,7 @@ export type Students = {
   jan26_lms_activity_w1: LMSActivity;
   jan26_lms_activity_w2: LMSActivity;
   jan26_engagements: Engagements[];
+  jan26_c_engagements: Engagements[];
   nov25_lms_activity: LMSActivity;
   nov25_lms_activity_w1: LMSActivity;
   nov25_engagements: Engagements[];

@@ -4,6 +4,7 @@ import StudentDetailsPage from "@/components/student-details";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState, use } from "react";
 import { Students } from "../studentColumns";
+import StudentDetailsPageC from "@/components/student-details-c";
 
 const supabase = createClient();
 
@@ -31,7 +32,7 @@ export default function StudentPage({
           // Try fetching from jan26_c_students if not found in jan26_students
           const { data, error } = await supabase
             .from("jan26_c_students")
-            .select("*, jan26_c_payment(*)")
+            .select("*, jan26_c_payment(*), jan26_c_engagements(*)")
             .eq("matric_no", matric_no)
             .single();
           if (error) throw error;
@@ -75,7 +76,10 @@ export default function StudentPage({
 
   return (
     <main className="container mx-auto relative">
-      <StudentDetailsPage studentData={student} />
+      {student?.jan26_payment && <StudentDetailsPage studentData={student} />}
+      {student?.jan26_c_payment && (
+        <StudentDetailsPageC studentData={student} />
+      )}
     </main>
   );
 }
