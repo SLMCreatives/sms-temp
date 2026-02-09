@@ -41,6 +41,7 @@ import { Students } from "@/app/student/studentColumns";
 import ChangeStatusForm from "./change-status";
 //import { Switch } from "./ui/switch";
 import ChangeStatusPTPTNForm from "./change-status-ptptn";
+import { EngagementFormC } from "./engagement-form-c";
 
 interface StudentDetailsProps {
   studentData: Students;
@@ -380,7 +381,12 @@ const StudentDetailsPage: React.FC<StudentDetailsProps> = ({ studentData }) => {
                     <SheetHeader>
                       <SheetTitle>Add Engagement</SheetTitle>
                     </SheetHeader>
-                    <EngagementForm matric_no={studentData.matric_no} />
+                    {studentData.jan26_payment && (
+                      <EngagementForm matric_no={studentData.matric_no} />
+                    )}
+                    {studentData.jan26_c_payment && (
+                      <EngagementFormC matric_no={studentData.matric_no} />
+                    )}
                   </SheetContent>
                 </Sheet>
               </CardFooter>
