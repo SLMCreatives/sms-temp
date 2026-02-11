@@ -22,38 +22,38 @@ import { Textarea } from "./ui/textarea";
 interface StudentCardProps {
   student: Students;
   lms_activity: LMSActivity;
-  jan26_lms_activity?: LMSActivity;
+  nov25_lms_activity?: LMSActivity;
   index: number;
-  jan26_payment?: Payment;
+  nov25_payment?: Payment;
 }
 
 export function StudentList({
   student,
-  jan26_lms_activity,
+  nov25_lms_activity,
   index
 }: StudentCardProps) {
   return (
     <Card
       key={student.matric_no}
       className={`w-full hover:shadow-lg transition-shadow grid grid-cols-[1fr_50px] gap-0 py-2 ${
-        student.jan26_lms_activity?.last_login_at === null
+        student.nov25_lms_activity?.last_login_at === null
           ? "border-red-600 border-2"
           : ""
-      } ${student.status !== "Active" ? "border-red-100 border-2" : ""} ${student.jan26_payment?.payment_mode === "PTPTN" && student.jan26_payment.proof === "FALSE" ? "border-blue-600 border-2" : ""} `}
+      } ${student.status !== "Active" ? "border-red-100 border-2" : ""} ${student.nov25_payment?.payment_mode === "PTPTN" && student.nov25_payment.proof === "FALSE" ? "border-blue-600 border-2" : ""} `}
     >
       <CardContent className="pl-2 overflow-hidden">
         <div className="flex flex-col gap-2 px-0">
           <p
             className={`text-sm text-nowrap font-normal overflow-hidden capitalize truncate min-w-[200px] ${
-              student.jan26_lms_activity?.last_login_at === null
+              student.nov25_lms_activity?.last_login_at === null
                 ? "text-red-500 font-bold"
                 : ""
             } ${
               student.status !== "Active" ? "text-gray-500 line-through" : ""
             } 
             ${
-              student.jan26_payment?.payment_mode === "PTPTN" &&
-              student.jan26_payment.proof === "FALSE"
+              student.nov25_payment?.payment_mode === "PTPTN" &&
+              student.nov25_payment.proof === "FALSE"
                 ? "text-blue-600 uppercase"
                 : ""
             }`}
@@ -64,8 +64,8 @@ export function StudentList({
         </div>
       </CardContent>
       <CardFooter className="w-full flex flex-row gap-1 justify-end h-full">
-        {student.jan26_payment &&
-        student.jan26_payment.payment_mode === "PTPTN" ? (
+        {student.nov25_payment &&
+        student.nov25_payment.payment_mode === "PTPTN" ? (
           <Tooltip>
             <TooltipTrigger>
               <HandCoins className="w-5 h-5 text-blue-600" />
@@ -73,7 +73,7 @@ export function StudentList({
             <TooltipContent>PTPTN Payment Mode</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {jan26_lms_activity && jan26_lms_activity.course_progress === 0 ? (
+        {nov25_lms_activity && nov25_lms_activity.course_progress === 0 ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleSlash className="w-5 h-5 text-red-600" />
@@ -81,9 +81,9 @@ export function StudentList({
             <TooltipContent>0% Course Progress</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {jan26_lms_activity &&
-        jan26_lms_activity.course_progress > 0 &&
-        jan26_lms_activity.course_progress <= 0.1 ? (
+        {nov25_lms_activity &&
+        nov25_lms_activity.course_progress > 0 &&
+        nov25_lms_activity.course_progress <= 0.1 ? (
           <Tooltip>
             <TooltipTrigger>
               <BookX className="w-5 h-5 text-red-600" />
@@ -91,7 +91,7 @@ export function StudentList({
             <TooltipContent>Less than 20% Course Progress</TooltipContent>
           </Tooltip>
         ) : null}{" "}
-        {student.jan26_engagements?.length > 0 ? (
+        {student.nov25_engagements?.length > 0 ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleCheckBig className="w-5 h-5 text-green-500" />
@@ -111,7 +111,7 @@ export function StudentList({
           <DrawerTrigger asChild>
             <ArrowUpCircle
               className={`min-w-6 min-h-6  ${
-                student.jan26_lms_activity?.last_login_at === null
+                student.nov25_lms_activity?.last_login_at === null
                   ? "text-red-600"
                   : "text-purple-500"
               }`}
@@ -208,14 +208,14 @@ export function StudentList({
                   readOnly
                   value={
                     Math.round(
-                      student.jan26_lms_activity
-                        ? student.jan26_lms_activity.course_progress * 100
+                      student.nov25_lms_activity
+                        ? student.nov25_lms_activity.course_progress * 100
                         : 0
                     ) + "%"
-                  } //student.jan26_lms_activity.course_progress * 100 + "%"}
+                  } //student.nov25_lms_activity.course_progress * 100 + "%"}
                   className={`w-full ${
-                    student.jan26_lms_activity &&
-                    student.jan26_lms_activity.course_progress < 0.1
+                    student.nov25_lms_activity &&
+                    student.nov25_lms_activity.course_progress < 0.1
                       ? "text-red-500 font-bold"
                       : ""
                   }`}
@@ -230,10 +230,10 @@ export function StudentList({
                   name="last_login"
                   readOnly
                   value={
-                    student.jan26_lms_activity &&
-                    student.jan26_lms_activity.last_login_at
+                    student.nov25_lms_activity &&
+                    student.nov25_lms_activity.last_login_at
                       ? new Date(
-                          student.jan26_lms_activity.last_login_at
+                          student.nov25_lms_activity.last_login_at
                         ).toLocaleDateString("en-GB", {
                           day: "2-digit",
                           month: "2-digit",
@@ -242,8 +242,8 @@ export function StudentList({
                       : "Never Logged In"
                   }
                   className={`w-full ${
-                    student.jan26_lms_activity &&
-                    student.jan26_lms_activity.last_login_at === null
+                    student.nov25_lms_activity &&
+                    student.nov25_lms_activity.last_login_at === null
                       ? "text-red-500 font-bold"
                       : ""
                   }`}
@@ -258,14 +258,14 @@ export function StudentList({
                   name="engagement"
                   readOnly
                   value={
-                    student.jan26_engagements &&
-                    student.jan26_engagements.length >= 0
-                      ? `${student.jan26_engagements.length}`
+                    student.nov25_engagements &&
+                    student.nov25_engagements.length >= 0
+                      ? `${student.nov25_engagements.length}`
                       : "Not Engaged"
                   }
                   className={`w-full ${
-                    student.jan26_engagements &&
-                    student.jan26_engagements.length >= 0
+                    student.nov25_engagements &&
+                    student.nov25_engagements.length >= 0
                       ? "text-green-500"
                       : "text-red-500"
                   }`}
@@ -280,13 +280,13 @@ export function StudentList({
                   name="payment"
                   readOnly
                   value={
-                    student.jan26_payment && student.jan26_payment.payment_mode
-                      ? student.jan26_payment.payment_mode
+                    student.nov25_payment && student.nov25_payment.payment_mode
+                      ? student.nov25_payment.payment_mode
                       : "N/A"
                   }
                   className={`w-full ${
-                    student.jan26_payment &&
-                    student.jan26_payment.payment_mode === "PTPTN"
+                    student.nov25_payment &&
+                    student.nov25_payment.payment_mode === "PTPTN"
                       ? "text-blue-500 font-bold"
                       : ""
                   }`}
@@ -297,13 +297,13 @@ export function StudentList({
                 >
                   Payment Status
                 </Label>
-                {student.jan26_payment &&
-                student.jan26_payment.payment_mode === "PTPTN" ? (
+                {student.nov25_payment &&
+                student.nov25_payment.payment_mode === "PTPTN" ? (
                   <Input
                     name="payment_status"
                     readOnly
                     value={
-                      student.jan26_payment.proof === "TRUE"
+                      student.nov25_payment.proof === "TRUE"
                         ? "Submitted with proof"
                         : "No Proof Submitted"
                     }
@@ -313,7 +313,7 @@ export function StudentList({
                   <Textarea
                     name="payment_status"
                     readOnly
-                    value={student.jan26_payment?.payment_status || "N/A"}
+                    value={student.nov25_payment?.payment_status || "N/A"}
                     className={`w-full text-right text-sm`}
                   />
                 )}

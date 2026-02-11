@@ -41,6 +41,28 @@ export default function SSTManagement() {
     }
     setLoading(false);
   };
+  const handleInitialAssignmentNov25 = async () => {
+    if (
+      !confirm(
+        "This will distribute all the unassigned students to active SST members. Proceed?"
+      )
+    )
+      return;
+
+    setLoading(true);
+    const { error } = await supabase.rpc("nov25_auto_assign_sst");
+
+    if (error) {
+      setMessage({ text: `Error: ${error.message}`, type: "error" });
+    } else {
+      setMessage({
+        text: "Successfully assigned students to SST members.",
+        type: "success"
+      });
+    }
+    setLoading(false);
+  };
+
   const handleInitialAssignmentC = async () => {
     if (
       !confirm(
@@ -98,7 +120,7 @@ export default function SSTManagement() {
           <p className="mb-4">
             Distribute unassigned students to active SST members.
           </p>
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row flex-wrap gap-4">
             <Button
               onClick={handleInitialAssignment}
               disabled={loading}
@@ -112,6 +134,13 @@ export default function SSTManagement() {
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
             >
               {loading ? "Processing..." : "Assign Conventional Students"}
+            </Button>
+            <Button
+              onClick={handleInitialAssignmentNov25}
+              disabled={loading}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? "Processing..." : "Assign Nov 25 Students"}
             </Button>
           </div>
         </div>

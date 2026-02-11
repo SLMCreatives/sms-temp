@@ -1,4 +1,3 @@
-import { StudentListConven } from "@/components/student-list-c";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
 import { Students } from "@/app/student/studentColumns";
@@ -12,13 +11,14 @@ import {
 } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
+import { StudentList } from "@/components/student-list-nov25";
 
 const supabase = createClient();
 
 async function getData(): Promise<Students[]> {
   const { data: students, error } = await supabase
-    .from("jan26_c_students")
-    .select("*, jan26_c_payment(*), jan26_c_engagements(*)");
+    .from("nov25_students")
+    .select("*, nov25_payment(*), nov25_engagements(*), nov25_lms_activity(*)");
   if (error) {
     console.log("Error fetching data:", error.message);
     return [];
@@ -32,11 +32,11 @@ export default async function Jan26CPage() {
     (student) => student.status === "Active"
   );
   const ptptn = ptptn_active
-    .filter((student) => student.jan26_c_payment?.payment_mode === "PTPTN")
+    .filter((student) => student.nov25_payment?.payment_mode === "PTPTN")
     .toSorted((a, b) =>
-      a.jan26_c_payment.proof === "FALSE"
+      a.nov25_payment.proof === "FALSE"
         ? -1
-        : b.jan26_c_payment.proof === "FALSE"
+        : b.nov25_payment.proof === "FALSE"
           ? 1
           : 0
     );
@@ -73,21 +73,21 @@ export default async function Jan26CPage() {
  */
   /* const ptptn_amirul = ptptn_active.filter(
       (student) =>
-        student.jan26_c_payment?.payment_mode === "PTPTN" &&
-        student.jan26_c_payment.proof === "TRUE"
+        student.nov25_payment?.payment_mode === "PTPTN" &&
+        student.nov25_payment.proof === "TRUE"
     ); */
 
   const ptptnFalse = ptptn_active.filter(
     (student) =>
-      student.jan26_c_payment?.payment_mode === "PTPTN" &&
-      student.jan26_c_payment.proof === "FALSE"
+      student.nov25_payment?.payment_mode === "PTPTN" &&
+      student.nov25_payment.proof === "FALSE"
   );
 
   const ptptnPercentage = Math.round((ptptnFalse.length / ptptn.length) * 100);
 
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start gap-4 px-8 py-6">
-      <p className="text-3xl italic font-bold">Conventional | Jan 26</p>
+      <p className="text-3xl italic font-bold">Online | Nov 25</p>
       <p className="text-lg font-bold">Engagement Progress</p>
       <Accordion type="multiple" className="w-full" defaultValue={["item-1"]}>
         <AccordionItem value="item-1">
@@ -136,10 +136,11 @@ export default async function Jan26CPage() {
         <TabsContent value="ptptn" className="flex flex-col gap-4">
           <p className="text-sm italic font-bold ">PTPTN Students</p>
           {ptptn.map((student, index) => (
-            <StudentListConven
+            <StudentList
               key={student.matric_no}
               student={student}
               index={index}
+              lms_activity={student.lms_activity}
             />
           ))}
         </TabsContent>
@@ -148,7 +149,12 @@ export default async function Jan26CPage() {
 
           <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
             {amirul_ptptn.map((student, index) => (
-              <StudentListConven key={index} student={student} index={index} />
+              <StudentList
+                key={index}
+                student={student}
+                index={index}
+                lms_activity={student.lms_activity}
+              />
             ))}
           </div>
         </TabsContent>
@@ -156,10 +162,11 @@ export default async function Jan26CPage() {
           <p className="text-sm italic font-bold ">Ayu</p>
           <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
             {ayu_ptptn.map((student, index) => (
-              <StudentListConven
+              <StudentList
                 key={student.matric_no}
                 student={student}
                 index={index}
+                lms_activity={student.lms_activity}
               />
             ))}
           </div>
@@ -169,10 +176,11 @@ export default async function Jan26CPage() {
 
           <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
             {farzana_ptptn.map((student, index) => (
-              <StudentListConven
+              <StudentList
                 key={student.matric_no}
                 student={student}
                 index={index}
+                lms_activity={student.lms_activity}
               />
             ))}
           </div>
@@ -182,10 +190,11 @@ export default async function Jan26CPage() {
 
           <div className="flex flex-col gap-2 pb-4 lg:grid grid-cols-2 border-b-2 border-b-foreground/10">
             {najwa_ptptn.map((student, index) => (
-              <StudentListConven
+              <StudentList
                 key={student.matric_no}
                 student={student}
                 index={index}
+                lms_activity={student.lms_activity}
               />
             ))}
           </div>

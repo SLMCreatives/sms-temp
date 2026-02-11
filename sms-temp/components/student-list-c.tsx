@@ -5,7 +5,8 @@ import {
   ArrowUpCircle,
   CircleSlash,
   HandCoins,
-  ArrowRightCircle
+  ArrowRightCircle,
+  CircleCheckBig
 } from "lucide-react";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -58,6 +59,14 @@ export function StudentListConven({ student, index }: StudentCardProps) {
             <TooltipContent>PTPTN Payment Mode</TooltipContent>
           </Tooltip>
         ) : null}{" "}
+        {student.jan26_c_engagements.length > 0 ? (
+          <Tooltip>
+            <TooltipTrigger>
+              <CircleCheckBig className="w-5 h-5 text-green-500" />
+            </TooltipTrigger>
+            <TooltipContent>Engaged</TooltipContent>
+          </Tooltip>
+        ) : null}
         {student.status !== "Active" ? (
           <Tooltip>
             <TooltipTrigger>

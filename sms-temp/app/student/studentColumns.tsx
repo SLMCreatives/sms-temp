@@ -107,6 +107,13 @@ export type Students = {
     payment_status: string;
     proof: string;
   };
+  nov25_payment: {
+    id: string;
+    matric_no: string;
+    payment_mode: string;
+    payment_status: string;
+    proof: string;
+  };
 };
 
 export type ProgressionStudents = {

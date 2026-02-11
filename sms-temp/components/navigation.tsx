@@ -14,7 +14,8 @@ import {
   Cpu,
   GraduationCap,
   LayoutDashboard,
-  Mails
+  Mails,
+  MapPinned
 } from "lucide-react";
 import Image from "next/image";
 
@@ -71,6 +72,17 @@ export function NavMenuAuth() {
                   <p className="flex flex-row gap-4 items-center justify-start">
                     <Cpu className="h-5 w-5" />
                     FAiFT
+                  </p>
+                </Link>
+              </NavigationMenuLink>
+              <NavigationMenuLink asChild>
+                <Link
+                  href="/student/c/jan26"
+                  className="flex flex-row flex-nowrap justify-between w-full"
+                >
+                  <p className="flex flex-row gap-4 items-center justify-start">
+                    <MapPinned className="h-5 w-5" />
+                    Conventional
                   </p>
                 </Link>
               </NavigationMenuLink>
