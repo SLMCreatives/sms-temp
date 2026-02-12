@@ -16,16 +16,16 @@ type TableSearch = {
 
 const tables: TableSearch[] = [
   {
+    table: "nov25_students",
+    select: "*, nov25_engagements(*), nov25_lms_activity(*), nov25_payment(*)"
+  },
+  {
     table: "jan26_students",
     select: "*, jan26_engagements(*), jan26_lms_activity(*), jan26_payment(*)"
   },
   {
     table: "jan26_c_students",
     select: "*, jan26_c_payment(*), jan26_c_engagements(*)"
-  },
-  {
-    table: "nov25_students",
-    select: "*, nov25_engagements(*), nov25_lms_activity(*), nov25_payment(*)"
   }
 ];
 
