@@ -24,7 +24,6 @@ import {
   FolderCheck
 } from "lucide-react";
 //import { Comments, Students } from "@/app/student/studentColumns";
-import { EngagementForm } from "./engagement-form";
 //import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 //import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import {
@@ -40,7 +39,9 @@ import { Button } from "./ui/button";
 import { Students } from "@/app/student/studentColumns";
 import ChangeStatusForm from "./change-status";
 //import { Switch } from "./ui/switch";
-import ChangeStatusPTPTNForm from "./change-status-ptptn";
+//import ChangeStatusPTPTNForm from "./change-status-ptptn";
+import { EngagementFormNov } from "./engagement-form-nov";
+import ChangeStatusPTPTNFormNov from "./change-status-ptptn-nov";
 
 interface StudentDetailsProps {
   studentData: Students;
@@ -189,7 +190,7 @@ const StudentDetailsPageNov: React.FC<StudentDetailsProps> = ({
                                 studentData.nov25_payment?.proof === "TRUE"
                               }
                             /> */}
-                            <ChangeStatusPTPTNForm student={studentData} />
+                            <ChangeStatusPTPTNFormNov student={studentData} />
                           </div>
                         </div>
                       </div>
@@ -376,7 +377,7 @@ const StudentDetailsPageNov: React.FC<StudentDetailsProps> = ({
                     <SheetHeader>
                       <SheetTitle>Add Engagement</SheetTitle>
                     </SheetHeader>
-                    <EngagementForm matric_no={studentData.matric_no} />
+                    <EngagementFormNov matric_no={studentData.matric_no} />
                   </SheetContent>
                 </Sheet>
               </CardFooter>
