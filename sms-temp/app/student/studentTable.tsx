@@ -101,7 +101,7 @@ export default function DataTable<TData, TValue>({
   ).length;
 
   return (
-    <div className="container mx-auto rounded-md border max-w-sm md:max-w-6xl px-4">
+    <div className="container mx-auto rounded-md border max-w-sm md:max-w-6xl lg:w-[90vw] px-4">
       <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-4 py-4 border-b">
         <div className="text-center">
           <div className="text-2xl font-bold text-blue-600">

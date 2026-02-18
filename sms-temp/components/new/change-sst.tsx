@@ -7,8 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "./ui/select";
-import { Students } from "@/app/student/studentColumns";
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogClose,
@@ -17,56 +16,44 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from "./ui/dialog";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-type PTPTNStatus = "TRUE" | "FALSE";
+type SSTID = "1" | "2" | "3" | "4";
 
-interface ChangeStatusFormProps {
-  student: Students;
+interface ChangePaymentFormProps {
+  matric_no: string;
+  sst_id: string;
 }
 
 const supabase = createClient();
 
-export default function ChangeStatusPTPTNForm({
-  student
-}: ChangeStatusFormProps) {
-  const [status, setStatus] = useState<PTPTNStatus>(
-    (student.jan26_payment?.proof as PTPTNStatus) ||
-      (student.jan26_c_payment?.proof as PTPTNStatus) ||
-      (student.nov25_payment?.proof as PTPTNStatus)
-  );
+export default function NewChangeSSTForm({
+  matric_no,
+  sst_id
+}: ChangePaymentFormProps) {
+  const [status, setStatus] = useState<SSTID>(sst_id as SSTID);
+
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await handleStatusChange(status);
+    await handlePaymentChange(status);
+    router.refresh();
   };
 
-  const handleStatusChange = async (status: PTPTNStatus) => {
+  const handlePaymentChange = async (status: SSTID) => {
     try {
       const { error } = await supabase
-        .from("jan26_payment")
-        .update({ proof: status })
-        .eq("matric_no", student.matric_no)
+        .from("a_students")
+        .update({ sst_id: status })
+        .eq("matric_no", matric_no)
         .select()
         .single();
-
-      if (error) {
-        // Try updating jan26_c_payment if not found in jan26_payment
-        const { error } = await supabase
-          .from("jan26_c_payment")
-          .update({ proof: status })
-          .eq("matric_no", student.matric_no)
-          .select()
-          .single();
-        if (error) throw error;
-        toast.success("Student status updated to " + status);
-        setStatus(status); // Update local state to reflect the change
-        return;
-      }
       if (error) {
         toast.error("Error updating status: " + error);
       } else {
@@ -84,17 +71,24 @@ export default function ChangeStatusPTPTNForm({
     <Dialog open={open} onOpenChange={setClose}>
       <DialogTrigger asChild>
         <Badge
-          variant="default"
-          className={`${
-            status !== "TRUE" && "bg-red-600"
-          } px-3 py-1 cursor-pointer hover:opacity-80 transition`}
+          variant="outline"
+          className={`
+           px-3 py-1 cursor-pointer hover:opacity-80 transition text-xs border-0`}
         >
-          {status}
+          {status === "1"
+            ? "Amirul"
+            : status === "2"
+              ? "Farzana"
+              : status === "3"
+                ? "Najwa"
+                : status === "4"
+                  ? "Ayu"
+                  : "-"}
         </Badge>
       </DialogTrigger>
       <DialogContent className="w-fit">
         <DialogHeader>
-          <DialogTitle>Change PTPTN Status</DialogTitle>
+          <DialogTitle>Change Assigned SST</DialogTitle>
           <DialogDescription className="hidden">
             Change happens in database
           </DialogDescription>
@@ -102,15 +96,17 @@ export default function ChangeStatusPTPTNForm({
 
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <Select
-            onValueChange={(status) => setStatus(status as PTPTNStatus)}
+            onValueChange={(status) => setStatus(status as SSTID)}
             defaultValue={status}
           >
             <SelectTrigger className="w-full">
-              <SelectValue />
+              <SelectValue placeholder="Assign SST" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="TRUE">True</SelectItem>
-              <SelectItem value="FALSE">False</SelectItem>
+              <SelectItem value="1">Amirul</SelectItem>
+              <SelectItem value="4">Ayu</SelectItem>
+              <SelectItem value="2">Farzana</SelectItem>
+              <SelectItem value="3">Najwa</SelectItem>
             </SelectContent>
           </Select>
           <DialogClose asChild>

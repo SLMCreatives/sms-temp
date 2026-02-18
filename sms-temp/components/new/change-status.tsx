@@ -7,8 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "./ui/select";
-import { Students } from "@/app/student/studentColumns";
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogClose,
@@ -17,56 +16,46 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from "./ui/dialog";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-type PTPTNStatus = "TRUE" | "FALSE";
+type StudentStatus = "Active" | "At Risk" | "Withdraw" | "Deferred";
 
 interface ChangeStatusFormProps {
-  student: Students;
+  matric_no: string;
+  current_status: string;
 }
 
 const supabase = createClient();
 
-export default function ChangeStatusPTPTNForm({
-  student
+export default function NewChangeStatusForm({
+  matric_no,
+  current_status
 }: ChangeStatusFormProps) {
-  const [status, setStatus] = useState<PTPTNStatus>(
-    (student.jan26_payment?.proof as PTPTNStatus) ||
-      (student.jan26_c_payment?.proof as PTPTNStatus) ||
-      (student.nov25_payment?.proof as PTPTNStatus)
+  const [status, setStatus] = useState<StudentStatus>(
+    current_status as StudentStatus
   );
+
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await handleStatusChange(status);
+    router.refresh();
   };
 
-  const handleStatusChange = async (status: PTPTNStatus) => {
+  const handleStatusChange = async (status: StudentStatus) => {
     try {
       const { error } = await supabase
-        .from("jan26_payment")
-        .update({ proof: status })
-        .eq("matric_no", student.matric_no)
+        .from("a_students")
+        .update({ status: status })
+        .eq("matric_no", matric_no)
         .select()
         .single();
-
-      if (error) {
-        // Try updating jan26_c_payment if not found in jan26_payment
-        const { error } = await supabase
-          .from("jan26_c_payment")
-          .update({ proof: status })
-          .eq("matric_no", student.matric_no)
-          .select()
-          .single();
-        if (error) throw error;
-        toast.success("Student status updated to " + status);
-        setStatus(status); // Update local state to reflect the change
-        return;
-      }
       if (error) {
         toast.error("Error updating status: " + error);
       } else {
@@ -84,17 +73,16 @@ export default function ChangeStatusPTPTNForm({
     <Dialog open={open} onOpenChange={setClose}>
       <DialogTrigger asChild>
         <Badge
-          variant="default"
-          className={`${
-            status !== "TRUE" && "bg-red-600"
-          } px-3 py-1 cursor-pointer hover:opacity-80 transition`}
+          variant="outline"
+          className={`${status === "Withdraw" && "bg-red-200"} ${status === "Deferred" && "bg-orange-200"} ${status === "At Risk" && "bg-yellow-200"}
+           px-3 py-1 cursor-pointer hover:opacity-80 transition text-xs`}
         >
           {status}
         </Badge>
       </DialogTrigger>
       <DialogContent className="w-fit">
         <DialogHeader>
-          <DialogTitle>Change PTPTN Status</DialogTitle>
+          <DialogTitle>Change Student Status</DialogTitle>
           <DialogDescription className="hidden">
             Change happens in database
           </DialogDescription>
@@ -102,15 +90,17 @@ export default function ChangeStatusPTPTNForm({
 
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <Select
-            onValueChange={(status) => setStatus(status as PTPTNStatus)}
+            onValueChange={(status) => setStatus(status as StudentStatus)}
             defaultValue={status}
           >
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="TRUE">True</SelectItem>
-              <SelectItem value="FALSE">False</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Withdraw">Withdraw</SelectItem>
+              <SelectItem value="Deferred">Deferred</SelectItem>
+              <SelectItem value="At Risk">At Risk</SelectItem>
             </SelectContent>
           </Select>
           <DialogClose asChild>

@@ -1,4 +1,4 @@
-import { Table } from "@tanstack/react-table";
+import { type Table } from "@tanstack/react-table";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,12 +23,12 @@ export function DataTablePagination<TData>({
   table
 }: DataTablePaginationProps<TData>) {
   return (
-    <div className="flex items-center justify-between w-full px-2 py-4 border-y">
-      <div className="text-muted-foreground md:flex-1 hidden text-sm w-full items-center justify-between">
+    <div className="flex items-center justify-between px-2">
+      <div className="text-muted-foreground flex-1 text-sm">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
-      <div className="flex w-full items-center justify-between space-x-6 lg:space-x-8">
+      <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
@@ -41,7 +41,7 @@ export function DataTablePagination<TData>({
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 25, 50].map((pageSize) => (
+              {[10, 20, 25, 30, 40, 50].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>
@@ -49,7 +49,7 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-[150px] items-center justify-center text-xs font-medium text-muted-foreground italic">
+        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
           {table.getPageCount()}
         </div>

@@ -1,7 +1,6 @@
 import { StudentList } from "@/components/student-list";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createClient } from "@/lib/supabase/client";
-import { Students } from "../studentColumns";
 import { ChevronRight } from "lucide-react";
 import StudentListLegend from "@/components/legend";
 import {
@@ -12,6 +11,7 @@ import {
 } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
+import { Students } from "../studentColumns";
 
 const supabase = createClient();
 

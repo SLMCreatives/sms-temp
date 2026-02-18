@@ -7,17 +7,19 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger
 } from "./ui/navigation-menu";
-import {
-  BookOpenText,
-  Briefcase,
-  ChartPie,
-  Cpu,
-  GraduationCap,
-  LayoutDashboard,
-  Mails,
-  MapPinned
-} from "lucide-react";
+import { ChartPie, LayoutDashboard, Mails } from "lucide-react";
 import Image from "next/image";
+
+const navigationLinks = [
+  {
+    group: "Year",
+    links: [
+      { name: "Jan 2026 Online", href: "/student/2026/jan/online" },
+      { name: "Jan 2026 Conventional", href: "/student/2026/jan/conventional" },
+      { name: "Nov 2025 Online", href: "/student/2025/nov/online" }
+    ]
+  }
+];
 
 export function NavMenuAuth() {
   return (
@@ -37,6 +39,28 @@ export function NavMenuAuth() {
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
+          {navigationLinks.map((navGroup) => (
+            <NavigationMenuItem key={navGroup.group}>
+              <NavigationMenuTrigger>
+                <div className="flex flex-row gap-2 items-center">
+                  <p className="hidden md:flex">{navGroup.group}</p>
+                </div>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="max-w-[250px] w-full flex flex-col gap-2">
+                {navGroup.links.map((link) => (
+                  <NavigationMenuLink asChild key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="flex flex-row gap-4 items-center justify-start w-full"
+                    >
+                      {link.name}
+                    </Link>
+                  </NavigationMenuLink>
+                ))}
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          ))}
+          {/* 
           <NavigationMenuItem>
             <NavigationMenuTrigger>
               <div className="flex flex-row gap-2 items-center">
@@ -87,7 +111,7 @@ export function NavMenuAuth() {
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuContent>
-          </NavigationMenuItem>
+          </NavigationMenuItem> */}
           <NavigationMenuItem>
             <NavigationMenuTrigger>
               <div className="flex flex-row gap-2 items-center">
