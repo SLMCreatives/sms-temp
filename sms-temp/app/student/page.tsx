@@ -9,6 +9,9 @@ const intakes = [
   { label: "Jan-26", value: "JAN26" }
 ];
 
+export const dynamic = "force-dynamic";
+export const revalidate = 600;
+
 export default async function DemoPage() {
   const data = await getData();
 
