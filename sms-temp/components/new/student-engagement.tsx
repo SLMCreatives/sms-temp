@@ -24,12 +24,12 @@ const sstMembers = [
     image: "sst/farzana.png"
   },
   {
-    id: 3,
+    id: 4,
     name: "Ayu",
     image: "sst/ayu.jpeg"
   },
   {
-    id: 4,
+    id: 3,
     name: "Najwa",
     image: "sst/najwa.png"
   }
