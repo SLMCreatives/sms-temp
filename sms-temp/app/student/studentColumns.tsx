@@ -133,29 +133,6 @@ export type ProgressionStudents = {
   registration_status: string;
 };
 
-const sst = [
-  {
-    id: 1,
-    name: "Amirul",
-    image: "sst/amirul.png"
-  },
-  {
-    id: 2,
-    name: "Farzana",
-    image: "sst/farzana.png"
-  },
-  {
-    id: 3,
-    name: "Najwa",
-    image: "sst/najwa.png"
-  },
-  {
-    id: 4,
-    name: "Ayu",
-    image: "sst/ayu.jpeg"
-  }
-];
-
 export const studentColumns: ColumnDef<Students>[] = [
   {
     header: "No.",
@@ -437,21 +414,13 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     accessorKey: "sst_id",
     id: "sst_id",
     header: "Assigned SST",
-
     cell: ({ row }) => {
-      const names = sst.find((s) => s.id === row.original.sst_id)?.name;
       return (
         <div className="flex items-center justify-center">
-          <Badge className="text-xs group" variant={"secondary"}>
-            {row.original.sst_id ? (
-              names
-            ) : (
-              <NewChangeSSTForm
-                matric_no={row.original.matric_no}
-                sst_id={row.original.sst_id?.toString() as SSTID}
-              />
-            )}
-          </Badge>
+          <NewChangeSSTForm
+            matric_no={row.original.matric_no}
+            sst_id={row.original.sst_id?.toString() as SSTID}
+          />
         </div>
       );
     },
