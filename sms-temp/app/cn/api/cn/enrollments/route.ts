@@ -1,29 +1,66 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { cnApiClient } from "@/lib/cn-api-client";
+
+const CN_API_BASE = "https://api.thecn.com/v1";
+
+const consumerKeyCN = "64db1c79e35314ba4507ac76";
+const consumerSecretCN = "3cd-0MFyQiHAtaa9cqi4iPgRgpMX23Jp";
+const oauthBaseURL = "https://www.thecn.com/oauth2/token";
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const user_id = searchParams.get("user_id");
-    const course_id = searchParams.get("course_id") || undefined;
+    const id = searchParams.get("user_id");
 
-    if (!user_id) {
-      return NextResponse.json(
-        { errs: ["user_id is required"] },
-        { status: 400 }
-      );
+    // 1. Get OAuth Access Token
+    async function getAccessToken() {
+      const consumerKey = consumerKeyCN;
+      const consumerSecret = consumerSecretCN;
+
+      // Encode credentials
+      const credentials = `${consumerKey}:${consumerSecret}`;
+      const encodedCredentials = Buffer.from(credentials).toString("base64");
+
+      // Make the request
+      const response = await fetch(`${oauthBaseURL}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${encodedCredentials}`,
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+        },
+        body: "grant_type=client_credentials",
+        cache: "no-store"
+      });
+
+      const data = await response.json();
+
+      return {
+        accessToken: data.access_token
+      };
     }
 
-    const response = await cnApiClient.listEnrollments({
-      user_id,
-      course_id
+    const { accessToken } = await getAccessToken();
+    const access_token = accessToken;
+
+    // 2. Fetch User from CN API using the ID
+    const res = await fetch(`${CN_API_BASE}/sis_institution_user/${id}`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "application/json"
+      }
     });
 
-    return NextResponse.json(response);
+    const json = await res.json();
+    console.log(json);
+    if (!res.ok) {
+      const err = await res.text();
+      return NextResponse.json({ error: err }, { status: res.status });
+    }
+
+    return NextResponse.json(json); // Returns the object containing user data
   } catch (error) {
-    console.error("[v0] Error fetching enrollments:", error);
+    console.error("Error fetching CN student:", error);
     return NextResponse.json(
-      { errs: ["Failed to fetch enrollments"] },
+      { errs: ["Failed to fetch student"] },
       { status: 500 }
     );
   }

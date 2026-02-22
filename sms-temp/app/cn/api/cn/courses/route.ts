@@ -1,29 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { type NextRequest, NextResponse } from "next/server";
 
-export interface CNUser {
-  id: string;
-  cn_number: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  status: string;
-  labels: string[];
-  user_id: string;
-  login_id?: string;
-}
-
-interface CNEnrollment {
-  id: string;
-  user_id: string;
-  course_id: string;
-  status: string;
-  progress: number;
-  last_login_at: string;
-  created_at: string;
-  updated_at: string;
-}
-
 const CN_API_BASE = "https://api.thecn.com/v1";
 
 const consumerKeyCN = "64db1c79e35314ba4507ac76";
@@ -33,21 +10,9 @@ const oauthBaseURL = "https://www.thecn.com/oauth2/token";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const limit = Number.parseInt(searchParams.get("limit") || "12");
-    const offset = Number.parseInt(searchParams.get("offset") || "0");
+    const id = searchParams.get("user_id");
 
-    // Fetch institution users (which represent course participants)
-
-    /* const getAccessToken = async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_CN_OATH_BASE}`, {
-        cache: "no-store"
-      });
-      if (!res.ok) {
-        console.log("Error", res);
-      }
-      return res.json() as Promise<{ access_token: string }>;
-    }; */
-
+    // 1. Get OAuth Access Token
     async function getAccessToken() {
       const consumerKey = consumerKeyCN;
       const consumerSecret = consumerSecretCN;
@@ -77,8 +42,9 @@ export async function GET(request: NextRequest) {
     const { accessToken } = await getAccessToken();
     const access_token = accessToken;
 
+    // 2. Fetch User from CN API using the ID
     const res = await fetch(
-      `${CN_API_BASE}/sis_institution_user/?limit=${limit}&offset=${offset}`,
+      `${CN_API_BASE}/sis_institution_user_course_enrollment/?user_id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${access_token}`,
@@ -86,25 +52,17 @@ export async function GET(request: NextRequest) {
         }
       }
     );
-    const data = await res.json();
+    const json = await res.json();
+    if (!res.ok) {
+      const err = await res.text();
+      return NextResponse.json({ error: err }, { status: res.status });
+    }
 
-    return NextResponse.json({
-      data: data,
-      meta: {
-        limit,
-        offset,
-        total: data.length || data.errs
-      }
-    });
+    return NextResponse.json(json); // Returns the object containing user data
   } catch (error) {
-    console.error("[v0] CN API Error:", error);
+    console.error("Error fetching CN Course:", error);
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch enrollment data"
-      },
+      { errs: ["Failed to fetch course"] },
       { status: 500 }
     );
   }

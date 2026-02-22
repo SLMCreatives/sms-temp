@@ -76,7 +76,8 @@ export function DataTable<TData, TValue>({
     onRowSelectionChange: setRowSelection,
     enableMultiRowSelection: false,
     onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel()
+    getFilteredRowModel: getFilteredRowModel(),
+    autoResetPageIndex: false
   });
 
   const filteredCount = table.getFilteredRowModel().rows.length;

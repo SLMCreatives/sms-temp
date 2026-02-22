@@ -37,7 +37,13 @@ export default function CoursesPage() {
         const res = await fetch(`/cn/api/cn/users?limit=12&offset=${offset}`);
         const json: ApiResp<dataType> = await res.json();
         if (json.data) {
-          setUserLists(json.data);
+          const orderedData = json.data.data.toReversed();
+          setUserLists(
+            offset === 0
+              ? { data: orderedData }
+              : { data: [...userLists.data, ...orderedData] }
+          );
+          console.log(json.data);
         }
       } catch (error) {
         console.error("Failed to fetch users:", error);

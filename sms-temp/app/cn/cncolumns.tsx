@@ -21,6 +21,10 @@ export type CNUsers = {
 
 export const columns: ColumnDef<CNUsers>[] = [
   {
+    accessorKey: "id",
+    header: "ID"
+  },
+  {
     accessorKey: "cn_number",
     header: "CN Number"
   },
@@ -46,7 +50,7 @@ export const columns: ColumnDef<CNUsers>[] = [
       return (
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link href={`/cn/${row.original.user_id}`} target="_blank">
+            <Link href={`/cn/${row.original.id}`} target="_blank">
               View{" "}
             </Link>
           </Button>
