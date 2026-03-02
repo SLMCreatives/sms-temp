@@ -446,6 +446,27 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     }
   },
   {
+    accessorKey: "a_engagements",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Outcome
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center justify-center text-xs">
+          {row.original.a_engagements?.at(-1)?.outcome}
+        </div>
+      );
+    }
+  },
+  {
     header: "Action",
     cell: ({ row }) => {
       return (

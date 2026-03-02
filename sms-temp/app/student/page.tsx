@@ -5,8 +5,9 @@ import { getData } from "./getData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const intakes = [
-  { label: "Nov-25", value: "NOV25" },
-  { label: "Jan-26", value: "JAN26" }
+  { label: "Mar-26", value: "MAR26" },
+  { label: "Jan-26", value: "JAN26" },
+  { label: "Nov-25", value: "NOV25" }
 ];
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export default async function DemoPage() {
 
       <div className="flex flex-col">
         <div className="lg:hidden flex">
-          <Tabs defaultValue="NOV25">
+          <Tabs defaultValue="MAR26">
             <TabsList className="flex gap-2 flex-row items-center justify-between">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <p className="text-muted-foreground">Intakes:</p>
@@ -56,7 +57,7 @@ export default async function DemoPage() {
            */}{" "}
         </div>
         <div className="hidden lg:flex ">
-          <Tabs defaultValue="NOV25">
+          <Tabs defaultValue="MAR26">
             <TabsList className="flex gap-2 flex-row items-center justify-between ">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <p className="text-muted-foreground">Intakes:</p>
