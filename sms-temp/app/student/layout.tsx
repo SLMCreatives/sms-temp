@@ -1,3 +1,4 @@
+import { AppSidebar } from "@/components/nav_components/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
@@ -13,10 +14,10 @@ export default function ProtectedLayout({
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 w-full flex flex-col items-center">
         <SidebarProvider>
-          {/* <AppSidebar /> */}
+          <AppSidebar />
           <SidebarInset>
             <SidebarTrigger className=" sticky top-2 left-2 z-40 md:hidden " />
-            <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto lg:bg-zinc-100 dark:bg-stone-950 min-h-screen">
+            <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto lg:bg-zinc-100 dark:bg-stone-950 min-h-screen lg:pl-[250px]">
               {children}
             </div>
           </SidebarInset>

@@ -1,27 +1,34 @@
 import { StudentAttritionDashboard } from "@/components/student-attrition-dashboard";
 import { createClient } from "@/lib/supabase/client";
-import { Students } from "../student/studentColumns";
+import { Student } from "@/lib/types/database";
 
 const supabase = createClient();
 
-async function getData(): Promise<Students[]> {
+type Props = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+async function getData(): Promise<Student[]> {
   const { data: students, error } = await supabase
-    .from("jan26_students")
-    .select(
-      "*, jan26_lms_activity(*), jan26_engagements(*), jan26_lms_activity_w1(*), jan26_lms_activity_w2(*)"
-    );
+    .from("a_students")
+    .select("*, a_lms_activity(*), a_engagements(*), a_payments(*)")
+    .neq("intake_code", "SEPT25");
   if (error) {
     console.log("Error fetching data:", error.message);
     return [];
   }
-  return students as Students[];
+  return students as Student[];
 }
 
-export default async function Page() {
+export default async function Page({ searchParams }: Props) {
+  const params = await searchParams;
+  const intake = typeof params?.intake === "string" ? params.intake : "JAN26";
+
   const data = await getData();
+
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-5xl items-start justify-start">
-      <StudentAttritionDashboard data={data} />
+      <StudentAttritionDashboard data={data} intake={intake} />
     </div>
   );
 }

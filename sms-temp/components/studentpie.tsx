@@ -20,6 +20,7 @@ import {
   ChartTooltipContent
 } from "@/components/ui/chart";
 import { Students } from "@/app/student/studentColumns";
+import { Student } from "@/lib/types/database";
 
 export const description = "A pie chart with a label";
 
@@ -51,63 +52,32 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 interface StudentChartProps {
-  data: Students[];
+  data: Student[];
 }
 
 export function StudentPieChart({ data }: StudentChartProps) {
-  const db_students = data as Students[];
+  const db_students = data as Student[];
   const active_students = db_students.filter(
-    (student) => student.status === "Active"
+    (student) => student.status === "Active" || student.status === "At-Risk"
   );
   const not_logged_in = active_students.filter(
     (student) =>
-      student.jan26_lms_activity &&
-      student.jan26_lms_activity.last_login_at === null
+      student.a_lms_activity && student.a_lms_activity.last_login_at === null
   );
 
   const zero_progress = db_students.filter(
     (student) =>
-      student.jan26_lms_activity &&
-      student.jan26_lms_activity.course_progress === 0 &&
+      student.a_lms_activity &&
+      student.a_lms_activity.cp_w3 === 0 &&
       !not_logged_in.includes(student)
   );
 
   const low_progress = db_students.filter(
     (student) =>
-      student.jan26_lms_activity &&
-      student.jan26_lms_activity.course_progress <= 0.2 &&
+      student.a_lms_activity &&
+      student.a_lms_activity.cp_w3 <= 0.2 &&
       !zero_progress.includes(student) &&
       !not_logged_in.includes(student)
-  );
-
-  /* const engaged = db_students.filter((student) =>
-    student.engagements.some(
-      (engagement) => engagement && engagement.created_at > "2025-09-22"
-    )
-  ); */
-
-  const not_loggedin_engaged = not_logged_in.filter((student) =>
-    student.jan26_engagements.some(
-      (engagement) => engagement && engagement.created_at > "2025-09-22"
-    )
-  );
-
-  const zero_engaged = zero_progress.filter((student) =>
-    student.jan26_engagements.some(
-      (engagement) => engagement && engagement.created_at > "2025-09-22"
-    )
-  );
-
-  const low_engaged = low_progress.filter((student) =>
-    student.jan26_engagements.some(
-      (engagement) => engagement && engagement.created_at > "2025-09-22"
-    )
-  );
-
-  const no_response = db_students.filter((student) =>
-    student.jan26_engagements.some(
-      (engagement) => engagement && engagement.outcome === "no_response"
-    )
   );
 
   const therest = active_students.filter(

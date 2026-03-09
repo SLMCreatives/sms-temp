@@ -5,6 +5,7 @@ import { getData } from "./getData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const intakes = [
+  { label: "TnP May-26", value: "TNP-C2-26" },
   { label: "Mar-26", value: "MAR26" },
   { label: "Jan-26", value: "JAN26" },
   { label: "Nov-25", value: "NOV25" }

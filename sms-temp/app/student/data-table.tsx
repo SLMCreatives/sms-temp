@@ -221,10 +221,10 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header, index) => {
                   return (
                     <TableHead
-                      key={header.id}
+                      key={index}
                       className={`${header.column.id === "full_name" || header.column.id === "select" ? "sticky left-0 bg-background" : ""}`}
                     >
                       {header.isPlaceholder
@@ -241,15 +241,15 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow
-                  key={row.id}
+                  key={index}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => row.toggleSelected()}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell, index) => (
                     <TableCell
-                      key={cell.id}
+                      key={index}
                       className={`${cell.column.id === "full_name" || cell.column.id === "select" ? "sticky left-0 bg-background" : ""}`}
                     >
                       {flexRender(

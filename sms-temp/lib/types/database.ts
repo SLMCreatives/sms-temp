@@ -59,3 +59,23 @@ export type StudentDashboardRow = Student & {
   payment?: Payment;
   engagements?: Engagement[];
 };
+
+export type StudentProgressionRow = {
+  matric_no: string;
+  full_name: string;
+  phone: string;
+  programme: string;
+  eligible_intake: string;
+  study_mode: string;
+  faculty_code: string;
+  status: string;
+  completed: boolean;
+  training: boolean;
+  training_completion_date: string | null;
+  progression_intent: boolean;
+  progression_status: boolean;
+  progression_intake: string;
+  engaged: boolean;
+  engagement_status: string;
+  assigned_sst: string;
+};

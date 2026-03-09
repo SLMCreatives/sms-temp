@@ -16,7 +16,7 @@ import { StudentDashboardRow } from "@/lib/types/database";
 const informationTabs = [
   { label: "Status", value: "student.status", icon: Brackets },
   { label: "Matric No", value: "student.matric_no", icon: IdCard },
-  { label: "Email", value: "student.email.toLowerCase()", icon: Mail },
+  { label: "Email", value: "student.email?.toLowerCase()", icon: Mail },
   { label: "Phone", value: "student.phone", icon: Phone }
 ];
 

@@ -4,19 +4,19 @@ import { StudentDashboardRow } from "@/lib/types/database";
 const informationTabs = [
   {
     label: "Payment Mode",
-    value: "student.a_payments.payment_mode",
+    value: "student.a_payments?.payment_mode",
     icon: IdCard
   },
   {
     label: "Payment Status",
-    value: "student.a_payments.payment_status",
+    value: "student.a_payments?.payment_status",
     icon: BanknoteArrowUp
   },
 
   {
     label: "PTPTN Proof",
     value:
-      "student.a_payments.ptptn_proof_status === true ? 'Approved' : 'No Proof'",
+      "student.a_payments?.ptptn_proof_status === true ? 'Approved' : 'No Proof'",
     icon: BanknoteArrowUp
   }
 ];

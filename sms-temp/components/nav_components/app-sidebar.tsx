@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Bot, CircleUserRound, SquareTerminal } from "lucide-react";
+import { CircleUserRound, Menu } from "lucide-react";
 
 //import { NavUser } from "@/components/nav_components/nav-user";
 //import { TeamSwitcher } from "@/components/nav_components/team-switcher";
@@ -13,7 +13,6 @@ import {
   SidebarHeader,
   SidebarRail
 } from "@/components/ui/sidebar";
-import { TeamSwitcher } from "./team-switcher";
 
 // This is sample data.
 const data = {
@@ -46,37 +45,41 @@ const data = {
   ],
   navMain: [
     {
-      title: "Intake",
+      title: "Navigation",
       url: "#",
-      icon: SquareTerminal,
+      icon: Menu,
       isActive: true,
       items: [
         {
-          title: "Jan 26 Online",
-          url: "/student/2026/jan/online"
+          title: "Student List",
+          url: "/student"
         },
         {
-          title: "Jan 26 Conventional",
-          url: "/student/2026/jan/conventional"
+          title: "Dashboard",
+          url: "/dashboard"
         },
         {
-          title: "Nov 25 Online",
-          url: "/student/2025/nov/online"
+          title: "Admin",
+          url: "/admin"
         }
       ]
-    },
-    {
-      title: "Team Tasks",
-      url: "#",
+    }
+    /* {
+      title: "Dashboard",
+      url: "/dashboard",
       icon: Bot,
       items: [
         {
-          title: "Amirul",
-          url: "/amirul"
+          title: "Dashboard",
+          url: "/dashboard"
         },
         {
-          title: "Farzana",
-          url: "/farzana"
+          title: "November 2025",
+          url: "/dashboard/c325"
+        },
+        {
+          title: "January 2026",
+          url: "/dashboard/c126"
         },
         {
           title: "Ayu",
@@ -84,7 +87,7 @@ const data = {
         },
         { title: "Najwa", url: "/najwa" }
       ]
-    }
+    } */
     /* {
       title: "Documentation",
       url: "#",
@@ -144,7 +147,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     >
       <SidebarHeader>
         {" "}
-        <TeamSwitcher teams={data.teams} />
+        {/* <TeamSwitcher teams={data.teams} /> */}
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
