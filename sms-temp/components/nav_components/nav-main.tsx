@@ -34,7 +34,9 @@ export function NavMain({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>SST Management App</SidebarGroupLabel>
+      <SidebarGroupLabel className="sr-only">
+        SST Management App
+      </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible

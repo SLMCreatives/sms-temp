@@ -7,18 +7,15 @@ import NewChangeStatusForm from "@/components/new/change-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from "@/components/ui/tooltip";
 import { StudentDashboardRow } from "@/lib/types/database";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowRightCircle,
   ArrowUpDown,
+  CheckCheck,
   MessageCircle,
-  Phone
+  Phone,
+  XCircle
 } from "lucide-react";
 import Link from "next/link";
 
@@ -219,56 +216,62 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
+        className="mr-2"
       />
     ),
     enableSorting: false,
-    enableHiding: false,
+    enableHiding: true,
     size: 10
   },
-  {
+  /* {
     header: "Intake",
+    id: "intake",
     accessorKey: "intake_code",
     cell: ({ row }) => {
       return <div>{row.original.intake_code}</div>;
     },
     enableSorting: false,
     enableColumnFilter: false
-  },
+  }, */
   {
     accessorKey: "matric_no",
-    header: "Matrix ID"
+    header: "Matrix ID",
+    id: "Matric No"
   },
   {
     accessorKey: "full_name",
+    id: "name",
     header: "Full Name",
-    cell: ({ row }) => {
+    filterFn: (row, columnId, filterValue) => {
+      const name = String(row.getValue("name")).toLowerCase();
+      const matric = String(row.original.matric_no).toLowerCase();
+      const status = String(row.original.status).toLowerCase();
+      const outcome = String(
+        row.original.a_engagements?.at(-1)?.outcome
+      ).toLowerCase();
+
+      const search = filterValue.toLowerCase();
+
       return (
-        <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center gap-2 w-[250px] overflow-hidden">
-              <div>{row.getValue("full_name")}</div>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <div className="flex items-center gap-2">
-              <div>{row.getValue("full_name")}</div>
-            </div>
-          </TooltipContent>
-        </Tooltip>
+        name.includes(search) ||
+        matric.includes(search) ||
+        status.includes(search) ||
+        outcome.includes(search)
       );
     }
   },
   {
     accessorKey: "study_mode",
+    id: "study_mode",
     header: "Study Mode",
     cell: ({ row }) => {
       return (
         <div className="text-center w-full">
           <Badge
-            variant={"default"}
-            className={`${row.original.study_mode === "Online" ? "bg-emerald-500" : "bg-cyan-500"}`}
+            variant={"outline"}
+            className={`${row.original.study_mode === "Online" ? "bg-purple-300 dark:bg-purple-800" : "bg-amber-300 dark:bg-amber-800"} border-0`}
           >
-            {row.original.study_mode === "Online" ? "O" : "C"}
+            {row.original.study_mode === "Online" ? "Online" : "Conventional"}
           </Badge>
         </div>
       );
@@ -276,6 +279,7 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
   },
   {
     accessorKey: "status",
+    id: "Status",
     header: ({}) => {
       return <div className="flex items-center justify-center">Status</div>;
     },
@@ -292,73 +296,11 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     }
   },
   {
-    accessorKey: "a_lms_activity.course_visits",
-    header: ({ column }) => {
-      return (
-        <div className="flex items-center justify-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Course Visits
-            <ArrowUpDown className="ml-1 h-3 w-3" />
-          </Button>
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="text-center w-full">
-          {row.original.a_lms_activity?.course_visits}
-        </div>
-      );
-    }
-  },
-  {
-    accessorKey: "a_lms_activity.cp_w1",
-    header: "CP W1",
-    cell: ({ row }) => {
-      return (
-        <div className="text-center w-full">
-          {row.original.a_lms_activity?.cp_w1
-            ? (row.original.a_lms_activity?.cp_w1 * 100).toFixed(0) + "%"
-            : "-"}
-        </div>
-      );
-    }
-  },
-  {
-    accessorKey: "a_lms_activity.cp_w2",
-    header: "CP W2",
-    cell: ({ row }) => {
-      return (
-        <div className="text-center w-full">
-          {row.original.a_lms_activity?.cp_w2
-            ? (row.original.a_lms_activity?.cp_w2 * 100).toFixed(0) + "%"
-            : "-"}
-        </div>
-      );
-    }
-  },
-  {
-    accessorKey: "a_lms_activity.cp_w3",
-    header: "CP W3",
-    cell: ({ row }) => {
-      return (
-        <div className="text-center w-full">
-          {row.original.a_lms_activity?.cp_w3
-            ? (row.original.a_lms_activity?.cp_w3 * 100).toFixed(0) + "%"
-            : "-"}
-        </div>
-      );
-    }
-  },
-  {
     accessorKey: "a_payments.payment_mode",
     id: "payment_mode",
     header: ({}) => {
       return (
-        <div className="w-full items-center justify-center">
+        <div className="w-full flex items-center justify-center">
           <p>Payment Mode</p>
         </div>
       );
@@ -378,17 +320,80 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     }
   },
   {
-    accessorKey: "a_payments.ptptn_proof_status",
-    id: "ptptn_proof_status",
+    accessorKey: "a_lms_activity.course_visits",
+    id: "course_visits",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          PTPTN Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center justify-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            CN Visits
+            <ArrowUpDown className="ml-1 h-3 w-3" />
+          </Button>
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      return (
+        <div className="text-center w-full">
+          {row.original.a_lms_activity?.course_visits}
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: "a_lms_activity.cp_w1",
+    id: "CP W1",
+    header: "CP W1",
+    cell: ({ row }) => {
+      return (
+        <div className="text-center w-full">
+          {row.original.a_lms_activity?.cp_w1
+            ? (row.original.a_lms_activity?.cp_w1 * 100).toFixed(0) + "%"
+            : "-"}
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: "a_lms_activity.cp_w2",
+    id: "CP W2",
+    header: "CP W2",
+    cell: ({ row }) => {
+      return (
+        <div className="text-center w-full">
+          {row.original.a_lms_activity?.cp_w2
+            ? (row.original.a_lms_activity?.cp_w2 * 100).toFixed(0) + "%"
+            : "-"}
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: "a_lms_activity.cp_w3",
+    id: "CP W3",
+    header: "CP W3",
+    cell: ({ row }) => {
+      return (
+        <div className="text-center w-full">
+          {row.original.a_lms_activity?.cp_w3
+            ? (row.original.a_lms_activity?.cp_w3 * 100).toFixed(0) + "%"
+            : "-"}
+        </div>
+      );
+    }
+  },
+
+  {
+    accessorKey: "a_payments.ptptn_proof_status",
+    id: "ptptn_proof_status",
+    header: ({}) => {
+      return (
+        <div className="w-full flex items-center justify-center">
+          <p>Payment Status</p>
+        </div>
       );
     },
     cell: ({ row }) => {
@@ -413,7 +418,13 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
   {
     accessorKey: "sst_id",
     id: "sst_id",
-    header: "Assigned SST",
+    header: ({}) => {
+      return (
+        <div className="w-full flex items-center justify-center">
+          <p>SST</p>
+        </div>
+      );
+    },
     cell: ({ row }) => {
       return (
         <div className="flex items-center justify-center">
@@ -430,6 +441,7 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
   },
   {
     accessorKey: "a_engagements",
+    id: "No of Engagements",
     header: ({} = {}) => {
       return (
         <div className="w-full items-center justify-center">
@@ -447,6 +459,7 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
   },
   {
     accessorKey: "a_engagements",
+    id: "Outcome",
     header: ({ column }) => {
       return (
         <Button
@@ -464,6 +477,37 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
           {row.original.a_engagements?.at(-1)?.outcome}
         </div>
       );
+    }
+  },
+  {
+    header: "SOS",
+    id: "sos",
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center justify-center text-xs">
+          {Array.isArray(row.original.a_sos) &&
+          row.original.a_sos.length > 0 ? (
+            <CheckCheck className="h-4 w-4 text-green-500" />
+          ) : (
+            <XCircle className="h-4 w-4 text-red-500" />
+          )}
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const sos = row.original.a_sos;
+
+      // If filterValue is true, ensure array exists and has items
+      if (filterValue === true) {
+        return Array.isArray(sos) && sos.length > 0;
+      }
+
+      // If filterValue is false, ensure array is empty or null
+      if (filterValue === false) {
+        return !Array.isArray(sos) || sos.length === 0;
+      }
+
+      return true; // "all" case (filterValue is undefined)
     }
   },
   {

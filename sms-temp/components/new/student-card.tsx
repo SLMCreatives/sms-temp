@@ -20,7 +20,8 @@ import StudentEngagement from "./student-engagement";
 import StudentInfo from "./student-info";
 import StudentLMSActivity from "./student-lms";
 import StudentPayment from "./student-payment";
-import { Student } from "@/lib/types/database";
+import { StudentDashboardRow } from "@/lib/types/database";
+import StudentSOS from "./student-sos";
 
 const tabs = [
   {
@@ -41,6 +42,7 @@ const tabs = [
     icon: BanknoteArrowUp,
     color: "#d97706"
   },
+  { value: "sos", label: "SOS", icon: MessageCircle, color: "#3b82f6" },
   {
     value: "escalate",
     label: "Escalate",
@@ -53,7 +55,7 @@ export function NewStudentCard({
   student,
   index
 }: {
-  student: Student;
+  student: StudentDashboardRow;
   index: number;
 }) {
   return (
@@ -104,6 +106,12 @@ export function NewStudentCard({
               className="items-start w-full justify-center"
             >
               <StudentPayment student={student} />
+            </TabsContent>
+            <TabsContent
+              value="sos"
+              className="items-start w-full justify-center"
+            >
+              <StudentSOS student={student} />
             </TabsContent>
             <TabsContent
               value="escalate"

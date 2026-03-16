@@ -13,6 +13,7 @@ import {
   SidebarHeader,
   SidebarRail
 } from "@/components/ui/sidebar";
+import { ThemeSwitcher } from "../theme-switcher";
 
 // This is sample data.
 const data = {
@@ -45,7 +46,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "Navigation",
+      title: "SST Engagement App",
       url: "#",
       icon: Menu,
       isActive: true,
@@ -140,7 +141,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
-      variant="floating"
+      variant="inset"
       collapsible="icon"
       {...props}
       className="min-w-[200px]"
@@ -153,7 +154,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
         {/*  <NavProjects projects={data.projects} /> */}
       </SidebarContent>
-      <SidebarFooter>{/*  <NavUser user={data.user} /> */}</SidebarFooter>
+      <SidebarFooter>
+        {/*  <NavUser user={data.user} /> */}
+        <div className="flex w-full flex-row items-end justify-end">
+          <ThemeSwitcher />
+        </div>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

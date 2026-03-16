@@ -6,7 +6,7 @@ const supabase = createClient();
 export async function getData(): Promise<StudentDashboardRow[]> {
   const { data: students, error } = await supabase
     .from("a_students")
-    .select("*, a_payments(*), a_lms_activity(*), a_engagements(*)")
+    .select("*, a_payments(*), a_lms_activity(*), a_engagements(*), a_sos(*)")
     .neq("intake_code", "SEPT25");
 
   if (error) {

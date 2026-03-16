@@ -15,7 +15,7 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
-import { CheckCircle, CircleX } from "lucide-react";
+import { CheckCheck, CircleX } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type ptptnStatus = boolean;
@@ -68,9 +68,9 @@ export default function NewChangePTPTNStatusForm({
     <Dialog open={open} onOpenChange={setClose}>
       <DialogTrigger asChild>
         {status === true ? (
-          <CheckCircle className="h-6 w-6 text-green-500" />
+          <CheckCheck className="h-4 w-4 text-green-500" />
         ) : (
-          <CircleX className="h-6 w-6 text-red-500" />
+          <CircleX className="h-4 w-4 text-red-500" />
         )}
       </DialogTrigger>
       <DialogContent className="w-fit">

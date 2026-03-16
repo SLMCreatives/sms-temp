@@ -24,8 +24,17 @@ import {
 import * as React from "react";
 import { DataTablePagination } from "@/components/ui/paginationControls";
 import { NewStudentCard } from "@/components/new/student-card";
-import { Student } from "@/lib/types/database";
-import { RefreshCcw, Search, UserCircle } from "lucide-react";
+import { StudentDashboardRow } from "@/lib/types/database";
+import {
+  CheckCheck,
+  CheckCircle,
+  Laptop,
+  RefreshCcw,
+  School,
+  Search,
+  UserCircle,
+  XCircle
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -37,8 +46,9 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { DataTableViewOptions } from "./view-options";
+import "@/app/globals.css";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -51,7 +61,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>({
-    left: ["select", "matric_no", "full_name"],
+    left: ["select", "Matric No", "name"],
     right: []
   });
   const [rowSelection, setRowSelection] = React.useState({});
@@ -83,24 +93,24 @@ export function DataTable<TData, TValue>({
   const filteredCount = table.getFilteredRowModel().rows.length;
 
   return (
-    <div className="grid grid-cols-3 gap-8 gap-y-4">
-      <div className="col-span-2 max-h-fit row-span-3 rounded-2xl border bg-background p-4 drop-shadow-xl relative">
+    <div className="grid grid-cols-3 gap-8 gap-y-4 py-2">
+      <div className="col-span-2 max-h-fit row-span-3 rounded-2xl container p-4 drop-shadow-xl relative border-0 ">
         <div className="flex items-center pb-4 w-full gap-2 border-b">
           <div className="flex flex-row gap-2 w-full items-center">
             <Search className="w-4 h-4 text-primary" />
             <Input
               value={
-                (table.getColumn("full_name")?.getFilterValue() as string) ?? ""
+                (table.getColumn("name")?.getFilterValue() as string) ?? ""
               }
               onChange={(event) =>
-                table.getColumn("full_name")?.setFilterValue(event.target.value)
+                table.getColumn("name")?.setFilterValue(event.target.value)
               }
-              className="text-left w-full"
-              placeholder="Search student name..."
+              className="text-left w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              placeholder="Search name, matric number, status or outcome"
             />
           </div>
-          <div>
-            <Select
+          {/* <div>
+            <Selectß
               value={
                 (table.getColumn("sst_id")?.getFilterValue() as string) ?? ""
               }
@@ -124,20 +134,21 @@ export function DataTable<TData, TValue>({
                 </SelectGroup>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
+
           <div>
             <Select
               value={
-                (table.getColumn("status")?.getFilterValue() as string) ?? ""
+                (table.getColumn("Status")?.getFilterValue() as string) ?? ""
               }
               onValueChange={(value) =>
                 table
-                  .getColumn("status")
+                  .getColumn("Status")
                   ?.setFilterValue(value === "all" ? "" : value)
               }
               defaultValue="Active"
             >
-              <SelectTrigger className="lg:w-fit w-full">
+              <SelectTrigger className="lg:w-fit w-full border-0">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -152,6 +163,40 @@ export function DataTable<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
+
+          <div>
+            <Select
+              onValueChange={(value) => {
+                const column = table.getColumn("sos");
+                if (!column) return;
+
+                if (value === "all") {
+                  column.setFilterValue(undefined); // Clear filter
+                } else if (value === "submitted") {
+                  column.setFilterValue(true); // Signal to filter for length > 0
+                } else if (value === "not-submitted") {
+                  column.setFilterValue(false); // Signal to filter for length === 0
+                }
+              }}
+            >
+              <SelectTrigger className="lg:w-fit w-full border-0">
+                <SelectValue placeholder="SOS" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>SOS</SelectLabel>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="submitted">
+                    <CheckCheck className=" text-green-500 mr-2" />
+                  </SelectItem>
+                  <SelectItem value="not-submitted">
+                    <XCircle className="mr-2 text-red-500" />
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div>
             <Select
               value={
@@ -164,8 +209,8 @@ export function DataTable<TData, TValue>({
                   ?.setFilterValue(value === "all" ? "" : value)
               }
             >
-              <SelectTrigger className="lg:w-fit w-full">
-                <SelectValue placeholder="Payment" />
+              <SelectTrigger className="lg:w-fit w-full border-0">
+                <SelectValue placeholder="Payment Mode" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
@@ -178,23 +223,53 @@ export function DataTable<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          <Label htmlFor="ptptn_proof_status" className="text-muted-foreground">
-            Proof
-          </Label>
-          <Switch
-            id="ptptn_proof_status"
-            checked={
-              table.getColumn("ptptn_proof_status")?.getFilterValue() === true
-            }
-            onCheckedChange={(value) => {
-              table.getColumn("ptptn_proof_status")?.setFilterValue(value);
+
+          <ToggleGroup
+            type="single"
+            variant={"default"}
+            spacing={2}
+            onValueChange={(value) => {
+              table
+                .getColumn("ptptn_proof_status")
+                ?.setFilterValue(value ? true : false);
             }}
-            defaultChecked={true}
-          />
-          <Label htmlFor="study_mode" className="text-muted-foreground">
-            Mode
-          </Label>
-          <Switch
+            className="space-x-4"
+          >
+            <ToggleGroupItem
+              value="true"
+              aria-label="Toggle true"
+              className="data-[state=on]:bg-green-200 dark:data-[state=on]:bg-green-700 dark:data-[state=on]:text-white data-[state=on]:text-black data-[state=off]:bg-red-200 dark:data-[state=off]:bg-red-700 dark:data-[state=off]:text-white data-[state=off]:text-black"
+            >
+              <CheckCircle className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+
+          <ToggleGroup
+            type="single"
+            variant={"default"}
+            defaultValue="Online"
+            spacing={2}
+            onValueChange={(value) => {
+              table.getColumn("study_mode")?.setFilterValue(value);
+            }}
+            className="space-x-2"
+          >
+            <ToggleGroupItem
+              value="Online"
+              aria-label="Toggle Online"
+              className="data-[state=on]:bg-purple-200 dark:data-[state=on]:bg-purple-700 dark:data-[state=on]:text-white data-[state=on]:text-black"
+            >
+              <Laptop className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="Conventional"
+              aria-label="Toggle Conventional"
+              className="data-[state=on]:bg-amber-200 dark:data-[state=on]:bg-amber-700 dark:data-[state=on]:text-white data-[state=on]:text-black"
+            >
+              <School className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+          {/*  <Switch
             id="study_mode"
             checked={
               table.getColumn("study_mode")?.getFilterValue() === "Online"
@@ -205,8 +280,36 @@ export function DataTable<TData, TValue>({
                 ?.setFilterValue(value ? "Online" : "Conventional");
             }}
             defaultChecked={true}
-          />
-          <div className="absolute -top-8 right-2">
+          /> */}
+          <div className="absolute -top-12 right-2 flex flex-row gap-4 items-center justify-end">
+            <div>
+              <Select
+                value={
+                  (table.getColumn("sst_id")?.getFilterValue() as string) ?? ""
+                }
+                onValueChange={(value) =>
+                  table
+                    .getColumn("sst_id")
+                    ?.setFilterValue(value === "all" ? "" : value)
+                }
+              >
+                <SelectTrigger className="lg:w-fit w-full">
+                  <SelectValue placeholder="SST" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>SST Members</SelectLabel>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="1">Amirul</SelectItem>
+                    <SelectItem value="2">Farzana</SelectItem>
+                    <SelectItem value="3">Najwa</SelectItem>
+                    <SelectItem value="4">Ayu</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <DataTableViewOptions table={table} />
+
             <p className="text-xs italic text-muted-foreground">
               {filteredCount}/{data.length}
             </p>
@@ -225,7 +328,7 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className={`${header.column.id === "full_name" || header.column.id === "select" ? "sticky left-0 bg-background" : ""}`}
+                      className={`${header.column.id === "name" ? "sticky left-0 z-20" : ""}`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -243,14 +346,15 @@ export function DataTable<TData, TValue>({
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={row.id}
+                  key={row.index}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => row.toggleSelected()}
+                  className="cursor-pointer"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={`${cell.column.id === "full_name" || cell.column.id === "select" ? "sticky left-0 bg-background" : ""}`}
+                      className={`${cell.column.id === "name" ? "sticky left-0 z-20 py-4 " : ""} ${row.getIsSelected() ? "font-bold " : "text-stone-500"} bg-white  dark:bg-black text-black dark:text-white`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -285,7 +389,7 @@ export function DataTable<TData, TValue>({
                 key={row.id}
               >
                 <NewStudentCard
-                  student={row.original as Student}
+                  student={row.original as StudentDashboardRow}
                   index={index + 1}
                 />
               </div>

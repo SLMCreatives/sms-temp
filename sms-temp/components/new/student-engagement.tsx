@@ -11,6 +11,8 @@ import {
 import { Button } from "../ui/button";
 import { StudentDashboardRow } from "@/lib/types/database";
 import { NewEngagementForm } from "./engagement-form";
+import { Badge } from "../ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const sstMembers = [
   {
@@ -107,15 +109,34 @@ export default function StudentEngagement({
               className="flex flex-col gap-1 items-start border-b pb-2 pr-6"
             >
               {/* <MessageSquarePlus className="w-4 h-4 text-muted-foreground flex-shrink-0" /> */}
-              <p className="text-xs text-muted-foreground">
-                {engagement.topic}- {formattedDate(engagement.created_at)}
-              </p>
-              <p className="font-medium text-xs">{engagement.remarks}</p>
-              <p className="font-medium text-xs text-muted-foreground italic">
-                {engagement.sst_id
-                  ? sstMembers.find((sst) => sst.id === engagement.sst_id)?.name
-                  : "-"}
-              </p>
+
+              <div className="flex flex-row gap-4 items-start justify-start py-1">
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage
+                    src={
+                      engagement.sst_id
+                        ? sstMembers.find((sst) => sst.id === engagement.sst_id)
+                            ?.image
+                        : ""
+                    }
+                  />
+                  <AvatarFallback>{engagement.sst_id}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  {/* <p className="text-md text-muted-foreground font-bold">
+                    {engagement.topic}
+                  </p> */}
+                  <p className="font-medium text-xs pb-1 line-clamp-5">
+                    {" "}
+                    <span className="font-bold">{engagement.topic}</span>:{" "}
+                    {engagement.outcome.replace(/[._-]/g, " ").toUpperCase()} -{" "}
+                    {engagement.remarks}
+                  </p>
+                  <p className="text-xs text-muted-foreground/80 italic">
+                    {formattedDate(engagement.created_at)}
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>

@@ -14,6 +14,7 @@ export interface Student {
   a_engagements: Engagement[] | null;
   a_payments: Payment | null;
   a_lms_activity: LMSActivity | null;
+  a_sos: SOS | null;
 }
 
 // 2. Payment Tracking
@@ -58,6 +59,7 @@ export type StudentDashboardRow = Student & {
   lms?: LMSActivity;
   payment?: Payment;
   engagements?: Engagement[];
+  sos?: SOS;
 };
 
 export type StudentProgressionRow = {
@@ -79,3 +81,17 @@ export type StudentProgressionRow = {
   engagement_status: string;
   assigned_sst: string;
 };
+
+export interface SOS {
+  id: string;
+  matric_no: string;
+  created_at: string;
+  date_submitted: string;
+  q1: string;
+  q2: string;
+  q3: string;
+  q4: string;
+  q5: string;
+  nps: number;
+  feedback: string;
+}

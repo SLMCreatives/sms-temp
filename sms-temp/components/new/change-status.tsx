@@ -43,6 +43,7 @@ export default function NewChangeStatusForm({
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log(status);
     e.preventDefault();
     await handleStatusChange(status);
     router.refresh();
@@ -74,8 +75,8 @@ export default function NewChangeStatusForm({
       <DialogTrigger asChild>
         <Badge
           variant="outline"
-          className={`${status === "Withdraw" && "bg-red-200"} ${status === "Deferred" && "bg-orange-200"} ${status === "At Risk" && "bg-yellow-200"}
-           px-3 py-1 cursor-pointer hover:opacity-80 transition text-xs`}
+          className={`${status === "Withdraw" && "bg-red-200 dark:bg-red-600"} ${status === "Deferred" && "bg-amber-200 dark:bg-amber-600"} ${status === "At Risk" && "bg-yellow-200 dark:bg-yellow-600"} ${status === "Active" && "bg-green-200 dark:bg-green-600"}
+            cursor-pointer hover:opacity-80 transition border-0 dark:border-0`}
         >
           {status}
         </Badge>
@@ -88,7 +89,7 @@ export default function NewChangeStatusForm({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Select
             onValueChange={(status) => setStatus(status as StudentStatus)}
             defaultValue={status}

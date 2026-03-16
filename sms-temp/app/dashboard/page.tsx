@@ -22,7 +22,7 @@ async function getData(): Promise<Student[]> {
 
 export default async function Page({ searchParams }: Props) {
   const params = await searchParams;
-  const intake = typeof params?.intake === "string" ? params.intake : "JAN26";
+  const intake = typeof params?.intake === "string" ? params.intake : "MAR26";
 
   const data = await getData();
 

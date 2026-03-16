@@ -75,7 +75,13 @@ export default function NewChangePaymentForm({
         <Badge
           variant="outline"
           className={`
-           px-3 py-1 cursor-pointer hover:opacity-80 transition text-xs`}
+           cursor-pointer hover:opacity-80 transition border-0 capitalize ${
+             status === "PTPTN"
+               ? "bg-green-200 dark:bg-green-600 "
+               : status === "SELF"
+                 ? "bg-blue-200 dark:bg-blue-600 "
+                 : "bg-amber-200 dark:bg-amber-600"
+           }`}
         >
           {status}
         </Badge>

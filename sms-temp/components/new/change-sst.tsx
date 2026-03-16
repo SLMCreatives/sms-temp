@@ -73,7 +73,17 @@ export default function NewChangeSSTForm({
         <Badge
           variant="outline"
           className={`
-           px-3 py-1 cursor-pointer hover:opacity-80 transition text-xs border-0`}
+           cursor-pointer hover:opacity-80 transition text-xs border-0 ${
+             status === "1"
+               ? "bg-blue-200 dark:bg-blue-600"
+               : status === "2"
+                 ? "bg-amber-200 dark:bg-amber-600"
+                 : status === "3"
+                   ? "bg-green-200 dark:bg-green-600"
+                   : status === "4"
+                     ? "bg-pink-200 dark:bg-pink-600"
+                     : "bg-muted text-muted-foreground"
+           } `}
         >
           {status === "1"
             ? "Amirul"

@@ -26,6 +26,7 @@ import StudentEngagement from "./student-engagement";
 import StudentInfo from "./student-info";
 import StudentLMSActivity from "./student-lms";
 import StudentPayment from "./student-payment";
+import StudentSOS from "./student-sos";
 
 export const tabs = [
   {
@@ -45,6 +46,12 @@ export const tabs = [
     label: "Payment",
     icon: BanknoteArrowUp,
     color: "#d97706"
+  },
+  {
+    value: "sos",
+    label: "SOS",
+    icon: MessageCircle,
+    color: "#ef4444"
   },
   {
     value: "escalate",
@@ -169,6 +176,12 @@ export default function NewStudentList({
                           className="items-start w-full justify-center"
                         >
                           <StudentPayment student={student} />
+                        </TabsContent>
+                        <TabsContent
+                          value="sos"
+                          className="items-start w-full justify-center"
+                        >
+                          <StudentSOS student={student} />
                         </TabsContent>
                         <TabsContent
                           value="escalate"
