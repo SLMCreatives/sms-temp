@@ -3,6 +3,8 @@ import NewStudentList from "@/components/new/student-list";
 import { DataTable } from "./data-table";
 import { getData } from "./getData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const intakes = [
   { label: "TnP May-26", value: "TNP-C2-26" },
@@ -92,6 +94,14 @@ export default async function DemoPage() {
             />
           ))} */}
           {/*  <DataTable data={data} columns={newStudentColumns} /> */}
+          <Button
+            asChild
+            size="sm"
+            variant={"outline"}
+            onClick={() => toast.success("Toaster")}
+          >
+            Test Toaster
+          </Button>
         </div>
       </div>
     </div>

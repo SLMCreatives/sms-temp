@@ -49,6 +49,7 @@ import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "./view-options";
 import "@/app/globals.css";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -90,7 +91,14 @@ export function DataTable<TData, TValue>({
     autoResetPageIndex: false
   });
 
+  const router = useRouter();
   const filteredCount = table.getFilteredRowModel().rows.length;
+
+  const handleReset = () => {
+    table.resetColumnFilters();
+    table.resetSorting();
+    router.refresh();
+  };
 
   return (
     <div className="grid grid-cols-3 gap-8 gap-y-4 py-2">
@@ -315,7 +323,7 @@ export function DataTable<TData, TValue>({
             </p>
           </div>
           <div>
-            <Button variant="ghost" onClick={() => table.resetColumnFilters()}>
+            <Button variant="ghost" onClick={() => handleReset()}>
               <RefreshCcw className="w-4 h-4" />
             </Button>
           </div>

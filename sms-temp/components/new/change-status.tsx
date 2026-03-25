@@ -42,13 +42,27 @@ export default function NewChangeStatusForm({
 
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(status);
-    e.preventDefault();
-    await handleStatusChange(status);
-    router.refresh();
-  };
-
+  async function handleSubmit(formdata: FormData) {
+    try {
+      const { error } = await supabase
+        .from("a_students")
+        .update({ status: formdata.get("status") })
+        .eq("matric_no", matric_no)
+        .select()
+        .single();
+      if (error) {
+        toast.error("Error updating status: " + error);
+      } else {
+        toast.success("Student status updated to " + formdata.get("status"));
+        setStatus(formdata.get("status") as StudentStatus); // Update local state to reflect the change
+        setClose(false);
+        router.refresh();
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred." + error);
+    }
+  }
+  /* 
   const handleStatusChange = async (status: StudentStatus) => {
     try {
       const { error } = await supabase
@@ -66,7 +80,7 @@ export default function NewChangeStatusForm({
     } catch (error) {
       toast.error("An unexpected error occurred." + error);
     }
-  };
+  }; */
 
   const [open, setClose] = useState(false);
 
@@ -81,7 +95,7 @@ export default function NewChangeStatusForm({
           {status}
         </Badge>
       </DialogTrigger>
-      <DialogContent className="w-fit">
+      <DialogContent className="w-fit ring">
         <DialogHeader>
           <DialogTitle>Change Student Status</DialogTitle>
           <DialogDescription className="hidden">
@@ -89,10 +103,10 @@ export default function NewChangeStatusForm({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form action={handleSubmit} className="flex flex-col gap-4">
           <Select
             onValueChange={(status) => setStatus(status as StudentStatus)}
-            defaultValue={status}
+            value={status}
           >
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -105,7 +119,7 @@ export default function NewChangeStatusForm({
             </SelectContent>
           </Select>
           <DialogClose asChild>
-            <Button type="submit" className="w-full">
+            <Button type="button" className="w-full">
               Update Status
             </Button>
           </DialogClose>

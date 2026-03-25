@@ -36,29 +36,31 @@ export default function NewChangeSSTForm({
   matric_no,
   sst_id
 }: ChangePaymentFormProps) {
-  const [status, setStatus] = useState<SSTID>(sst_id as SSTID);
+  const [sstID, setsstID] = useState<SSTID>(sst_id as SSTID);
 
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await handlePaymentChange(status);
+    console.log(sstID);
+    await handleSSTchange(sstID);
     router.refresh();
   };
 
-  const handlePaymentChange = async (status: SSTID) => {
+  const handleSSTchange = async (sstID: SSTID) => {
+    console.log(sstID, matric_no);
     try {
       const { error } = await supabase
         .from("a_students")
-        .update({ sst_id: status })
+        .update({ sst_id: sstID })
         .eq("matric_no", matric_no)
         .select()
         .single();
       if (error) {
         toast.error("Error updating status: " + error);
       } else {
-        toast.success("Student status updated to " + status);
-        setStatus(status); // Update local state to reflect the change
+        toast.success("Student assigned SST updated to " + sstID);
+        setsstID(sstID); // Update local state to reflect the change
       }
     } catch (error) {
       toast.error("An unexpected error occurred." + error);
@@ -74,24 +76,24 @@ export default function NewChangeSSTForm({
           variant="outline"
           className={`
            cursor-pointer hover:opacity-80 transition text-xs border-0 ${
-             status === "1"
+             sst_id === "1"
                ? "bg-blue-200 dark:bg-blue-600"
-               : status === "2"
+               : sst_id === "2"
                  ? "bg-amber-200 dark:bg-amber-600"
-                 : status === "3"
+                 : sst_id === "3"
                    ? "bg-green-200 dark:bg-green-600"
-                   : status === "4"
+                   : sst_id === "4"
                      ? "bg-pink-200 dark:bg-pink-600"
                      : "bg-muted text-muted-foreground"
            } `}
         >
-          {status === "1"
+          {sst_id === "1"
             ? "Amirul"
-            : status === "2"
+            : sst_id === "2"
               ? "Farzana"
-              : status === "3"
+              : sst_id === "3"
                 ? "Najwa"
-                : status === "4"
+                : sst_id === "4"
                   ? "Ayu"
                   : "-"}
         </Badge>
@@ -104,10 +106,13 @@ export default function NewChangeSSTForm({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+        <form
+          onSubmit={(value) => handleSubmit(value)}
+          className="grid gap-4 py-4"
+        >
           <Select
-            onValueChange={(status) => setStatus(status as SSTID)}
-            defaultValue={status}
+            onValueChange={(value) => setsstID(value as SSTID)}
+            value={sstID}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Assign SST" />
@@ -121,7 +126,7 @@ export default function NewChangeSSTForm({
           </Select>
           <DialogClose asChild>
             <Button type="submit" className="w-full">
-              Update Status
+              Update SST
             </Button>
           </DialogClose>
         </form>

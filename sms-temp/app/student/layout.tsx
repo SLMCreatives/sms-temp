@@ -4,6 +4,7 @@ import {
   SidebarProvider,
   SidebarTrigger
 } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function ProtectedLayout({
   children
@@ -18,6 +19,7 @@ export default function ProtectedLayout({
           <SidebarInset>
             <SidebarTrigger className=" sticky top-2 left-2 z-40 md:hidden " />
             <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto  min-h-screen lg:pl-[250px] dark:bg-black">
+              <Toaster position="top-right" richColors />
               {children}
             </div>
           </SidebarInset>

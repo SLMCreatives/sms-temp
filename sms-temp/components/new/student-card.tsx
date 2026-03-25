@@ -1,8 +1,6 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import {
-  Phone,
   MessageCircle,
-  Inbox,
   AlertTriangle,
   BanknoteArrowUp,
   GraduationCap,
@@ -22,6 +20,7 @@ import StudentLMSActivity from "./student-lms";
 import StudentPayment from "./student-payment";
 import { StudentDashboardRow } from "@/lib/types/database";
 import StudentSOS from "./student-sos";
+import EditStudent from "./edit-student";
 
 const tabs = [
   {
@@ -121,10 +120,8 @@ export function NewStudentCard({
             </TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="w-full items-end justify-end flex gap-4">
-          <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-          <MessageCircle className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-          <Inbox className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+        <CardFooter className="w-full flex flex-row items-center justify-end absolute top-2 left-1">
+          <EditStudent student={student} />
         </CardFooter>
       </Card>
     </>
