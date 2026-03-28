@@ -3,35 +3,37 @@
 import { StudentMetrics } from "@/components/student-metrics";
 import { Student } from "@/lib/types/database";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
-} from "./ui/select";
-import { SelectItem } from "@radix-ui/react-select";
-import { useState } from "react";
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from "./ui/carousel";
 
 interface StudentMetricsProps {
   data: Student[];
-  intake: string;
 }
 
-export function StudentAttritionDashboard({
-  data,
-  intake
-}: StudentMetricsProps) {
-  const [selectedIntake, setSelectedIntake] = useState(intake ?? "MAR26");
+export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
   const db_students = data;
 
   const online_students = db_students.filter(
     (student) => student.study_mode === "Online"
   );
 
-  const Janonline = online_students.filter(
+  const mar26 = online_students.filter(
     (student) =>
-      student.intake_code === intake && student.study_mode === "Online"
+      student.intake_code === "MAR26" && student.study_mode === "Online"
+  );
+
+  const jan26 = online_students.filter(
+    (student) =>
+      student.intake_code === "JAN26" && student.study_mode === "Online"
+  );
+
+  const nov25 = online_students.filter(
+    (student) =>
+      student.intake_code === "NOV25" && student.study_mode === "Online"
   );
 
   /*   const db_fob = db_students?.filter(
@@ -45,18 +47,11 @@ export function StudentAttritionDashboard({
   const db_sit = db_students?.filter(
     (student) => student.faculty_code === "FAiFT"
   ); */
-
-  function handleIntakeChange(intake: string) {
-    window.location.href = `/dashboard?intake=${intake}`;
-  }
-
-  console.log(intake, selectedIntake);
-
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full items-start justify-start">
       {/* Header */}
-      <header className="border-b border-border">
-        <div className=" mx-auto px-6 py-4 w-full">
+      <header className="border-b border-border w-full flex">
+        <div className=" mx-auto px-6 py-4 w-full items-center justify-between gap-10">
           <div className="flex items-center  justify-between gap-4 w-full">
             <div>
               <h1 className="text-2xl font-semibold text-foreground">
@@ -66,37 +61,42 @@ export function StudentAttritionDashboard({
                 Monitor student engagement and identify at-risk students
               </p>
             </div>
-
-            <Select
-              value={selectedIntake}
-              onValueChange={(value) => {
-                setSelectedIntake(value);
-                handleIntakeChange(value);
-              }}
-            >
-              <SelectTrigger className="py-4 w-full">
-                <SelectValue placeholder="Intake" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>C1</SelectLabel>
-                  <SelectItem value="NOV25">Nov-25</SelectItem>
-                  <SelectItem value="JAN26">Jan-26</SelectItem>
-                </SelectGroup>
-                <SelectGroup>
-                  <SelectLabel>C2</SelectLabel>
-                  <SelectItem value="MAR26">Mar-26</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            {/* <Badge>{intake}</Badge> */}
           </div>
         </div>
       </header>
       {/* Main Content */}
       <main className="container mx-auto px-6 py-6 ">
         <div className="flex flex-col gap-6">
-          <StudentMetrics data={Janonline} />
+          <Carousel>
+            <CarouselContent className="w-full">
+              <CarouselItem>
+                <div className=" w-full mx-auto">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
+                    March 26
+                  </h3>
+                  <StudentMetrics data={mar26} />
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="w-full mx-auto">
+                  <h3 className="text-2xl font-semibold text-foreground mb-4">
+                    January 26
+                  </h3>
+                  <StudentMetrics data={jan26} />
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="w-full mx-auto">
+                  <h3 className="text-2xl font-semibold text-foreground mb-4">
+                    November 25
+                  </h3>
+                  <StudentMetrics data={nov25} />
+                </div>
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
         </div>
       </main>
     </div>

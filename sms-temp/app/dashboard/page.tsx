@@ -4,10 +4,6 @@ import { Student } from "@/lib/types/database";
 
 const supabase = createClient();
 
-type Props = {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-};
-
 async function getData(): Promise<Student[]> {
   const { data: students, error } = await supabase
     .from("a_students")
@@ -20,15 +16,12 @@ async function getData(): Promise<Student[]> {
   return students as Student[];
 }
 
-export default async function Page({ searchParams }: Props) {
-  const params = await searchParams;
-  const intake = typeof params?.intake === "string" ? params.intake : "MAR26";
-
+export default async function Page() {
   const data = await getData();
 
   return (
     <div className="flex flex-col mx-auto max-w-2xl lg:max-w-5xl items-start justify-start">
-      <StudentAttritionDashboard data={data} intake={intake} />
+      <StudentAttritionDashboard data={data} />
     </div>
   );
 }

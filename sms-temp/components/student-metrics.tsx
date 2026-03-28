@@ -28,7 +28,9 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
   );
 
   const positive = db_students.filter(
-    (student) => student.a_engagements?.at(-1)?.sentiment === "Positive"
+    (student) =>
+      engaged_students.includes(student) &&
+      student.a_engagements?.at(-1)?.sentiment === "Positive"
   );
 
   const negative = db_students.filter(
@@ -55,42 +57,38 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       !not_logged_in.includes(student)
   );
 
+  const self_payment = db_students.filter(
+    (student) => student.a_payments?.payment_mode === "SELF"
+  );
+
+  const payment_others = db_students.filter(
+    (student) =>
+      student.a_payments?.payment_mode !== "SELF" &&
+      student.a_payments?.payment_mode !== "PTPTN"
+  );
+
+  const ptptn = db_students.filter(
+    (student) => student.a_payments?.payment_mode === "PTPTN"
+  );
+
+  const ptptn_submittedproof = db_students.filter(
+    (student) =>
+      student.a_payments?.payment_mode === "PTPTN" &&
+      student.a_payments?.ptptn_proof_status === true
+  );
+
   const stats = [
     {
       title: "Active",
       value: active_students.length,
       icon: Users,
-      color: "text-primary"
+      color: "text-green-500"
     },
     {
       title: "SST Engaged",
       value: engaged_students.length,
       icon: Phone,
       color: "text-primary"
-    },
-    {
-      title: "Not Logged In",
-      value: not_logged_in.length,
-      icon: LogOut,
-      color: "text-destructive"
-    },
-    {
-      title: "Low CP",
-      value: low_progress.length,
-      icon: Loader,
-      color: "text-destructive"
-    },
-    {
-      title: "Deferred",
-      value: deferred.length,
-      icon: ClockAlert,
-      color: "text-amber-600"
-    },
-    {
-      title: "Withdrawn",
-      value: lost_students.length,
-      icon: LucideGhost,
-      color: "text-destructive"
     },
     {
       title: "Positive",
@@ -102,7 +100,55 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       title: "Negative",
       value: negative.length,
       icon: ThumbsDown,
-      color: "text-destructive"
+      color: "text-red-500"
+    },
+    {
+      title: "Not Logged In",
+      value: not_logged_in.length,
+      icon: LogOut,
+      color: "text-red-500"
+    },
+    {
+      title: "Low CP",
+      value: low_progress.length,
+      icon: Loader,
+      color: "text-yellow-500"
+    },
+    {
+      title: "Deferred",
+      value: deferred.length,
+      icon: ClockAlert,
+      color: "text-amber-600"
+    },
+    {
+      title: "Withdrawn",
+      value: lost_students.length,
+      icon: LucideGhost,
+      color: "text-red-500"
+    },
+    {
+      title: "Self Payment",
+      value: self_payment.length,
+      icon: Users,
+      color: "text-primary"
+    },
+    {
+      title: "Payment Others",
+      value: payment_others.length,
+      icon: Users,
+      color: "text-primary"
+    },
+    {
+      title: "PTPTN",
+      value: ptptn.length,
+      icon: Users,
+      color: "text-primary"
+    },
+    {
+      title: "Submitted Proof",
+      value: ptptn_submittedproof.length,
+      icon: Users,
+      color: "text-primary"
     }
   ];
 
@@ -110,124 +156,27 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
     <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
         <div key={stat.title}>
-          <Card className="bg-card border-border flex flex-col items-start justify-between">
+          <Card className="bg-card border flex flex-col items-start justify-between">
             <CardHeader className="flex flex-row items-center justify-between lg:pb-2 w-full">
               <div className="flex flex-col gap-1">
-                <CardTitle className="text-md font-medium text-muted-foreground">
+                <CardTitle className="text-base font-medium text-muted-foreground">
                   {stat.title}
                 </CardTitle>
               </div>
-              <stat.icon className={`w-4 h-4 ${stat.color} flex-shrink-0`} />
+              <stat.icon className={`w-5 h-5 ${stat.color} flex-shrink-0`} />
             </CardHeader>
             <CardContent className="flex flex-row items-end justify-between w-full">
               <p className="text-3xl font-bold text-foreground">{stat.value}</p>
               <p className="text-xs italic text-muted-foreground">
-                {((stat.value / active_students.length) * 100).toFixed(0)}%
+                {stat.title === "Positive" || stat.title === "Negative"
+                  ? ((stat.value / engaged_students.length) * 100).toFixed(1)
+                  : ((stat.value / db_students.length) * 100).toFixed(1)}
+                %
               </p>
             </CardContent>
           </Card>
         </div>
       ))}
-      {/* <Card className="bg-card border-border flex flex-col items-start justify-between">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex flex-col gap-1">
-            <CardTitle className="text-md font-medium text-muted-foreground">
-              Total Active Students
-            </CardTitle>
-            <CardDescription className="text-xs italic ">
-              Enrolled on CN
-            </CardDescription>
-          </div>
-          <Users className="h-4 w-4 text-success" />
-        </CardHeader>
-        <CardContent className="flex flex-row lg:flex-col-reverse justify-between">
-          <div className="flex flex-row justify-between items-end gap-2">
-            <p className="text-3xl font-bold text-foreground">
-              {active_students.length}{" "}
-            </p>
-            <span className="font-normal italic text-xl text-muted-foreground">
-              {Math.round((active_students.length / db_students.length) * 100)}%
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-card border-border flex flex-col items-start justify-between">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex flex-col gap-1">
-            <CardTitle className="text-md font-medium text-muted-foreground">
-              Not Logged In
-            </CardTitle>
-            <CardDescription className="text-xs italic ">
-              As of 3rd Feb 2026
-            </CardDescription>
-          </div>
-          <UserX className="h-4 w-4 text-warning" />
-        </CardHeader>
-        <CardContent className="flex flex-row lg:flex-col-reverse justify-between">
-          <div className="text-3xl font-bold text-foreground justify-between">
-            {not_logged_in.length}
-            <span className="italic font-normal">
-              {"  "}
-              {Math.round(
-                (not_logged_in.length / active_students.length) * 100
-              )}
-              %
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-card border-border flex flex-col items-start justify-between">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex flex-col gap-1">
-            <CardTitle className="text-md font-medium text-muted-foreground">
-              Zero Course Progress
-            </CardTitle>
-            <CardDescription className="text-xs italic ">
-              Excluding Not Logged In
-            </CardDescription>
-          </div>
-          <AlertCircle className="h-4 w-4 text-destructive" />
-        </CardHeader>
-        <CardContent className="flex flex-row lg:flex-col-reverse justify-between">
-          <div className="text-3xl font-bold text-foreground">
-            {zero_progress.length.toLocaleString()}
-            <span className="italic font-normal">
-              {"  "}
-              {Math.round(
-                (zero_progress.length / active_students.length) * 100
-              )}
-              %
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-card border-border flex flex-col items-start justify-between">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex flex-col gap-1">
-            <CardTitle className="text-md font-medium text-muted-foreground">
-              Less than 20% Course Progress
-            </CardTitle>
-            <CardDescription className="text-xs italic ">
-              Excluding Zero Progress
-            </CardDescription>
-          </div>
-
-          <AlertCircle className="h-4 w-4 text-warning" />
-        </CardHeader>
-        <CardContent className="flex flex-row lg:flex-col-reverse  justify-between">
-          <div className="text-3xl font-bold text-foreground">
-            {low_progress.length.toLocaleString()}
-            <span className="italic font-normal">
-              {"  "}
-              {Math.round((low_progress.length / active_students.length) * 100)}
-              %
-            </span>
-          </div>
-        </CardContent>
-      </Card> */}
     </div>
   );
 }
