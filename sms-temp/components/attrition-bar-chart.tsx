@@ -57,7 +57,7 @@ const chartConfig = {
   },
   2024: {
     label: "2024",
-    color: "#ade8f4"
+    color: "#2ebfa5"
   }
 } satisfies ChartConfig;
 
@@ -80,8 +80,8 @@ export function AttritionBarChart(data: any) {
 
   return (
     <Card className="bg-card border-stone-400/50 border flex flex-col w-full relative">
-      <CardHeader className="flex flex-col items-start justify-start absolute top-2 left-2">
-        <CardTitle className="text-sm font-bold">
+      <CardHeader className="flex flex-col items-start justify-start absolute top-4 left-10  z-30">
+        <CardTitle className="text-sm font-bold italic text-stone-600 dark:text-stone-400">
           Online Attrition Rate
         </CardTitle>
         <CardDescription className="">
@@ -90,10 +90,13 @@ export function AttritionBarChart(data: any) {
               {chartData.find((d) => d.month === lastMonthName)?.[2026] + "%"}
             </p>
             <div className="flex flex-row gap-2 items-center justify-start text-xs">
-              <Badge variant="default" className="bg-green-200">
+              <Badge
+                variant="default"
+                className="bg-green-200 dark:bg-green-700"
+              >
                 {vsLastYearAttrition}%
               </Badge>{" "}
-              <p className="text-stone-400 dark:text-stone-600 italic text-xs">
+              <p className="text-stone-600 dark:text-stone-400 italic text-xs">
                 vs 2025
               </p>
             </div>
@@ -101,21 +104,22 @@ export function AttritionBarChart(data: any) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[250px] w-full pt-4">
+        <ChartContainer config={chartConfig} className="h-full w-full">
           <LineChart
             accessibilityLayer
             data={chartData}
             margin={{
-              top: 30,
+              top: 10,
               right: 10,
-              left: 10,
+              left: -20,
               bottom: 0
             }}
           >
             <CartesianGrid
-              vertical={true}
+              vertical={false}
               horizontal={true}
-              strokeDasharray="2 2"
+              stroke="#c9cebd dark:#2b2b2b"
+              strokeWidth={"0.5"}
             />
             <XAxis
               dataKey="month"
@@ -123,15 +127,17 @@ export function AttritionBarChart(data: any) {
               tickMargin={10}
               axisLine={false}
               tickFormatter={(value) => value.slice(0, 3)}
-              style={{ fontSize: "10px" }}
+              style={{ fontSize: "10px", fill: "#818181 dark:#A5A5A6" }}
             />
-            {/* <YAxis
+            <YAxis
               tickLine={false}
               axisLine={false}
+              tickCount={8}
+              domain={[2, 16]}
               tickMargin={10}
-              tickFormatter={(value) => value + " " + "%"}
-              style={{ fontSize: "10px" }}
-            /> */}
+              tickFormatter={(value) => value + "%"}
+              style={{ fontSize: "10px", fill: "#818181 dark:#A5A5A6" }}
+            />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
             <Line
@@ -141,6 +147,7 @@ export function AttritionBarChart(data: any) {
               dot={{ fill: "var(--color-2024)" }}
               type={"natural"}
               activeDot={{ fill: "var(--color-2024)" }}
+              opacity={0.5}
             />
             <Line
               dataKey="2025"
@@ -149,6 +156,7 @@ export function AttritionBarChart(data: any) {
               dot={{ fill: "var(--color-2025)" }}
               type={"natural"}
               activeDot={{ fill: "var(--color-2025)" }}
+              opacity={0.5}
             />
             <Line
               dataKey="2026"

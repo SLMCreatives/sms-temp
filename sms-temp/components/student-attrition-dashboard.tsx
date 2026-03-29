@@ -2,14 +2,9 @@
 
 import { StudentMetrics } from "@/components/student-metrics";
 import { Student } from "@/lib/types/database";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious
-} from "./ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 import { AttritionBarChart } from "./attrition-bar-chart";
+//import { StudentVerticalStats } from "./new/right-sidebar";
 
 interface StudentMetricsProps {
   data: Student[];
@@ -57,20 +52,25 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
         </div>
       </header>
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-6 grid grid-cols-4 gap-4">
-        <div className="w-full mx-auto col-span-4 ">
+      <main className="container mx-auto px-6 py-6 grid grid-cols-4 gap-6">
+        <div className="w-full mx-auto col-span-3">
           <h3 className="text-xl font-semibold text-foreground mb-4">
             Attrition Rate (by Year)
           </h3>
           <AttritionBarChart data={db_students} />
         </div>
-        <div className="flex flex-col gap-6 col-span-3 py-6">
-          <Carousel>
-            <CarouselContent className="w-full">
+        <div className="col-span-1 h-full w-full">
+          <Carousel
+            opts={{
+              align: "center",
+              loop: true
+            }}
+          >
+            <CarouselContent className="w-full ">
               <CarouselItem>
                 <div className=" w-full mx-auto">
                   <h3 className="text-xl font-semibold text-foreground mb-4">
-                    March 26
+                    March 2026
                   </h3>
                   <StudentMetrics data={mar26} />
                 </div>
@@ -78,7 +78,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
               <CarouselItem>
                 <div className="w-full mx-auto">
                   <h3 className="text-xl font-semibold text-foreground mb-4">
-                    January 26
+                    January 2026
                   </h3>
                   <StudentMetrics data={jan26} />
                 </div>
@@ -86,16 +86,19 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
               <CarouselItem>
                 <div className="w-full mx-auto">
                   <h3 className="text-xl font-semibold text-foreground mb-4">
-                    November 25
+                    November 2025
                   </h3>
                   <StudentMetrics data={nov25} />
                 </div>
               </CarouselItem>
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            {/*  <CarouselPrevious />
+            <CarouselNext /> */}
           </Carousel>
+          {/* 
+          <StudentVerticalStats data={mar26} /> */}
         </div>
+        <div className="flex flex-col gap-6 col-span-3 py-6"></div>
       </main>
     </div>
   );

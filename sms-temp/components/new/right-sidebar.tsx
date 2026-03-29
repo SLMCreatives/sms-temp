@@ -6,14 +6,14 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { Student } from "@/lib/types/database";
-import { Users, LogOut, LucideGhost } from "lucide-react";
-import { Progress } from "./ui/progress";
+import { Users, Phone, LogOut, LucideGhost, ThumbsUp } from "lucide-react";
+import { Progress } from "../ui/progress";
 
 interface StudentMetricsProps {
   data: Student[];
 }
 
-export function StudentMetrics({ data }: StudentMetricsProps) {
+export function StudentVerticalStats({ data }: StudentMetricsProps) {
   const db_students = data as Student[];
   const active_students = db_students.filter(
     (student) => student.status === "Active" || student.status === "At-Risk"
@@ -25,11 +25,11 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
     )
   );
 
-  /*   const positive = db_students.filter(
+  const positive = db_students.filter(
     (student) =>
       engaged_students.includes(student) &&
       student.a_engagements?.at(-1)?.sentiment === "Positive"
-  ); */
+  );
 
   /* const negative = db_students.filter(
     (student) => student.a_engagements?.at(-1)?.sentiment === "Negative"
@@ -82,20 +82,20 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       icon: Users,
       color: "text-green-500"
     },
-    /*   {
+    {
       title: "Engaged",
       value: engaged_students.length,
       icon: Phone,
       color: "text-primary"
-    }, */
-    /* {
+    },
+    {
       title: "Positive",
       value: positive.length,
       icon: ThumbsUp,
       color: "text-green-500"
-    }, */
+    },
     {
-      title: "Zero Login",
+      title: "0 Login",
       value: not_logged_in.length,
       icon: LogOut,
       color: "text-red-500"
@@ -106,12 +106,6 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
       icon: LucideGhost,
       color: "text-red-500"
     }
-    /*  {
-      title: "Deferred",
-      value: deferred.length,
-      icon: LucideGhost,
-      color: "text-red-500"
-    } */
     /* {
       title: "Self Payment",
       value: self_payment.length,
@@ -139,7 +133,7 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
   ];
 
   return (
-    <div className="grid gap-4 grid-cols-2 lg:grid-cols-1 h-full lg:h-auto lg:gap-6">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-1">
       {stats.map((stat) => (
         <div key={stat.title}>
           <Card className="bg-card border-stone-400/50 border flex flex-col items-start justify-between">

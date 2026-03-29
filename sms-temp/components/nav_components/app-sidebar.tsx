@@ -156,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         {/*  <NavUser user={data.user} /> */}
-        <div className="flex w-full flex-row items-end justify-end">
+        <div className="flex items-center gap-2 justify-end">
           <ThemeSwitcher />
         </div>
       </SidebarFooter>
