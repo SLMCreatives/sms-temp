@@ -9,6 +9,7 @@ import {
   LabelList,
   Line,
   LineChart,
+  ReferenceLine,
   XAxis,
   YAxis
 } from "recharts";
@@ -64,6 +65,8 @@ const chartConfig = {
 
 export function AttritionBarChart(data: any) {
   const today = new Date();
+  const thisMonth = today.getMonth();
+  const thisMonthName = today.toLocaleString("default", { month: "long" });
   const lastMonth = today.getMonth() - 1;
   const lastMonthName = new Date(today.getFullYear(), lastMonth).toLocaleString(
     "default",
@@ -138,6 +141,29 @@ export function AttritionBarChart(data: any) {
               tickMargin={10}
               tickFormatter={(value) => value + "%"}
               style={{ fontSize: "10px", fill: "#818181 dark:#A5A5A6" }}
+            />
+            <ReferenceLine
+              x={thisMonthName}
+              stroke="var(--color-2026)"
+              strokeDasharray="3 3"
+              label={{
+                value: chartData.find((d) => d.month === thisMonthName)?.[2026],
+                position: "top",
+                fill: "var(--color-2026)",
+                fontSize: "10px",
+                fontWeight: "bold"
+              }}
+            />
+            <ReferenceLine
+              x={"May"}
+              stroke="#818181"
+              label={{
+                value: "May Intake",
+                position: "right",
+                fill: "#818181 dark:#A5A5A6",
+                fontSize: "10px",
+                fontWeight: "bold"
+              }}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
