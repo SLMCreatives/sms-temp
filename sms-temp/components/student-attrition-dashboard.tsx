@@ -53,8 +53,8 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
         </div>
       </header>
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-6 grid grid-cols-4 gap-6">
-        <div className="w-full mx-auto col-span-3">
+      <main className="container mx-auto px-6 py-6 grid grid-cols-4 gap-6 gap-y-10">
+        <div className="w-full mx-auto col-span-4 ">
           <h3 className="text-xl font-semibold text-foreground mb-4">
             Attrition Rate (by Year)
           </h3>
@@ -99,7 +99,10 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
           {/* 
           <StudentVerticalStats data={mar26} /> */}
         </div>
-        <div className="flex flex-col gap-6 col-start-2 col-span-3 py-6">
+        <div className="flex flex-col gap-4 col-span-3 pb-6">
+          <h3 className="text-xl font-semibold text-foreground">
+            Engagement Tracker
+          </h3>
           <SSTEngagementTracker data={db_students} />
         </div>
       </main>

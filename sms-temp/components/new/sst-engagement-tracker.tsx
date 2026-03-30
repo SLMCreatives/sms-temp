@@ -85,7 +85,7 @@ export function SSTEngagementTracker({ data }: StudentMetricsProps) {
   });
 
   const intakes = [
-    { value: "all", label: "All" },
+    { value: "all", label: "All (Mar-26, Jan-26, Nov-25)" },
     { value: "MAR26", label: "March 2026" },
     { value: "JAN26", label: "January 2026" },
     { value: "NOV25", label: "November 2025" }
@@ -218,15 +218,21 @@ export function SSTEngagementTracker({ data }: StudentMetricsProps) {
                 </td>
                 <td className="text-center">{member.total}</td>
                 <td className="text-center">{member.engaged}</td>
-                <td className="text-center">
+                <td
+                  className={`text-center ${member.engagementRate >= 80 ? "" : "text-red-600"}`}
+                >
                   {member.engagementRate.toFixed(0)}%
                 </td>
                 <td className="text-center">{member.no_response}</td>
-                <td className="text-center">
+                <td
+                  className={`text-center ${member.no_responseRate >= 20 ? "text-red-600" : ""}`}
+                >
                   {member.no_responseRate.toFixed(0)}%
                 </td>
                 <td className="text-center">{member.withdrawn}</td>
-                <td className="text-center">
+                <td
+                  className={`text-center ${member.withdrawRate >= 10 ? "text-red-600" : ""}`}
+                >
                   {member.withdrawRate.toFixed(0)}%
                 </td>
               </tr>

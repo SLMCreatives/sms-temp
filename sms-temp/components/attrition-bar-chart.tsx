@@ -30,6 +30,7 @@ import {
 } from "./ui/card";
 import { toDate } from "date-fns";
 import { Badge } from "./ui/badge";
+import { Separator } from "./ui/separator";
 
 const chartData = [
   { month: "January", 2024: 3.7, 2025: 7.1, 2026: 3.7 },
@@ -104,7 +105,7 @@ export function AttritionBarChart(data: any) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-full w-full">
+        <ChartContainer config={chartConfig} className="h-[400px] w-full">
           <LineChart
             accessibilityLayer
             data={chartData}
@@ -140,6 +141,7 @@ export function AttritionBarChart(data: any) {
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
+            <Separator orientation="horizontal" className="my-2" />
             <Line
               dataKey="2024"
               stroke="var(--color-2024)"

@@ -139,13 +139,13 @@ export function StudentMetrics({ data }: StudentMetricsProps) {
   ];
 
   return (
-    <div className="grid gap-4 grid-cols-2 lg:grid-cols-1 h-full lg:h-auto lg:gap-6">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-1 h-full lg:h-auto lg:gap-4">
       {stats.map((stat) => (
         <div key={stat.title}>
           <Card className="bg-card border-stone-400/50 border flex flex-col items-start justify-between">
             <CardHeader className="flex flex-row items-center justify-between lg:pb-2 w-full">
-              <div className="flex flex-col gap-1">
-                <CardTitle className="text-xs font-bold text-muted-foreground">
+              <div className="flex flex-col gap-2">
+                <CardTitle className="text-sm font-bold text-muted-foreground">
                   {stat.title}
                 </CardTitle>
               </div>
