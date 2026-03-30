@@ -4,6 +4,7 @@ import { StudentMetrics } from "@/components/student-metrics";
 import { Student } from "@/lib/types/database";
 import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 import { AttritionBarChart } from "./attrition-bar-chart";
+import { SSTEngagementTracker } from "./new/sst-engagement-tracker";
 //import { StudentVerticalStats } from "./new/right-sidebar";
 
 interface StudentMetricsProps {
@@ -66,7 +67,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
               loop: true
             }}
           >
-            <CarouselContent className="w-full ">
+            <CarouselContent className="w-full">
               <CarouselItem>
                 <div className=" w-full mx-auto">
                   <h3 className="text-xl font-semibold text-foreground mb-4">
@@ -98,7 +99,9 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
           {/* 
           <StudentVerticalStats data={mar26} /> */}
         </div>
-        <div className="flex flex-col gap-6 col-span-3 py-6"></div>
+        <div className="flex flex-col gap-6 col-start-2 col-span-3 py-6">
+          <SSTEngagementTracker data={db_students} />
+        </div>
       </main>
     </div>
   );
