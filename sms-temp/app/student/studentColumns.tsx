@@ -232,7 +232,18 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     },
     enableSorting: false,
     enableColumnFilter: false
-  }, */
+  }, */ {
+    accessorKey: "campus_code",
+    id: "Campus Code",
+    header: "Campus",
+    cell: ({ row }) => {
+      return (
+        <div className="text-center w-full">
+          {row.original.campus_code || "-"}
+        </div>
+      );
+    }
+  },
   {
     accessorKey: "matric_no",
     header: "Matrix ID",

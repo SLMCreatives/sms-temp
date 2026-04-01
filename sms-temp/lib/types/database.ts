@@ -15,6 +15,7 @@ export interface Student {
   a_payments: Payment | null;
   a_lms_activity: LMSActivity | null;
   a_sos: SOS | null;
+  campus_code: string | null;
 }
 
 // 2. Payment Tracking
