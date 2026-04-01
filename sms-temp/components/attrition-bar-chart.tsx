@@ -36,7 +36,7 @@ import { Separator } from "./ui/separator";
 const chartData = [
   { month: "January", 2024: 3.7, 2025: 7.1, 2026: 3.7 },
   { month: "February", 2024: 3.7, 2025: 5.6, 2026: 3.8 },
-  { month: "March", 2024: 3.8, 2025: 5.1 },
+  { month: "March", 2024: 3.8, 2025: 5.1, 2026: 3.8 },
   { month: "April", 2024: 4.2, 2025: 5.6 },
   { month: "May", 2024: 7.7, 2025: 13.5 },
   { month: "June", 2024: 7.2, 2025: 9.4 },
@@ -82,23 +82,34 @@ export function AttritionBarChart(data: any) {
     lastMonthAttrition2026 - lastMonthAttrition2025
   ).toFixed(2);
 
+  const average2024 = (
+    chartData.reduce((acc, d) => acc + (d[2024] || 0), 0) / chartData.length
+  ).toFixed(2);
+  const average2025 = (
+    chartData.reduce((acc, d) => acc + (d[2025] || 0), 0) / chartData.length
+  ).toFixed(2);
+  const average2026 = (
+    chartData.reduce((acc, d) => acc + (d[2026] || 0), 0) / chartData.length
+  ).toFixed(2);
+
   return (
     <Card className="bg-card border-stone-400/50 border flex flex-col w-full relative">
       <CardHeader className="flex flex-col items-start justify-start absolute top-4 left-10  z-30">
         <CardTitle className="text-sm font-bold italic text-stone-600 dark:text-stone-400">
-          Online Attrition Rate
+          {lastMonthName} 2026
         </CardTitle>
         <CardDescription className="">
           <div className="flex flex-col gap-2">
             <p className="text-4xl text-muted-foreground pt-2">
-              {chartData.find((d) => d.month === lastMonthName)?.[2026] + "%"}
+              {chartData.find((d) => d.month === lastMonthName)?.[2026] + "%" ||
+                0 + "%"}
             </p>
             <div className="flex flex-row gap-2 items-center justify-start text-xs">
               <Badge
                 variant="default"
                 className="bg-green-200 dark:bg-green-700"
               >
-                {vsLastYearAttrition}%
+                {vsLastYearAttrition || 0}%
               </Badge>{" "}
               <p className="text-stone-600 dark:text-stone-400 italic text-xs">
                 vs 2025
@@ -113,7 +124,7 @@ export function AttritionBarChart(data: any) {
             accessibilityLayer
             data={chartData}
             margin={{
-              top: 10,
+              top: 20,
               right: 10,
               left: -20,
               bottom: 0
@@ -144,26 +155,56 @@ export function AttritionBarChart(data: any) {
             />
             <ReferenceLine
               x={thisMonthName}
+              stroke="#818181"
+              strokeWidth={80}
+              label={{
+                value: "This Month",
+                position: "top",
+                fill: "#818181",
+                fontSize: "10px",
+                fontWeight: "bold"
+              }}
+              opacity={0.1}
+            />
+            <ReferenceLine
+              y={average2024}
               stroke="var(--color-2026)"
               strokeDasharray="3 3"
               label={{
-                value: chartData.find((d) => d.month === thisMonthName)?.[2026],
-                position: "top",
+                value: `${average2024}% Threshold (2024 Avg)`,
+                position: "bottom",
+                fill: "var(--color-2026)",
+                fontSize: "10px",
+                fontWeight: "bold",
+                z: 1
+              }}
+              opacity={0.8}
+            />
+            <ReferenceLine
+              y={average2026}
+              stroke="var(--color-2026)"
+              strokeDasharray="3 3"
+              label={{
+                value: `${average2026}% 2026 Avg`,
+                position: "bottom",
                 fill: "var(--color-2026)",
                 fontSize: "10px",
                 fontWeight: "bold"
               }}
-            />
+            />{" "}
             <ReferenceLine
-              x={"May"}
-              stroke="#818181"
+              y={average2025}
+              stroke="var(--color-2026)"
+              strokeDasharray="3 3"
               label={{
-                value: "May Intake",
-                position: "right",
-                fill: "#818181 dark:#A5A5A6",
+                value: `${average2025}% Threshold (2025 Avg)`,
+                position: "bottom",
+                fill: "var(--color-2026)",
                 fontSize: "10px",
-                fontWeight: "bold"
+                fontWeight: "bold",
+                z: 1
               }}
+              opacity={0.5}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />

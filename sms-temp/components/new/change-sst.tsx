@@ -23,7 +23,7 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-type SSTID = "1" | "2" | "3" | "4";
+type SSTID = "1" | "2" | "3" | "4" | "6";
 
 interface ChangePaymentFormProps {
   matric_no: string;
@@ -95,7 +95,9 @@ export default function NewChangeSSTForm({
                 ? "Najwa"
                 : sst_id === "4"
                   ? "Ayu"
-                  : "-"}
+                  : sst_id === "6"
+                    ? "Miru"
+                    : "-"}
         </Badge>
       </DialogTrigger>
       <DialogContent className="w-fit">
@@ -122,6 +124,7 @@ export default function NewChangeSSTForm({
               <SelectItem value="4">Ayu</SelectItem>
               <SelectItem value="2">Farzana</SelectItem>
               <SelectItem value="3">Najwa</SelectItem>
+              <SelectItem value="6">Miru</SelectItem>
             </SelectContent>
           </Select>
           <DialogClose asChild>

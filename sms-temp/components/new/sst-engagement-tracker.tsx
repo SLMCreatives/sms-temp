@@ -22,8 +22,9 @@ const sstMembers = [
   { value: 1, label: "Amirul", image: "/sst/amirul.png" },
   { value: 2, label: "Farzana", image: "/sst/farzana.png" },
   { value: 3, label: "Najwa", image: "/sst/najwa.png" },
-  { value: 4, label: "Ayu", image: "/sst/ayu.jpeg" },
-  { value: 5, label: "Miruthala" }
+  { value: 4, label: "Ayu", image: "/sst/ayu.jpeg" }
+  /*   { value: 5, label: "Miruthala" }
+   */
 ];
 
 export function SSTEngagementTracker({ data }: StudentMetricsProps) {
@@ -85,10 +86,11 @@ export function SSTEngagementTracker({ data }: StudentMetricsProps) {
   });
 
   const intakes = [
-    { value: "all", label: "All (Mar-26, Jan-26, Nov-25)" },
+    { value: "all", label: "All (Mar-26, Jan-26)" },
     { value: "MAR26", label: "March 2026" },
-    { value: "JAN26", label: "January 2026" },
-    { value: "NOV25", label: "November 2025" }
+    { value: "JAN26", label: "January 2026" }
+    /*     { value: "NOV25", label: "November 2025" }
+     */
   ];
 
   const handleIntakeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

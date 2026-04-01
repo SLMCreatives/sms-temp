@@ -5,6 +5,7 @@ import { Student } from "@/lib/types/database";
 import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 import { AttritionBarChart } from "./attrition-bar-chart";
 import { SSTEngagementTracker } from "./new/sst-engagement-tracker";
+import { FacultyTracker } from "./new/faculty-tracker";
 //import { StudentVerticalStats } from "./new/right-sidebar";
 
 interface StudentMetricsProps {
@@ -12,7 +13,10 @@ interface StudentMetricsProps {
 }
 
 export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
-  const db_students = data;
+  const db_students = data.filter(
+    (student) =>
+      student.intake_code === "MAR26" || student.intake_code === "JAN26"
+  );
 
   const online_students = db_students.filter(
     (student) => student.study_mode === "Online"
@@ -28,10 +32,10 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
       student.intake_code === "JAN26" && student.study_mode === "Online"
   );
 
-  const nov25 = online_students.filter(
+  /*  const nov25 = online_students.filter(
     (student) =>
       student.intake_code === "NOV25" && student.study_mode === "Online"
-  );
+  ); */
 
   /*   const db_fob = db_students?.filter(
     (student) => student.faculty_code === "FOB"
@@ -58,7 +62,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
           <h3 className="text-xl font-semibold text-foreground mb-4">
             Attrition Rate (by Year)
           </h3>
-          <AttritionBarChart data={db_students} />
+          <AttritionBarChart data={online_students} />
         </div>
         <div className="col-span-1 h-full w-full">
           <Carousel
@@ -84,14 +88,14 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
                   <StudentMetrics data={jan26} />
                 </div>
               </CarouselItem>
-              <CarouselItem>
+              {/* <CarouselItem>
                 <div className="w-full mx-auto">
                   <h3 className="text-xl font-semibold text-foreground mb-4">
                     November 2025
                   </h3>
                   <StudentMetrics data={nov25} />
                 </div>
-              </CarouselItem>
+              </CarouselItem> */}
             </CarouselContent>
             {/*  <CarouselPrevious />
             <CarouselNext /> */}
@@ -99,11 +103,17 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
           {/* 
           <StudentVerticalStats data={mar26} /> */}
         </div>
-        <div className="flex flex-col gap-4 col-span-3 pb-6">
+        <div className="flex flex-col gap-4 col-span-3">
           <h3 className="text-xl font-semibold text-foreground">
             Engagement Tracker
           </h3>
-          <SSTEngagementTracker data={db_students} />
+          <SSTEngagementTracker data={online_students} />
+        </div>
+        <div className="flex flex-col gap-4 col-span-4">
+          <h3 className="text-xl font-semibold text-foreground">
+            Attrition by Faculty
+          </h3>
+          <FacultyTracker data={online_students} />
         </div>
       </main>
     </div>

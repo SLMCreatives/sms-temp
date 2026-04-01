@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-type SSTID = "1" | "2" | "3" | "4";
+type SSTID = "1" | "2" | "3" | "4" | "6";
 
 export type Engagements = {
   [x: string]: string | number | Date;

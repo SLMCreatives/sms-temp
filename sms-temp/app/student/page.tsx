@@ -39,8 +39,8 @@ export default async function DemoPage() {
 
       <div className="flex flex-col">
         <div className="lg:hidden flex">
-          <Tabs defaultValue="MAR26">
-            <TabsList className="flex gap-2 flex-row items-center justify-between ring">
+          <Tabs defaultValue="MAR26" className="flex flex-col gap-2">
+            <TabsList className="flex gap-2 flex-row items-center justify-between">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <p className="text-muted-foreground">Intakes:</p>
                 {intakes.map((intake) => (

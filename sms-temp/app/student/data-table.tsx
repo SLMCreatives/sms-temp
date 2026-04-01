@@ -312,6 +312,7 @@ export function DataTable<TData, TValue>({
                     <SelectItem value="2">Farzana</SelectItem>
                     <SelectItem value="3">Najwa</SelectItem>
                     <SelectItem value="4">Ayu</SelectItem>
+                    <SelectItem value="6">Miru</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
