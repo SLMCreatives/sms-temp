@@ -185,6 +185,7 @@ export function NewEngagementForm({ matric_no }: EngagementFormProps) {
                       <SelectItem value="2">Farzana</SelectItem>
                       <SelectItem value="3">Najwa</SelectItem>
                       <SelectItem value="4">Ayu</SelectItem>
+                      <SelectItem value="6">Miru</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
