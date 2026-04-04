@@ -107,7 +107,7 @@ export function FacultyTracker({ data }: StudentMetricsProps) {
         ...item,
         withdrawalRate: item.count > 0 ? (item.withdraw / item.count) * 100 : 0
       }))
-      .sort((a, b) => b.withdrawalRate - a.withdrawalRate);
+      .sort((a, b) => b.count - a.count);
   }, [data, selectedFaculty, selectedIntake, selectedLevel]);
 
   return (
@@ -181,7 +181,7 @@ export function FacultyTracker({ data }: StudentMetricsProps) {
               <th className="pb-2">Programme</th>
               <th className="pb-2 px-2 text-center">NE</th>
               <th className="pb-2 px-2 text-center">Withdrawn</th>
-              <th className="pb-2 px-2 text-center">%</th>
+              <th className="pb-2 px-2 text-center">% (W/NE)</th>
             </tr>
           </thead>
 

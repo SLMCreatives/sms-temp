@@ -22,9 +22,8 @@ const sstMembers = [
   { value: 1, label: "Amirul", image: "/sst/amirul.png" },
   { value: 2, label: "Farzana", image: "/sst/farzana.png" },
   { value: 3, label: "Najwa", image: "/sst/najwa.png" },
-  { value: 4, label: "Ayu", image: "/sst/ayu.jpeg" }
-  /*   { value: 5, label: "Miruthala" }
-   */
+  { value: 4, label: "Ayu", image: "/sst/ayu.jpeg" },
+  { value: 5, label: "Miruthala" }
 ];
 
 export function SSTEngagementTracker({ data }: StudentMetricsProps) {
