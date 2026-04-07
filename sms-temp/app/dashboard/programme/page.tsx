@@ -1,5 +1,5 @@
 import { StudentAttritionDashboard } from "@/components/student-attrition-dashboard";
-import { getData } from "../student/getData";
+import { getData } from "../../student/getData";
 
 export default async function Page() {
   const data = await getData();
