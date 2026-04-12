@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React from "react";
@@ -19,7 +20,9 @@ import {
   YAxis,
   Tooltip,
   RadialBar,
-  RadialBarChart
+  RadialBarChart,
+  CartesianGrid,
+  ReferenceLine
 } from "recharts";
 
 import {
@@ -48,12 +51,28 @@ import {
 
 // --- Mock Data ---
 const performanceData = [
-  { semester: "Sem 1", gpa: 3.5 },
-  { semester: "Sem 2", gpa: 3.7 },
-  { semester: "Sem 3", gpa: 3.85 }
+  { semester: "Sem 1", gpa: 3 },
+  { semester: "Sem 2", gpa: 3.5 },
+  { semester: "Sem 3", gpa: 3.85 },
+  { semester: "Sem 4", gpa: 0 },
+  { semester: "Sem 5", gpa: 0 },
+  { semester: "Sem 6", gpa: 0 },
+  { semester: "Sem 7", gpa: 0 },
+  { semester: "Sem 8", gpa: 0 }
 ];
 
-const healthScoreData = [{ score: 92, fill: "hsl(var(--chart-2))" }];
+const student = [
+  {
+    matric_no: "A1234567X",
+    full_name: "SITI AMALINA BINTI MOHD ALWEE",
+    programme: "Bachelor of Information Technology (Honours) - Online",
+    admission_date: "2025-01-19",
+    intake_code: "JAN2025",
+    current_semester: 4
+  }
+];
+
+//const healthScoreData = [{ score: 92, fill: "hsl(var(--chart-2))" }];
 
 const courses = [
   {
@@ -80,27 +99,67 @@ const courses = [
 ];
 
 const chartConfig = {
-  gpa: { label: "GPA", color: "hsl(var(--chart-1))" }
+  gpa: { label: "GPA", color: "hsl(var(--chart-1))" },
+  score: { label: "Health Score", color: "hsl(var(--chart-2))" }
 } satisfies ChartConfig;
 
 export default function StudentDashboard() {
+  const admission_date = student[0]?.admission_date;
+
+  const currentWeek = Math.ceil(
+    (new Date().getTime() - new Date(admission_date).getTime()) /
+      (1000 * 60 * 60 * 24 * 7)
+  );
+
+  const currentSemester = Math.ceil(currentWeek / 14);
+
+  const IntakeNamer = (intakeCode: string) => {
+    // Input string
+    const inputDate = intakeCode; // Example: "JAN2026"
+
+    // 1. Parse "JAN2026" (month name + year) to a Date object
+    // We add "1" to make it a valid date "1 JAN 2026"
+    const date = new Date(inputDate.replace(/([A-Za-z]+)(\d+)/, "$1 1 $2"));
+
+    // 2. Subtract one year
+    date.setFullYear(date.getFullYear());
+
+    // 3. Format back to "Jan 2025"
+    const result = date.toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric"
+    });
+    return result;
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50/50 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8 -mt-24 md:mt-0">
       <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Student Command Center
+          <h1 className="text-3xl font-bold tracking-tight sr-only">
+            Student Dashboard
           </h1>
-          <p className="text-slate-500">
-            Welcome back! Here is your academic overview for Jan 2026.
+          <p className="text-muted-foreground mt-1 italic">Welcome back!</p>
+          <p className="text-muted-foreground mt-1 text-5xl font-bold tracking-wide font-serif">
+            {student[0]?.full_name}
           </p>
         </div>
-        <Badge
-          variant="outline"
-          className="w-fit px-4 py-1 text-sm bg-white shadow-sm"
-        >
-          Jan 2026 Intake • Week 4
-        </Badge>
+        <div className="flex flex-row items-center justify-start gap-x-2">
+          <Badge
+            variant="outline"
+            className="w-fit px-4 py-1  text-sm shadow-sm"
+          >
+            {student[0]?.intake_code
+              ? IntakeNamer(student[0].intake_code)
+              : "Intake Code Unavailable"}
+          </Badge>
+          <Badge
+            variant="outline"
+            className="w-fit px-4 py-1 text-sm shadow-sm "
+          >
+            Week 12 / 14
+          </Badge>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -110,33 +169,29 @@ export default function StudentDashboard() {
             <CardTitle className="text-lg font-semibold">
               Admission Details
             </CardTitle>
-            <User className="h-5 w-5 text-slate-400" />
+            <User className="h-5 w-5 " />
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-sm text-slate-500">Status</span>
-              <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none">
+              <span className="text-sm ">Status</span>
+              <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none text-sm font-bold flex items-center gap-1 px-2">
                 Active Enrolled
               </Badge>
             </div>
             <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-sm text-slate-500">Payment</span>
+              <span className="text-sm">Payment</span>
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4 text-emerald-600" />
                 <span className="text-sm font-medium">Paid in Full</span>
               </div>
             </div>
             <div className="pt-2">
-              <p className="text-xs text-slate-400 uppercase font-bold mb-1">
-                Programme
-              </p>
-              <p className="text-sm font-medium">
-                Bachelor of Information Technology
-              </p>
+              <p className="text-xs uppercase font-bold mb-1">Programme</p>
+              <p className="text-sm font-medium">{student[0]?.programme}</p>
             </div>
           </CardContent>
-          <CardFooter className="bg-slate-50/80 mt-2 flex flex-col items-center py-4 rounded-b-lg">
-            <div className="h-[120px] w-full">
+          {/*  <CardFooter className="bg-slate-50/80 dark:bg-slate-800 mt-2 flex flex-col items-center py-4 rounded-lg">
+            <div className="h-[200px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <RadialBarChart
                   startAngle={180}
@@ -145,23 +200,23 @@ export default function StudentDashboard() {
                   outerRadius={80}
                   data={healthScoreData}
                 >
-                  <RadialBar dataKey="score" cornerRadius={10} />
+                  <RadialBar dataKey="score" cornerRadius={10} fill="#4F46E5" />
                   <text
                     x="50%"
                     y="80%"
                     textAnchor="middle"
-                    className="fill-slate-900 font-bold text-xl"
+                    className="fill-slate-900 dark:fill-slate-50 font-bold text-xl"
                   >
                     92%
                   </text>
                 </RadialBarChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-xs font-semibold text-slate-500 mt-[-20px] flex items-center gap-1">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-[-20px] flex items-center gap-1">
               <HeartPulse className="h-3 w-3 text-rose-500" /> Student Health
               Score
             </p>
-          </CardFooter>
+          </CardFooter> */}
         </Card>
 
         {/* --- SECTION 2: ACADEMIC PROGRESS --- */}
@@ -173,8 +228,16 @@ export default function StudentDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px] w-full">
+            <ChartContainer
+              config={chartConfig}
+              className="h-[200px] w-full -ml-5"
+            >
               <BarChart data={performanceData}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#e0e0e0"
+                />
                 <XAxis
                   dataKey="semester"
                   stroke="#888888"
@@ -189,23 +252,42 @@ export default function StudentDashboard() {
                   axisLine={false}
                   domain={[0, 4]}
                 />
+                <ReferenceLine
+                  x={"Sem" + " " + (currentSemester - 1)}
+                  stroke="#888888"
+                  strokeWidth={4}
+                  height={2}
+                  label={{
+                    value: "Current Semester",
+                    position: "insideTopLeft",
+                    fill: "#888888",
+                    fontSize: 10,
+                    fontStyle: "italic"
+                  }}
+                  strokeDasharray="3 3"
+                  className="pointer-events-none"
+                />
                 <Tooltip content={<ChartTooltipContent />} />
                 <Bar
                   dataKey="gpa"
                   fill="var(--color-gpa)"
                   radius={[4, 4, 0, 0]}
-                  barSize={40}
+                  barSize={30}
                 />
               </BarChart>
             </ChartContainer>
           </CardContent>
           <CardFooter className="border-t pt-4 flex justify-between">
             <div className="text-center">
-              <p className="text-xs text-slate-500">Current CGPA</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Current CGPA
+              </p>
               <p className="text-xl font-bold">3.85</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-slate-500">Credits Earned</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Credits Earned
+              </p>
               <p className="text-xl font-bold">8 / 40</p>
             </div>
             <Button variant="ghost" size="sm" className="text-indigo-600">
