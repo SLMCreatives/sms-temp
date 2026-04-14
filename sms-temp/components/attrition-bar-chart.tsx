@@ -36,7 +36,7 @@ import { Separator } from "./ui/separator";
 const chartData = [
   { month: "January", 2024: 3.7, 2025: 7.1, 2026: 3.7 },
   { month: "February", 2024: 3.7, 2025: 5.6, 2026: 3.8 },
-  { month: "March", 2024: 3.8, 2025: 5.1, 2026: 3.8 },
+  { month: "March", 2024: 3.8, 2025: 5.1, 2026: 4.3 },
   { month: "April", 2024: 4.2, 2025: 5.6 },
   { month: "May", 2024: 7.7, 2025: 13.5 },
   { month: "June", 2024: 7.2, 2025: 9.4 },
