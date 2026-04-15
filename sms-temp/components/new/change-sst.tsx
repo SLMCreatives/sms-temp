@@ -84,7 +84,9 @@ export default function NewChangeSSTForm({
                    ? "bg-green-200 dark:bg-green-600"
                    : sst_id === "4"
                      ? "bg-pink-200 dark:bg-pink-600"
-                     : "bg-muted text-muted-foreground"
+                     : sst_id === "6"
+                       ? "bg-violet-200 dark:bg-violet-600"
+                       : "bg-muted text-muted-foreground"
            } `}
         >
           {sst_id === "1"

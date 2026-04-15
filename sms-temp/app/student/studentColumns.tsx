@@ -10,10 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { StudentDashboardRow } from "@/lib/types/database";
 import { ColumnDef } from "@tanstack/react-table";
 import {
-  ArrowRightCircle,
   ArrowUpDown,
   CheckCheck,
   MessageCircle,
+  MessageCirclePlus,
   Phone,
   XCircle
 } from "lucide-react";
@@ -221,6 +221,25 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     ),
     enableSorting: false,
     enableHiding: true,
+    size: 10
+  },
+  {
+    header: "WhatsApp",
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center justify-center w-full">
+          <Button variant={"ghost"} size={"lg"} asChild>
+            <Link
+              href={`https://wa.me/6${row.original.phone?.replace(/[^0-9]/g, "")}`}
+              target="_blank"
+            >
+              {" "}
+              <MessageCirclePlus className="w-10 h-10 text-green-500" />
+            </Link>
+          </Button>
+        </div>
+      );
+    },
     size: 10
   },
   /* {
@@ -519,20 +538,6 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
       }
 
       return true; // "all" case (filterValue is undefined)
-    }
-  },
-  {
-    header: "Action",
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center justify-center w-full">
-          <Button variant={"ghost"} size={"sm"} asChild>
-            <Link href={`/student/${row.original.matric_no}`} target="_blank">
-              <ArrowRightCircle className="h-8 w-8" />
-            </Link>
-          </Button>
-        </div>
-      );
     }
   }
 ];
