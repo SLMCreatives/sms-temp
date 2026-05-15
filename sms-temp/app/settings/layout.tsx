@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
-export default function ProtectedLayout({
+export default function SettingsLayout({
   children
 }: {
   children: React.ReactNode;

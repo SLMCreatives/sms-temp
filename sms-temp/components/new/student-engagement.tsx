@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MessageSquarePlus } from "lucide-react";
+import { MessageSquarePlus, Trash } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -13,6 +13,7 @@ import { StudentDashboardRow } from "@/lib/types/database";
 import { NewEngagementForm } from "./engagement-form";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { toast } from "sonner";
 
 const sstMembers = [
   {
@@ -34,6 +35,11 @@ const sstMembers = [
     id: 3,
     name: "Najwa",
     image: "sst/najwa.png"
+  },
+  {
+    id: 6,
+    name: "Miru",
+    image: "sst/miru.png"
   }
 ];
 
@@ -126,7 +132,7 @@ export default function StudentEngagement({
                   {/* <p className="text-md text-muted-foreground font-bold">
                     {engagement.topic}
                   </p> */}
-                  <p className="font-medium text-xs pb-1 line-clamp-5">
+                  <p className="font-medium text-xs pb-1">
                     {" "}
                     <span className="font-bold">{engagement.topic}</span>:{" "}
                     {engagement.outcome.replace(/[._-]/g, " ").toUpperCase()} -{" "}
@@ -135,6 +141,15 @@ export default function StudentEngagement({
                   <p className="text-xs text-muted-foreground/80 italic">
                     {formattedDate(engagement.created_at)}
                   </p>
+                  <div className="flex flex-row gap-2 items-center w-full">
+                    <Button
+                      variant={"outline"}
+                      size={"lg"}
+                      className="w-fit ml-auto"
+                    >
+                      <Trash className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

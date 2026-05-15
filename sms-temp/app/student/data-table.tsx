@@ -47,7 +47,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { DataTableViewOptions } from "./view-options";
-import "@/app/globals.css";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useRouter } from "next/navigation";
 

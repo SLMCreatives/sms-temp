@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/nav_components/app-sidebar";
+import { UserProfile } from "@/components/new/user-profile";
 import {
   SidebarInset,
   SidebarProvider,
@@ -18,8 +19,11 @@ export default function ProtectedLayout({
           <AppSidebar />
           <SidebarInset>
             <SidebarTrigger className=" sticky top-2 left-2 z-40 md:hidden " />
-            <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto  min-h-screen lg:pl-[250px] dark:bg-black">
+            <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto lg:pl-[250px] dark:bg-black">
               <Toaster position="top-right" richColors />
+              <div className="fixed top-4 right-4">
+                <UserProfile />
+              </div>
               {children}
             </div>
           </SidebarInset>

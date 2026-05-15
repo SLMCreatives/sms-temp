@@ -119,7 +119,7 @@ export function NewEngagementForm({ matric_no }: EngagementFormProps) {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="min-h-screen dark:bg-black flex items-center justify-center px-4">
         <Card className="w-full max-w-md shadow-lg">
           <CardContent className="pt-6 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -139,7 +139,7 @@ export function NewEngagementForm({ matric_no }: EngagementFormProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen dark:bg-black">
       <div className="container mx-auto px-4 pb-6 md:py-8 max-w-4xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Student Information */}

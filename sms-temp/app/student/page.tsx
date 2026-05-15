@@ -27,7 +27,7 @@ export default async function DemoPage() {
   };
 
   return (
-    <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full lg:w-[100vw] items-start justify-start lg:justify-center ">
+    <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full lg:w-[100vw] lg:justify-center -mt-20 dark:bg-black">
       <div className="flex flex-row w-full pt-6 pb-2 justify-between">
         <div className="flex flex-row gap-1 items-end justify-between w-full">
           <h4 className="font-bold text-3xl ">SST.MS</h4>
@@ -44,7 +44,11 @@ export default async function DemoPage() {
               <div className="flex flex-row gap-2 items-center justify-center">
                 <p className="text-muted-foreground">Intakes:</p>
                 {intakes.map((intake) => (
-                  <TabsTrigger key={intake.value} value={intake.value}>
+                  <TabsTrigger
+                    key={intake.value}
+                    value={intake.value}
+                    className="data-[state=active]:bg-cyan-100 data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-cyan-600 dark:data-[state=active]:text-muted-foreground"
+                  >
                     {intake.label}
                   </TabsTrigger>
                 ))}

@@ -14,13 +14,13 @@ import {
   CardHeader,
   CardTitle
 } from "../ui/card";
-import StudentEngagement from "./student-engagement";
 import StudentInfo from "./student-info";
 import StudentLMSActivity from "./student-lms";
 import StudentPayment from "./student-payment";
 import { StudentDashboardRow } from "@/lib/types/database";
 import StudentSOS from "./student-sos";
 import EditStudent from "./edit-student";
+import StudentEngagement from "./student-engagement";
 
 const tabs = [
   {
