@@ -1,5 +1,5 @@
+"use client";
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MessageSquarePlus, Trash } from "lucide-react";
 import {
   Sheet,
@@ -14,6 +14,9 @@ import { NewEngagementForm } from "./engagement-form";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const sstMembers = [
   {
@@ -56,6 +59,23 @@ export default function StudentEngagement({
 }: {
   student: StudentDashboardRow;
 }) {
+  const router = useRouter();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Delete this engagement? This cannot be undone.")) return;
+    setDeletingId(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("a_engagements").delete().eq("id", id);
+    setDeletingId(null);
+    if (error) {
+      toast.error("Failed to delete engagement.");
+    } else {
+      toast.success("Engagement deleted.");
+      router.refresh();
+    }
+  };
+
   const formattedDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-GB", {
@@ -146,6 +166,8 @@ export default function StudentEngagement({
                       variant={"outline"}
                       size={"lg"}
                       className="w-fit ml-auto"
+                      disabled={deletingId === engagement.id}
+                      onClick={() => handleDelete(engagement.id)}
                     >
                       <Trash className="w-4 h-4" />
                     </Button>

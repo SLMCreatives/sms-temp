@@ -7,10 +7,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const intakes = [
-  { label: "TnP May-26", value: "TNP-C2-26" },
+  { label: "May-26", value: "MAY26" },
   { label: "Mar-26", value: "MAR26" },
-  { label: "Jan-26", value: "JAN26" },
-  { label: "Nov-25", value: "NOV25" }
+  { label: "Jan-26", value: "JAN26" }
 ];
 
 export const dynamic = "force-dynamic";
@@ -64,7 +63,7 @@ export default async function DemoPage() {
            */}{" "}
         </div>
         <div className="hidden lg:flex ">
-          <Tabs defaultValue="MAR26" className="flex flex-col gap-2">
+          <Tabs defaultValue="MAY26" className="flex flex-col gap-2">
             <TabsList className="flex gap-2 flex-row items-center justify-between ">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <p className="text-muted-foreground">Intakes:</p>
