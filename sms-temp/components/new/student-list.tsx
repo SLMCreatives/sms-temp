@@ -18,7 +18,13 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import FiltersSection from "./filters-section";
 import { StudentDashboardRow } from "@/lib/types/database";
-import { Drawer, DrawerContent, DrawerTrigger, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+  DrawerHeader,
+  DrawerTitle
+} from "../ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import StudentEngagement from "./student-engagement";
 import StudentInfo from "./student-info";
@@ -145,14 +151,12 @@ export default function NewStudentList({
                   </CardContent>
                 </Card>
               </DrawerTrigger>
-              <DrawerContent className="w-full h-full dark:bg-black">
+              <DrawerContent className="w-full h-full ">
                 <DrawerHeader className="sr-only">
-                  <DrawerTitle>
-                    Student Information
-                    </DrawerTitle>
-                    </DrawerHeader>
-                <Card className="w-full min-h-[285px] flex flex-col items-start justify-between gap-3 border-0 px-6">
-                  <CardHeader >
+                  <DrawerTitle>Student Information</DrawerTitle>
+                </DrawerHeader>
+                <Card className="w-full flex flex-col items-start justify-between gap-3 border-0 px-6 dark:bg-black bg-white">
+                  <CardHeader>
                     <CardTitle className="text-xl font-bold -mb-2 overflow-hidden text-ellipsis whitespace-nowrap w-full capitalize">
                       {student.full_name}
                     </CardTitle>

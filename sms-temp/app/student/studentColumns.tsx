@@ -1,9 +1,5 @@
 "use client";
 
-import NewChangePaymentForm from "@/components/new/change-payment";
-import NewChangePTPTNStatusForm from "@/components/new/change-ptptn-status";
-import NewChangeSSTForm from "@/components/new/change-sst";
-import NewChangeStatusForm from "@/components/new/change-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,7 +15,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-type SSTID = "1" | "2" | "3" | "4" | "6";
 
 export type Engagements = {
   [x: string]: string | number | Date;
@@ -314,13 +309,16 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
       return <div className="flex items-center justify-center">Status</div>;
     },
     cell: ({ row }) => {
+      const s = row.original.status;
+      const cls =
+        s === "Active"   ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-0" :
+        s === "At Risk"  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 border-0" :
+        s === "Deferred" ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-0" :
+        s === "Withdraw" ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-0" :
+        "border-0";
       return (
-        <div className="flex text-center justify-center text-xs w-20">
-          {" "}
-          <NewChangeStatusForm
-            matric_no={row.original.matric_no}
-            current_status={row.original.status}
-          />
+        <div className="flex justify-center">
+          <Badge className={cls}>{s ?? "-"}</Badge>
         </div>
       );
     }
@@ -336,15 +334,15 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
       );
     },
     cell: ({ row }) => {
+      const pm = row.original.a_payments?.payment_mode;
+      const cls =
+        pm === "PTPTN" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-0" :
+        pm === "SELF"  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-0" :
+        pm             ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-0" :
+        "border-0";
       return (
-        <div className="flex items-center justify-center gap-2">
-          {/* <Badge className="text-xs group" variant={"outline"}>
-            {row.original.a_payments?.payment_mode}
-          </Badge> */}
-          <NewChangePaymentForm
-            matric_no={row.original.matric_no}
-            payment_mode={row.original.a_payments?.payment_mode as string}
-          />
+        <div className="flex items-center justify-center">
+          <Badge className={cls}>{pm ?? "-"}</Badge>
         </div>
       );
     }
@@ -427,19 +425,16 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
       );
     },
     cell: ({ row }) => {
+      const isPTPTN = row.original.a_payments?.payment_mode === "PTPTN";
+      const approved = row.original.a_payments?.ptptn_proof_status;
       return (
-        <div className="flex items-center justify-center w-full gap-2">
-          {row.original.a_payments?.payment_mode === "PTPTN" ? (
-            <NewChangePTPTNStatusForm
-              matric_no={row.original.matric_no}
-              ptptn_proof_status={
-                row.original.a_payments?.ptptn_proof_status as boolean
-              }
-            />
+        <div className="flex items-center justify-center w-full">
+          {isPTPTN ? (
+            approved
+              ? <CheckCheck className="h-4 w-4 text-green-500" />
+              : <XCircle className="h-4 w-4 text-red-500" />
           ) : (
-            <div className="flex items-center justify-center w-full text-xs">
-              {row.original.a_payments?.payment_status}
-            </div>
+            <span className="text-xs">{row.original.a_payments?.payment_status ?? "-"}</span>
           )}
         </div>
       );
@@ -456,12 +451,21 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
       );
     },
     cell: ({ row }) => {
+      const id = row.original.sst_id;
+      const sst: Record<number, { name: string; cls: string }> = {
+        1: { name: "Amirul",  cls: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-0" },
+        2: { name: "Farzana", cls: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-0" },
+        3: { name: "Najwa",   cls: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-0" },
+        4: { name: "Ayu",     cls: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300 border-0" },
+        6: { name: "Miru",    cls: "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-300 border-0" },
+      };
+      const member = id ? sst[id] : null;
       return (
         <div className="flex items-center justify-center">
-          <NewChangeSSTForm
-            matric_no={row.original.matric_no}
-            sst_id={row.original.sst_id?.toString() as SSTID}
-          />
+          {member
+            ? <Badge className={member.cls}>{member.name}</Badge>
+            : <span className="text-xs text-muted-foreground">-</span>
+          }
         </div>
       );
     },

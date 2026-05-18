@@ -47,7 +47,7 @@ export interface Engagement {
   sst_id: number | null;
   topic: string;
   topic_other_remarks: string | null;
-  channel: string; // e.g., 'whatsapp', 'call'
+  channel: string; // e.g., 'whatsapp', 'call', 'email', 'teams'
   sentiment: "Positive" | "Neutral" | "Negative" | string;
   remarks: string | null;
   outcome: string;

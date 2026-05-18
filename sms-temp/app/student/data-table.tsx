@@ -408,9 +408,6 @@ export function DataTable<TData, TValue>({
             <p>Select A Student To View Details</p>
           </div>
         )}
-        {/*  <div className="flex flex-col w-full rounded-2xl bg-background p-4 drop-shadow-xl items-center justify-center">
-          <Calendar className="w-full h-full" />
-        </div> */}
       </div>
     </div>
   );

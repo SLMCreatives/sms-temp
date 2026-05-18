@@ -152,6 +152,15 @@
   border-color: var(--accent);
 }
 
+.dateLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
 .clearBtn {
   font-family: var(--mono);
   font-size: 11px;

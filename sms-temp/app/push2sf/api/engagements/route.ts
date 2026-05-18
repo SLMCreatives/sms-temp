@@ -49,13 +49,14 @@ export async function GET() {
         outcome,
         next_followup_date,
         created_at,
-        a_students!matric_no (
+        a_students!matric_no!inner (
           full_name,
           email,
           phone,
           intake_code
         )
       `)
+      .eq('a_students.intake_code', 'MAY26')
       .order('created_at', { ascending: false })
 
     if (error) throw error

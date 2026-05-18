@@ -74,7 +74,10 @@ export function NewStudentCard({
           </CardDescription>
         </CardHeader>
         <CardContent className="w-full h-full flex items-start justify-start">
-          <Tabs defaultValue="escalate" className="w-full flex flex-col gap-2">
+          <Tabs
+            defaultValue="information"
+            className="w-full flex flex-col gap-2"
+          >
             <TabsList className="bg-background h-full flex flex-row rounded-none border-b p-0 gap-4 items-center justify-end">
               {tabs.map((tab) => (
                 <TabsTrigger

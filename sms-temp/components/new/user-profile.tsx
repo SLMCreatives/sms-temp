@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { UserProfileClient } from "./user-profile-client";
 
 function getInitials(email: string, fullName?: string): string {
   if (fullName) {
@@ -22,11 +22,10 @@ export async function UserProfile() {
   const initials = getInitials(user.email ?? "??", fullName);
 
   return (
-    <div className="flex items-center space-x-4">
-      <Avatar className="h-10 w-10 rounded-full">
-        {avatarUrl && <AvatarImage src={avatarUrl} alt={fullName ?? user.email} />}
-        <AvatarFallback>{initials}</AvatarFallback>
-      </Avatar>
-    </div>
+    <UserProfileClient
+      avatarUrl={avatarUrl}
+      initials={initials}
+      fullName={fullName}
+    />
   );
 }

@@ -12,10 +12,8 @@ import {
 import styles from "./page.module.css";
 
 type FilterState = {
-  outcome: string;
-  channel: string;
-  sentiment: string;
-  intake_code: string;
+  date_from: string;
+  date_to: string;
   sst_id: string;
   search: string;
 };
@@ -56,10 +54,8 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<FilterState>({
-    outcome: "",
-    channel: "",
-    sentiment: "",
-    intake_code: "",
+    date_from: "",
+    date_to: "",
     sst_id: "",
     search: ""
   });
@@ -86,10 +82,16 @@ export default function HomePage() {
   }, [fetchData]);
 
   const filtered = engagements.filter((e) => {
-    if (filters.outcome && e.outcome !== filters.outcome) return false;
-    if (filters.channel && e.channel !== filters.channel) return false;
-    if (filters.sentiment && e.sentiment !== filters.sentiment) return false;
-    if (filters.intake_code && e.intake_code !== filters.intake_code) return false;
+    if (filters.date_from) {
+      const from = new Date(filters.date_from);
+      from.setHours(0, 0, 0, 0);
+      if (new Date(e.created_at) < from) return false;
+    }
+    if (filters.date_to) {
+      const to = new Date(filters.date_to);
+      to.setHours(23, 59, 59, 999);
+      if (new Date(e.created_at) > to) return false;
+    }
     if (filters.sst_id && String(e.sst_id) !== filters.sst_id) return false;
     if (filters.search) {
       const q = filters.search.toLowerCase();
@@ -102,13 +104,6 @@ export default function HomePage() {
     }
     return true;
   });
-
-  const outcomes = [
-    ...new Set(engagements.map((e) => e.outcome).filter(Boolean))
-  ];
-  const channels = [
-    ...new Set(engagements.map((e) => e.channel).filter(Boolean))
-  ];
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -205,58 +200,28 @@ export default function HomePage() {
               setFilters((f) => ({ ...f, search: e.target.value }))
             }
           />
-          <select
-            className={styles.select}
-            value={filters.outcome}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, outcome: e.target.value }))
-            }
-          >
-            <option value="">All Outcomes</option>
-            {outcomes.map((o) => (
-              <option key={o!} value={o!}>
-                {o}
-              </option>
-            ))}
-          </select>
-          <select
-            className={styles.select}
-            value={filters.channel}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, channel: e.target.value }))
-            }
-          >
-            <option value="">All Channels</option>
-            {channels.map((c) => (
-              <option key={c!} value={c!}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <select
-            className={styles.select}
-            value={filters.sentiment}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, sentiment: e.target.value }))
-            }
-          >
-            <option value="">All Sentiments</option>
-            <option value="Positive">Positive</option>
-            <option value="Neutral">Neutral</option>
-            <option value="Negative">Negative</option>
-          </select>
-          <select
-            className={styles.select}
-            value={filters.intake_code}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, intake_code: e.target.value }))
-            }
-          >
-            <option value="">All Intakes</option>
-            <option value="JAN26">JAN26</option>
-            <option value="MAR26">MAR26</option>
-            <option value="MAY26">MAY26</option>
-          </select>
+          <label className={styles.dateLabel}>
+            From
+            <input
+              type="date"
+              className={styles.select}
+              value={filters.date_from}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, date_from: e.target.value }))
+              }
+            />
+          </label>
+          <label className={styles.dateLabel}>
+            To
+            <input
+              type="date"
+              className={styles.select}
+              value={filters.date_to}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, date_to: e.target.value }))
+              }
+            />
+          </label>
           <select
             className={styles.select}
             value={filters.sst_id}
@@ -269,20 +234,16 @@ export default function HomePage() {
               <option key={id} value={id}>{name}</option>
             ))}
           </select>
-          {(filters.outcome ||
-            filters.channel ||
-            filters.sentiment ||
-            filters.intake_code ||
+          {(filters.date_from ||
+            filters.date_to ||
             filters.sst_id ||
             filters.search) && (
             <button
               className={styles.clearBtn}
               onClick={() =>
                 setFilters({
-                  outcome: "",
-                  channel: "",
-                  sentiment: "",
-                  intake_code: "",
+                  date_from: "",
+                  date_to: "",
                   sst_id: "",
                   search: ""
                 })
