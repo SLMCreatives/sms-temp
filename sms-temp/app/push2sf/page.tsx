@@ -1,0 +1,508 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+
+import { useEffect, useState, useCallback, Fragment } from "react";
+import {
+  Engagement,
+  SalesforceTask,
+  mapEngagementToSFTask
+} from "@/lib/sf-mapping";
+import styles from "./page.module.css";
+
+type FilterState = {
+  outcome: string;
+  channel: string;
+  sentiment: string;
+  intake_code: string;
+  sst_id: string;
+  search: string;
+};
+
+const SST_NAMES: Record<number, string> = {
+  1: "Amirul",
+  2: "Farzana",
+  3: "Najwa",
+  4: "Ayu",
+  6: "Miru"
+};
+
+const SENTIMENT_COLORS: Record<string, string> = {
+  Positive: "#16a34a",
+  Neutral: "#b45309",
+  Negative: "#dc2626"
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  Successful: "#16a34a",
+  "Not Started": "#b45309",
+  "No Reply": "#4b5563",
+  "Not Interested": "#dc2626",
+};
+
+const OUTCOME_LABELS: Record<string, string> = {
+  no_response: "No Response",
+  no_issue: "No Issue",
+  "followup-ro": "Follow-up (RO)",
+  "followup-sales": "Follow-up (Sales)",
+  withdrawn: "Withdrawn",
+  deferred: "Deferred",
+};
+
+export default function HomePage() {
+  const [engagements, setEngagements] = useState<Engagement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [filters, setFilters] = useState<FilterState>({
+    outcome: "",
+    channel: "",
+    sentiment: "",
+    intake_code: "",
+    sst_id: "",
+    search: ""
+  });
+  const [exported, setExported] = useState(false);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/push2sf/api/engagements");
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setEngagements(json.data);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const filtered = engagements.filter((e) => {
+    if (filters.outcome && e.outcome !== filters.outcome) return false;
+    if (filters.channel && e.channel !== filters.channel) return false;
+    if (filters.sentiment && e.sentiment !== filters.sentiment) return false;
+    if (filters.intake_code && e.intake_code !== filters.intake_code) return false;
+    if (filters.sst_id && String(e.sst_id) !== filters.sst_id) return false;
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      if (
+        !e.student_name?.toLowerCase().includes(q) &&
+        !e.matric_no?.toLowerCase().includes(q) &&
+        !e.student_email?.toLowerCase().includes(q)
+      )
+        return false;
+    }
+    return true;
+  });
+
+  const outcomes = [
+    ...new Set(engagements.map((e) => e.outcome).filter(Boolean))
+  ];
+  const channels = [
+    ...new Set(engagements.map((e) => e.channel).filter(Boolean))
+  ];
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selected.size === filtered.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(filtered.map((e) => e.id)));
+    }
+  };
+
+  const exportSelected = () => {
+    const toExport = engagements
+      .filter((e) => selected.has(e.id))
+      .map(mapEngagementToSFTask);
+
+    const blob = new Blob([JSON.stringify(toExport, null, 2)], {
+      type: "application/json"
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sf_tasks_${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setExported(true);
+    setTimeout(() => setExported(false), 3000);
+  };
+
+  const getSFStatus = (outcome: string | null) => {
+    const map: Record<string, string> = {
+      no_response: "No Reply",
+      no_issue: "Successful",
+      "followup-ro": "Not Started",
+      "followup-sales": "Not Started",
+      withdrawn: "Not Interested",
+      deferred: "Not Interested",
+    };
+    return outcome ? (map[outcome] ?? "Not Started") : "—";
+  };
+
+  return (
+    <div className={styles.shell}>
+      {/* Header */}
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <span className={styles.logo}>⬡</span>
+          <div>
+            <h1 className={styles.title}>Engagement Uploader</h1>
+            <p className={styles.subtitle}>
+              Supabase → Salesforce SST Activity
+            </p>
+          </div>
+        </div>
+        <div className={styles.headerRight}>
+          <div className={styles.stat}>
+            <span className={styles.statNum}>{engagements.length}</span>
+            <span className={styles.statLabel}>total</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statNum}>{filtered.length}</span>
+            <span className={styles.statLabel}>filtered</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statNum} style={{ color: "var(--accent)" }}>
+              {selected.size}
+            </span>
+            <span className={styles.statLabel}>selected</span>
+          </div>
+          <button
+            className={styles.refreshBtn}
+            onClick={fetchData}
+            disabled={loading}
+          >
+            {loading ? "↻" : "↺"} Refresh
+          </button>
+        </div>
+      </header>
+
+      {/* Toolbar */}
+      <div className={styles.toolbar}>
+        <div className={styles.filters}>
+          <input
+            className={styles.search}
+            placeholder="Search name, matric, email…"
+            value={filters.search}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, search: e.target.value }))
+            }
+          />
+          <select
+            className={styles.select}
+            value={filters.outcome}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, outcome: e.target.value }))
+            }
+          >
+            <option value="">All Outcomes</option>
+            {outcomes.map((o) => (
+              <option key={o!} value={o!}>
+                {o}
+              </option>
+            ))}
+          </select>
+          <select
+            className={styles.select}
+            value={filters.channel}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, channel: e.target.value }))
+            }
+          >
+            <option value="">All Channels</option>
+            {channels.map((c) => (
+              <option key={c!} value={c!}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <select
+            className={styles.select}
+            value={filters.sentiment}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, sentiment: e.target.value }))
+            }
+          >
+            <option value="">All Sentiments</option>
+            <option value="Positive">Positive</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Negative">Negative</option>
+          </select>
+          <select
+            className={styles.select}
+            value={filters.intake_code}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, intake_code: e.target.value }))
+            }
+          >
+            <option value="">All Intakes</option>
+            <option value="JAN26">JAN26</option>
+            <option value="MAR26">MAR26</option>
+            <option value="MAY26">MAY26</option>
+          </select>
+          <select
+            className={styles.select}
+            value={filters.sst_id}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, sst_id: e.target.value }))
+            }
+          >
+            <option value="">All SST</option>
+            {Object.entries(SST_NAMES).map(([id, name]) => (
+              <option key={id} value={id}>{name}</option>
+            ))}
+          </select>
+          {(filters.outcome ||
+            filters.channel ||
+            filters.sentiment ||
+            filters.intake_code ||
+            filters.sst_id ||
+            filters.search) && (
+            <button
+              className={styles.clearBtn}
+              onClick={() =>
+                setFilters({
+                  outcome: "",
+                  channel: "",
+                  sentiment: "",
+                  intake_code: "",
+                  sst_id: "",
+                  search: ""
+                })
+              }
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <div className={styles.actions}>
+          <button className={styles.selectAllBtn} onClick={selectAll}>
+            {selected.size === filtered.length && filtered.length > 0
+              ? "Deselect All"
+              : `Select All (${filtered.length})`}
+          </button>
+          <button
+            className={styles.exportBtn}
+            onClick={exportSelected}
+            disabled={selected.size === 0}
+          >
+            {exported ? "✓ Exported!" : `Export ${selected.size} to JSON`}
+          </button>
+        </div>
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className={styles.errorBanner}>
+          <span>⚠ {error}</span>
+          <button onClick={fetchData}>Retry</button>
+        </div>
+      )}
+
+      {/* Table */}
+      <div className={styles.tableWrap}>
+        {loading ? (
+          <div className={styles.loading}>
+            <div className={styles.loadingDots}>
+              <span />
+              <span />
+              <span />
+            </div>
+            <p>Fetching engagements…</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className={styles.empty}>No records match your filters.</div>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th className={styles.checkCol}>
+                  <input
+                    type="checkbox"
+                    checked={
+                      selected.size === filtered.length && filtered.length > 0
+                    }
+                    onChange={selectAll}
+                    className={styles.checkbox}
+                  />
+                </th>
+                <th>Student</th>
+                <th>Matric No</th>
+                <th>Channel / Topic</th>
+                <th>Outcome → SF Status</th>
+                <th>Sentiment</th>
+                <th>SST</th>
+                <th>Follow-up</th>
+                <th>Date</th>
+                <th className={styles.expandCol}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((e) => {
+                const sfStatus = getSFStatus(e.outcome);
+                const isSelected = selected.has(e.id);
+                const isExpanded = expandedRow === e.id;
+                return (
+                  <Fragment key={e.id}>
+                    <tr
+                      className={`${styles.row} ${isSelected ? styles.rowSelected : ""}`}
+                      onClick={() => toggleSelect(e.id)}
+                    >
+                      <td
+                        className={styles.checkCol}
+                        onClick={(ev) => ev.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelect(e.id)}
+                          className={styles.checkbox}
+                        />
+                      </td>
+                      <td>
+                        <div className={styles.studentName}>
+                          {e.student_name || "—"}
+                        </div>
+                        <div className={styles.studentEmail}>
+                          {e.student_email || ""}
+                        </div>
+                      </td>
+                      <td>
+                        <span className={styles.mono}>{e.matric_no}</span>
+                      </td>
+                      <td>
+                        <div className={styles.channel}>{e.channel || "—"}</div>
+                        <div className={styles.topic}>{e.topic || ""}</div>
+                      </td>
+                      <td>
+                        <div className={styles.outcomeWrap}>
+                          <span className={styles.outcome}>
+                            {e.outcome ? (OUTCOME_LABELS[e.outcome] ?? e.outcome) : "—"}
+                          </span>
+                          {e.outcome && (
+                            <>
+                              <span className={styles.arrow}>→</span>
+                              <span
+                                className={styles.sfStatus}
+                                style={{
+                                  color:
+                                    STATUS_COLORS[sfStatus] ??
+                                    "var(--text-muted)"
+                                }}
+                              >
+                                {sfStatus}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        {e.sentiment ? (
+                          <span
+                            className={styles.sentiment}
+                            style={{
+                              color:
+                                SENTIMENT_COLORS[e.sentiment] ??
+                                "var(--text-muted)"
+                            }}
+                          >
+                            {e.sentiment}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className={styles.sstName}>{e.sst_id ? (SST_NAMES[e.sst_id] ?? e.sst_id) : "—"}</td>
+                      <td className={styles.mono}>
+                        {e.next_followup_date || "—"}
+                      </td>
+                      <td className={styles.mono}>
+                        {e.created_at
+                          ? new Date(e.created_at).toLocaleDateString()
+                          : "—"}
+                      </td>
+                      <td className={styles.expandCol}>
+                        <button
+                          className={styles.expandBtn}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            setExpandedRow(isExpanded ? null : e.id);
+                          }}
+                        >
+                          {isExpanded ? "▲" : "▼"}
+                        </button>
+                      </td>
+                    </tr>
+                    {isExpanded && (
+                      <tr key={`${e.id}-detail`} className={styles.detailRow}>
+                        <td colSpan={10}>
+                          <div className={styles.detailGrid}>
+                            <div className={styles.detailSection}>
+                              <div className={styles.detailLabel}>Remarks</div>
+                              <div className={styles.detailValue}>
+                                {e.remarks || "—"}
+                              </div>
+                            </div>
+                            <div className={styles.detailSection}>
+                              <div className={styles.detailLabel}>
+                                Other Remarks
+                              </div>
+                              <div className={styles.detailValue}>
+                                {e.topic_other_remarks || "—"}
+                              </div>
+                            </div>
+                            <div className={styles.detailSection}>
+                              <div className={styles.detailLabel}>Phone</div>
+                              <div className={styles.detailValue}>
+                                {e.student_phone || "—"}
+                              </div>
+                            </div>
+                            <div className={styles.detailSection}>
+                              <div className={styles.detailLabel}>
+                                SF Comments Preview
+                              </div>
+                              <div className={styles.detailValue}>
+                                <pre className={styles.commentPreview}>
+                                  {e.remarks || "—"}
+                                </pre>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Footer */}
+      <footer className={styles.footer}>
+        <span className={styles.mono} style={{ color: "var(--text-dim)" }}>
+          Export produces sf_tasks_[date].json · Feed to Claude in Chrome to
+          upload to Salesforce
+        </span>
+      </footer>
+    </div>
+  );
+}

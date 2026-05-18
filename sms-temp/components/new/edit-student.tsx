@@ -143,7 +143,7 @@ export default function EditStudent({
     {
       value: student.phone,
       label: "Phone",
-      editable: false,
+      editable: true,
       table: "a_students"
     },
     {
@@ -304,8 +304,15 @@ export default function EditStudent({
       <div key={index} className="flex flex-col">
         <div className="text-xs italic">{item.label}</div>
 
-        {item.editable === false && (
-          <div className="text-sm font-bold">{item.value}</div>
+        {item.editable === true && !item.options && (
+          <input
+            type="text"
+            defaultValue={item.value ?? ""}
+            onChange={(e) =>
+              handleValueChange(item.table, item.label, e.target.value)
+            }
+            className="text-sm font-bold border rounded px-2 py-1 bg-transparent"
+          />
         )}
 
         {item.editable === true &&
