@@ -1,5 +1,6 @@
 "use client";
 
+import { WhatsAppCell } from "@/components/new/whatsapp-cell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,7 +10,6 @@ import {
   ArrowUpDown,
   CheckCheck,
   MessageCircle,
-  MessageCirclePlus,
   Phone,
   XCircle
 } from "lucide-react";
@@ -220,21 +220,14 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
   },
   {
     header: "WhatsApp",
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center justify-center w-full">
-          <Button variant={"ghost"} size={"lg"} asChild>
-            <Link
-              href={`https://wa.me/6${row.original.phone?.replace(/[^0-9]/g, "")}`}
-              target="_blank"
-            >
-              {" "}
-              <MessageCirclePlus className="w-10 h-10 text-green-500" />
-            </Link>
-          </Button>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="flex items-center justify-center w-full">
+        <WhatsAppCell
+          phone={row.original.phone}
+          studentName={row.original.full_name}
+        />
+      </div>
+    ),
     size: 10
   },
   /* {
