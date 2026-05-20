@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useEffect, useState, useCallback, Fragment } from "react";
+import { useEffect, useState, useCallback, useRef, Fragment } from "react";
 import {
   Engagement,
   SalesforceTask,
@@ -16,7 +16,18 @@ type FilterState = {
   date_to: string;
   sst_id: string;
   search: string;
+  outcomes: string[];
 };
+
+const OUTCOME_OPTIONS = [
+  "Contacted",
+  "Responded",
+  "No Response",
+  "In Progress",
+  "Resolved",
+  "Escalated",
+  "At Risk",
+];
 
 const SST_NAMES: Record<number, string> = {
   1: "Amirul",
@@ -57,10 +68,23 @@ export default function HomePage() {
     date_from: "",
     date_to: "",
     sst_id: "",
-    search: ""
+    search: "",
+    outcomes: []
   });
   const [exported, setExported] = useState(false);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [outcomeDropdownOpen, setOutcomeDropdownOpen] = useState(false);
+  const outcomeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (outcomeRef.current && !outcomeRef.current.contains(e.target as Node)) {
+        setOutcomeDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -102,6 +126,10 @@ export default function HomePage() {
       )
         return false;
     }
+    if (filters.outcomes.length > 0) {
+      const label = e.outcome ? (OUTCOME_LABELS[e.outcome] ?? e.outcome) : "";
+      if (!filters.outcomes.includes(label)) return false;
+    }
     return true;
   });
 
@@ -141,6 +169,15 @@ export default function HomePage() {
 
   const getSFStatus = (outcome: string | null) => {
     const map: Record<string, string> = {
+      // current outcome values
+      Contacted: "Successful",
+      Responded: "Successful",
+      "No Response": "No Reply",
+      "In Progress": "Successful",
+      Resolved: "Successful",
+      Escalated: "Successful",
+      "At Risk": "Not Interested",
+      // legacy DB values
       no_response: "No Reply",
       no_issue: "Successful",
       "followup-ro": "Not Started",
@@ -234,10 +271,56 @@ export default function HomePage() {
               <option key={id} value={id}>{name}</option>
             ))}
           </select>
+          <div className={styles.outcomeDropdown} ref={outcomeRef}>
+            <button
+              className={`${styles.select} ${styles.outcomeBtn} ${filters.outcomes.length > 0 ? styles.outcomeBtnActive : ""}`}
+              onClick={() => setOutcomeDropdownOpen((o) => !o)}
+              type="button"
+            >
+              {filters.outcomes.length === 0
+                ? "Outcome"
+                : `Outcome (${filters.outcomes.length})`}
+              <span className={styles.outcomeChevron}>{outcomeDropdownOpen ? "▲" : "▼"}</span>
+            </button>
+            {outcomeDropdownOpen && (
+              <div className={styles.outcomePanel}>
+                {OUTCOME_OPTIONS.map((opt) => {
+                  const checked = filters.outcomes.includes(opt);
+                  return (
+                    <label key={opt} className={styles.outcomeOption}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          setFilters((f) => ({
+                            ...f,
+                            outcomes: checked
+                              ? f.outcomes.filter((o) => o !== opt)
+                              : [...f.outcomes, opt]
+                          }))
+                        }
+                        className={styles.checkbox}
+                      />
+                      {opt}
+                    </label>
+                  );
+                })}
+                {filters.outcomes.length > 0 && (
+                  <button
+                    className={styles.outcomeClear}
+                    onClick={() => setFilters((f) => ({ ...f, outcomes: [] }))}
+                  >
+                    Clear selection
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
           {(filters.date_from ||
             filters.date_to ||
             filters.sst_id ||
-            filters.search) && (
+            filters.search ||
+            filters.outcomes.length > 0) && (
             <button
               className={styles.clearBtn}
               onClick={() =>
@@ -245,7 +328,8 @@ export default function HomePage() {
                   date_from: "",
                   date_to: "",
                   sst_id: "",
-                  search: ""
+                  search: "",
+                  outcomes: []
                 })
               }
             >

@@ -222,6 +222,82 @@
   cursor: not-allowed;
 }
 
+/* ─── Outcome multi-select ─── */
+.outcomeDropdown {
+  position: relative;
+}
+
+.outcomeBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.outcomeBtnActive {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.outcomeChevron {
+  font-size: 8px;
+  color: var(--text-dim);
+}
+
+.outcomePanel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 0;
+  min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.outcomeOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.outcomeOption:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.outcomeClear {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 7px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.outcomeClear:hover {
+  color: var(--text-muted);
+}
+
 /* ─── Error ─── */
 .errorBanner {
   display: flex;
