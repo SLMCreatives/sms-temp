@@ -16,6 +16,7 @@ export type Engagement = {
   student_phone?: string
   sst_name?: string
   intake_code?: string
+  opp_id?: string | null
 }
 
 export type SalesforceTask = {
@@ -33,6 +34,7 @@ export type SalesforceTask = {
   status: string
   task_record_type: string
   outcome_original: string | null
+  opp_id: string | null
 }
 
 const OUTCOME_TO_STATUS: Record<string, string> = {
@@ -67,5 +69,6 @@ export function mapEngagementToSFTask(engagement: Engagement): SalesforceTask {
     status: engagement.outcome ? (OUTCOME_TO_STATUS[engagement.outcome] ?? 'Not Started') : 'Not Started',
     task_record_type: 'SST Activity',
     outcome_original: engagement.outcome,
+    opp_id: engagement.opp_id ?? null,
   }
 }

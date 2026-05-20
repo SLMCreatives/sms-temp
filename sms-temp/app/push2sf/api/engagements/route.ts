@@ -6,6 +6,7 @@ type StudentJoin = {
   email: string | null
   phone: string | null
   intake_code: string | null
+  opp_id: string | null
 }
 
 type EngagementRow = {
@@ -53,7 +54,8 @@ export async function GET() {
           full_name,
           email,
           phone,
-          intake_code
+          intake_code,
+          opp_id
         )
       `)
       .eq('a_students.intake_code', 'MAY26')
@@ -80,6 +82,7 @@ export async function GET() {
         student_phone: student?.phone ?? '',
         intake_code: student?.intake_code ?? '',
         sst_name: e.sst_id ? (SST_NAMES[e.sst_id] ?? '') : '',
+        opp_id: student?.opp_id ?? null,
       }
     })
 
