@@ -51,12 +51,21 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const OUTCOME_LABELS: Record<string, string> = {
+  // current
+  Contacted: "Contacted",
+  Responded: "Responded",
+  "No Response": "No Response",
+  "In Progress": "In Progress",
+  Resolved: "Resolved",
+  Escalated: "Escalated",
+  "At Risk": "At Risk",
+  // legacy
   no_response: "No Response",
-  no_issue: "No Issue",
-  "followup-ro": "Follow-up (RO)",
-  "followup-sales": "Follow-up (Sales)",
-  withdrawn: "Withdrawn",
-  deferred: "Deferred",
+  no_issue: "Resolved",
+  "followup-ro": "In Progress",
+  "followup-sales": "In Progress",
+  withdrawn: "At Risk",
+  deferred: "At Risk",
 };
 
 function CachePanel({ onClose }: { onClose: () => void }) {
@@ -322,7 +331,6 @@ export default function HomePage() {
 
   const getSFStatus = (outcome: string | null) => {
     const map: Record<string, string> = {
-      // current outcome values
       Contacted: "Successful",
       Responded: "Successful",
       "No Response": "No Reply",
@@ -330,15 +338,10 @@ export default function HomePage() {
       Resolved: "Successful",
       Escalated: "Successful",
       "At Risk": "Not Interested",
-      // legacy DB values
-      no_response: "No Reply",
-      no_issue: "Successful",
-      "followup-ro": "Not Started",
-      "followup-sales": "Not Started",
-      withdrawn: "Not Interested",
-      deferred: "Not Interested",
     };
-    return outcome ? (map[outcome] ?? "Not Started") : "—";
+    if (!outcome) return "—";
+    const label = OUTCOME_LABELS[outcome] ?? outcome;
+    return map[label] ?? "Not Started";
   };
 
   return (

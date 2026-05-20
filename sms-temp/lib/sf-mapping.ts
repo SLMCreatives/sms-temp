@@ -38,6 +38,15 @@ export type SalesforceTask = {
 }
 
 const OUTCOME_TO_STATUS: Record<string, string> = {
+  // current
+  'Contacted': 'Successful',
+  'Responded': 'Successful',
+  'No Response': 'No Reply',
+  'In Progress': 'Successful',
+  'Resolved': 'Successful',
+  'Escalated': 'Successful',
+  'At Risk': 'Not Interested',
+  // legacy
   'no_response': 'No Reply',
   'no_issue': 'Successful',
   'followup-ro': 'Not Started',
@@ -47,12 +56,7 @@ const OUTCOME_TO_STATUS: Record<string, string> = {
 }
 
 export function mapEngagementToSFTask(engagement: Engagement): SalesforceTask {
-  const commentParts = [
-    engagement.remarks && `Remarks: ${engagement.remarks}`,
-    engagement.outcome && `Outcome: ${engagement.outcome}`,
-    engagement.sentiment && `Sentiment: ${engagement.sentiment}`,
-    engagement.topic_other_remarks && `Other: ${engagement.topic_other_remarks}`,
-  ].filter(Boolean)
+  const commentParts = [engagement.remarks].filter(Boolean)
 
   return {
     engagement_id: engagement.id,
