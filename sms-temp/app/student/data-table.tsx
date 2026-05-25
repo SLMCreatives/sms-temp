@@ -58,19 +58,11 @@ interface DataTableProps<TData, TValue> {
   isManager?: boolean;
 }
 
-const SST_NAMES: Record<number, string> = {
-  1: "Amirul",
-  2: "Farzana",
-  3: "Najwa",
-  4: "Ayu",
-  6: "Miru",
-};
-
 export function DataTable<TData, TValue>({
   columns,
   data,
   userSstId,
-  isManager = false,
+  isManager = false
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>({
@@ -117,12 +109,17 @@ export function DataTable<TData, TValue>({
   const scopedStudents = isManager
     ? allStudents
     : userSstId
-    ? allStudents.filter((s) => s.sst_id === userSstId)
-    : [];
+      ? allStudents.filter((s) => s.sst_id === userSstId)
+      : [];
   const zeroLoginStudents = scopedStudents.filter(
-    (s) => s.study_mode === "Online" && s.a_lms_activity != null && s.a_lms_activity.course_visits === 0
+    (s) =>
+      s.study_mode === "Online" &&
+      s.a_lms_activity != null &&
+      s.a_lms_activity.course_visits === 0
   );
-  const totalIntake = allStudents.filter((s) => s.study_mode === "Online").length;
+  const totalIntake = allStudents.filter(
+    (s) => s.study_mode === "Online"
+  ).length;
   const zeroLoginPct = totalIntake
     ? Math.round((zeroLoginStudents.length / totalIntake) * 100)
     : 0;
