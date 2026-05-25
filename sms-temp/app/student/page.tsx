@@ -5,6 +5,7 @@ import { getData } from "./getData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/server";
 
 const intakes = [
   { label: "May-26", value: "MAY26" },
@@ -16,7 +17,22 @@ export const dynamic = "force-dynamic";
 export const revalidate = 600;
 
 export default async function DemoPage() {
-  const data = await getData();
+  const [data, supabase] = await Promise.all([getData(), createClient()]);
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const MANAGER_EMAIL = "sulaiman.munaff@unitar.my";
+  const isManager = user?.email === MANAGER_EMAIL;
+
+  // For non-managers, resolve their sst_id from a_sst by login email
+  let userSstId: number | null = null;
+  if (!isManager && user?.email) {
+    const { data: sstRow } = await supabase
+      .from("a_sst")
+      .select("id")
+      .eq("email", user.email)
+      .maybeSingle();
+    userSstId = sstRow?.id ?? null;
+  }
 
   const filterIntakes = (intakeCode: string) => {
     const filteredData = data.filter(
@@ -83,6 +99,8 @@ export default async function DemoPage() {
                 <DataTable
                   data={filterIntakes(intake.value)}
                   columns={newStudentColumns}
+                  userSstId={userSstId}
+                  isManager={isManager}
                 />
               </TabsContent>
             ))}

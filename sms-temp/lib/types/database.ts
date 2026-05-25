@@ -9,6 +9,7 @@ export interface Student {
   status: string;
   faculty_code: string | null;
   programme_name: string | null;
+  study_level: string | null;
   sst_id: number | null; // Foreign Key to SST table
   created_at: string; // ISO Timestamp
   a_engagements: Engagement[] | null;

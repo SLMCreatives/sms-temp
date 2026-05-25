@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { StudentDashboardRow } from "@/lib/types/database";
 import { ColumnDef } from "@tanstack/react-table";
 import {
+  AlertTriangle,
   ArrowUpDown,
   CheckCheck,
   MessageCircle,
@@ -260,6 +261,22 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     accessorKey: "full_name",
     id: "name",
     header: "Full Name",
+    cell: ({ row }) => {
+      const lms = row.original.a_lms_activity;
+      const zeroLogin =
+        row.original.study_mode === "Online" &&
+        (lms?.course_visits ?? 0) === 0;
+      return (
+        <div className="flex items-center gap-1.5">
+          {zeroLogin && (
+            <AlertTriangle className="h-3.5 w-3.5 text-red-500 shrink-0" />
+          )}
+          <span className={zeroLogin ? "text-red-600 dark:text-red-400 font-medium" : ""}>
+            {row.original.full_name}
+          </span>
+        </div>
+      );
+    },
     filterFn: (row, columnId, filterValue) => {
       const name = String(row.getValue("name")).toLowerCase();
       const matric = String(row.original.matric_no).toLowerCase();
@@ -357,9 +374,16 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
       );
     },
     cell: ({ row }) => {
+      const visits = row.original.a_lms_activity?.course_visits ?? 0;
+      const cls =
+        visits === 0
+          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold rounded px-2 py-0.5"
+          : visits < 5
+          ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-semibold rounded px-2 py-0.5"
+          : "";
       return (
-        <div className="text-center w-full">
-          {row.original.a_lms_activity?.course_visits}
+        <div className="text-center w-full flex justify-center">
+          <span className={cls}>{visits}</span>
         </div>
       );
     }
@@ -369,11 +393,16 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     id: "CP W1",
     header: "CP W1",
     cell: ({ row }) => {
+      const val = row.original.a_lms_activity?.cp_w1 ?? 0;
+      const cls =
+        val === 0
+          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold rounded px-2 py-0.5"
+          : "";
       return (
-        <div className="text-center w-full">
-          {row.original.a_lms_activity?.cp_w1
-            ? (row.original.a_lms_activity?.cp_w1 * 100).toFixed(0) + "%"
-            : "-"}
+        <div className="text-center w-full flex justify-center">
+          <span className={cls}>
+            {val ? (val * 100).toFixed(0) + "%" : "0%"}
+          </span>
         </div>
       );
     }
@@ -383,11 +412,16 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     id: "CP W2",
     header: "CP W2",
     cell: ({ row }) => {
+      const val = row.original.a_lms_activity?.cp_w2 ?? 0;
+      const cls =
+        val === 0
+          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold rounded px-2 py-0.5"
+          : "";
       return (
-        <div className="text-center w-full">
-          {row.original.a_lms_activity?.cp_w2
-            ? (row.original.a_lms_activity?.cp_w2 * 100).toFixed(0) + "%"
-            : "-"}
+        <div className="text-center w-full flex justify-center">
+          <span className={cls}>
+            {val ? (val * 100).toFixed(0) + "%" : "0%"}
+          </span>
         </div>
       );
     }
@@ -397,11 +431,16 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     id: "CP W3",
     header: "CP W3",
     cell: ({ row }) => {
+      const val = row.original.a_lms_activity?.cp_w3 ?? 0;
+      const cls =
+        val === 0
+          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold rounded px-2 py-0.5"
+          : "";
       return (
-        <div className="text-center w-full">
-          {row.original.a_lms_activity?.cp_w3
-            ? (row.original.a_lms_activity?.cp_w3 * 100).toFixed(0) + "%"
-            : "-"}
+        <div className="text-center w-full flex justify-center">
+          <span className={cls}>
+            {val ? (val * 100).toFixed(0) + "%" : "0%"}
+          </span>
         </div>
       );
     }
