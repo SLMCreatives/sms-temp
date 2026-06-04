@@ -16,6 +16,7 @@ export type Engagement = {
   student_phone?: string
   sst_name?: string
   intake_code?: string
+  opp_id?: string | null
 }
 
 export type SalesforceTask = {
@@ -33,9 +34,19 @@ export type SalesforceTask = {
   status: string
   task_record_type: string
   outcome_original: string | null
+  opp_id: string | null
 }
 
 const OUTCOME_TO_STATUS: Record<string, string> = {
+  // current
+  'Contacted': 'Successful',
+  'Responded': 'Successful',
+  'No Response': 'No Reply',
+  'In Progress': 'Successful',
+  'Resolved': 'Successful',
+  'Escalated': 'Successful',
+  'At Risk': 'Not Interested',
+  // legacy
   'no_response': 'No Reply',
   'no_issue': 'Successful',
   'followup-ro': 'Not Started',
@@ -45,12 +56,7 @@ const OUTCOME_TO_STATUS: Record<string, string> = {
 }
 
 export function mapEngagementToSFTask(engagement: Engagement): SalesforceTask {
-  const commentParts = [
-    engagement.remarks && `Remarks: ${engagement.remarks}`,
-    engagement.outcome && `Outcome: ${engagement.outcome}`,
-    engagement.sentiment && `Sentiment: ${engagement.sentiment}`,
-    engagement.topic_other_remarks && `Other: ${engagement.topic_other_remarks}`,
-  ].filter(Boolean)
+  const commentParts = [engagement.remarks].filter(Boolean)
 
   return {
     engagement_id: engagement.id,
@@ -67,5 +73,6 @@ export function mapEngagementToSFTask(engagement: Engagement): SalesforceTask {
     status: engagement.outcome ? (OUTCOME_TO_STATUS[engagement.outcome] ?? 'Not Started') : 'Not Started',
     task_record_type: 'SST Activity',
     outcome_original: engagement.outcome,
+    opp_id: engagement.opp_id ?? null,
   }
 }

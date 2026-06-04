@@ -63,7 +63,8 @@ const COLUMN_GROUPS = [
       { key: "total_engagements", label: "Total Engagements" },
       { key: "last_engagement_date", label: "Last Engagement Date" },
       { key: "last_sentiment", label: "Last Sentiment" },
-      { key: "last_outcome", label: "Last Outcome" }
+      { key: "last_outcome", label: "Last Outcome" },
+      { key: "last_remarks", label: "Last Remarks" }
     ]
   },
   {
@@ -143,7 +144,13 @@ export default function DataExport() {
       if (selectedSsts.length > 0) q = q.in("sst_id", selectedSsts);
       return q;
     },
-    [selectedStatuses, selectedFaculties, selectedModes, selectedIntakes, selectedSsts]
+    [
+      selectedStatuses,
+      selectedFaculties,
+      selectedModes,
+      selectedIntakes,
+      selectedSsts
+    ]
   );
 
   useEffect(() => {
@@ -231,6 +238,7 @@ export default function DataExport() {
         last_engagement_date: lastEng?.created_at ?? null,
         last_sentiment: lastEng?.sentiment ?? null,
         last_outcome: lastEng?.outcome ?? null,
+        last_remarks: lastEng?.remarks ?? null,
         nps: s.a_sos?.nps ?? null,
         q1: s.a_sos?.q1 ?? null,
         q2: s.a_sos?.q2 ?? null,
@@ -314,7 +322,9 @@ export default function DataExport() {
               ))}
             </div>
             {selectedSsts.length === 0 && (
-              <p className="text-xs text-muted-foreground">All (no filter applied)</p>
+              <p className="text-xs text-muted-foreground">
+                All (no filter applied)
+              </p>
             )}
           </div>
         </div>

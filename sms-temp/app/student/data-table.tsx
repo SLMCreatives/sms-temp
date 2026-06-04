@@ -26,6 +26,7 @@ import { DataTablePagination } from "@/components/ui/paginationControls";
 import { NewStudentCard } from "@/components/new/student-card";
 import { StudentDashboardRow } from "@/lib/types/database";
 import {
+  AlertTriangle,
   CheckCheck,
   CheckCircle,
   Laptop,
@@ -53,11 +54,15 @@ import { useRouter } from "next/navigation";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  userSstId?: number | null;
+  isManager?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
-  data
+  data,
+  userSstId,
+  isManager = false
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>({
@@ -99,8 +104,43 @@ export function DataTable<TData, TValue>({
     router.refresh();
   };
 
+  // Students with 0 course visits — all SST for manager, own for SST member
+  const allStudents = data as StudentDashboardRow[];
+  const scopedStudents = isManager
+    ? allStudents
+    : userSstId
+      ? allStudents.filter((s) => s.sst_id === userSstId)
+      : [];
+  const zeroLoginStudents = scopedStudents.filter(
+    (s) =>
+      s.study_mode === "Online" &&
+      s.a_lms_activity != null &&
+      s.a_lms_activity.course_visits === 0
+  );
+  const totalIntake = allStudents.filter(
+    (s) => s.study_mode === "Online"
+  ).length;
+  const zeroLoginPct = totalIntake
+    ? Math.round((zeroLoginStudents.length / totalIntake) * 100)
+    : 0;
+  const showBanner = isManager || !!userSstId;
+
   return (
     <div className="grid grid-cols-3 gap-8 gap-y-4 py-2">
+      {showBanner && (
+        <div className="col-span-3 flex items-center gap-3 px-4 py-2.5 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+          <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+          <span className="text-sm font-semibold text-red-700 dark:text-red-300">
+            {isManager ? "All SST" : "My Students"} — Zero Logins
+          </span>
+          <span className="text-sm font-mono text-red-700 dark:text-red-300">
+            {zeroLoginStudents.length} / {totalIntake}
+          </span>
+          <span className="text-xs rounded-full bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200 px-2 py-0.5 font-mono font-semibold">
+            {zeroLoginPct}%
+          </span>
+        </div>
+      )}
       <div className="col-span-2 max-h-fit row-span-3 rounded-2xl container p-4 drop-shadow-xl relative border-0 ">
         <div className="flex items-center pb-4 w-full gap-2 border-b">
           <div className="flex flex-row gap-2 w-full items-center">
@@ -288,36 +328,33 @@ export function DataTable<TData, TValue>({
             }}
             defaultChecked={true}
           /> */}
-          <div className="absolute -top-12 right-2 flex flex-row gap-4 items-center justify-end">
-            <div>
-              <Select
-                value={
-                  (table.getColumn("sst_id")?.getFilterValue() as string) ?? ""
-                }
-                onValueChange={(value) =>
-                  table
-                    .getColumn("sst_id")
-                    ?.setFilterValue(value === "all" ? "" : value)
-                }
-              >
-                <SelectTrigger className="lg:w-fit w-full">
-                  <SelectValue placeholder="SST" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>SST Members</SelectLabel>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="1">Amirul</SelectItem>
-                    <SelectItem value="2">Farzana</SelectItem>
-                    <SelectItem value="3">Najwa</SelectItem>
-                    <SelectItem value="4">Ayu</SelectItem>
-                    <SelectItem value="6">Miru</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="ml-auto flex flex-row gap-4 items-center">
+            <Select
+              value={
+                (table.getColumn("sst_id")?.getFilterValue() as string) ?? ""
+              }
+              onValueChange={(value) =>
+                table
+                  .getColumn("sst_id")
+                  ?.setFilterValue(value === "all" ? "" : value)
+              }
+            >
+              <SelectTrigger className="lg:w-fit w-full border-0">
+                <SelectValue placeholder="SST" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>SST Members</SelectLabel>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="1">Amirul</SelectItem>
+                  <SelectItem value="2">Farzana</SelectItem>
+                  <SelectItem value="3">Najwa</SelectItem>
+                  <SelectItem value="4">Ayu</SelectItem>
+                  <SelectItem value="6">Miru</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <DataTableViewOptions table={table} />
-
             <p className="text-xs italic text-muted-foreground">
               {filteredCount}/{data.length}
             </p>

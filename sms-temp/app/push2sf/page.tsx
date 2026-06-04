@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useEffect, useState, useCallback, Fragment } from "react";
+import { useEffect, useState, useCallback, useRef, Fragment } from "react";
 import {
   Engagement,
   SalesforceTask,
@@ -16,7 +16,18 @@ type FilterState = {
   date_to: string;
   sst_id: string;
   search: string;
+  outcomes: string[];
 };
+
+const OUTCOME_OPTIONS = [
+  "Contacted",
+  "Responded",
+  "No Response",
+  "In Progress",
+  "Resolved",
+  "Escalated",
+  "At Risk",
+];
 
 const SST_NAMES: Record<number, string> = {
   1: "Amirul",
@@ -40,13 +51,174 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const OUTCOME_LABELS: Record<string, string> = {
+  // current
+  Contacted: "Contacted",
+  Responded: "Responded",
+  "No Response": "No Response",
+  "In Progress": "In Progress",
+  Resolved: "Resolved",
+  Escalated: "Escalated",
+  "At Risk": "At Risk",
+  // legacy
   no_response: "No Response",
-  no_issue: "No Issue",
-  "followup-ro": "Follow-up (RO)",
-  "followup-sales": "Follow-up (Sales)",
-  withdrawn: "Withdrawn",
-  deferred: "Deferred",
+  no_issue: "Resolved",
+  "followup-ro": "In Progress",
+  "followup-sales": "In Progress",
+  withdrawn: "At Risk",
+  deferred: "At Risk",
 };
+
+function CachePanel({ onClose }: { onClose: () => void }) {
+  const [jsonText, setJsonText] = useState("");
+  const [parseError, setParseError] = useState<string | null>(null);
+  const [allEntries, setAllEntries] = useState<any[] | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importCount, setImportCount] = useState<number | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+
+  const handleParse = () => {
+    setParseError(null);
+    setAllEntries(null);
+    setImportCount(null);
+    setImportError(null);
+    let parsed: any;
+    try {
+      parsed = JSON.parse(jsonText);
+    } catch {
+      setParseError("Invalid JSON — please check and try again.");
+      return;
+    }
+    let entries: any[];
+    if (Array.isArray(parsed)) {
+      entries = parsed;
+    } else if (typeof parsed === "object" && parsed !== null) {
+      entries = Object.entries(parsed).map(([key, val]) => {
+        if (typeof val === "object" && val !== null && !Array.isArray(val)) {
+          return { matric_no: key, ...(val as object) };
+        }
+        return { matric_no: key, value: val };
+      });
+    } else {
+      setParseError("Expected a JSON object (keyed by matric_no) or a flat array.");
+      return;
+    }
+    if (entries.length === 0) {
+      setParseError("No entries found in the pasted JSON.");
+      return;
+    }
+    setAllEntries(entries);
+  };
+
+  const handleConfirm = async () => {
+    if (!allEntries) return;
+    setImporting(true);
+    setImportError(null);
+    try {
+      const res = await fetch("/push2sf/api/cache", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entries: allEntries }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        const detail = [json.error, json.hint, json.details].filter(Boolean).join(" — ");
+        throw new Error(detail || "Import failed");
+      }
+      setImportCount(json.count ?? allEntries.length);
+      setAllEntries(null);
+      setJsonText("");
+    } catch (e: any) {
+      setImportError(e.message);
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setAllEntries(null);
+    setParseError(null);
+  };
+
+  const preview = allEntries?.slice(0, 3) ?? null;
+
+  return (
+    <div className={styles.cachePanel}>
+      <div className={styles.cachePanelHeader}>
+        <div>
+          <span className={styles.cachePanelTitle}>Cache Import</span>
+          <span className={styles.cachePanelSub}>
+            Paste sf-opportunity-cache.json — accepts keyed object or flat array
+          </span>
+        </div>
+        <button className={styles.cachePanelClose} onClick={onClose}>✕</button>
+      </div>
+      <div className={styles.cachePanelBody}>
+        {importCount !== null ? (
+          <div className={styles.cacheSuccess}>
+            ✓ {importCount} {importCount === 1 ? "entry" : "entries"} imported
+            <button
+              className={styles.cacheResetBtn}
+              onClick={() => setImportCount(null)}
+            >
+              Import more
+            </button>
+          </div>
+        ) : allEntries ? (
+          <div className={styles.cachePreviewWrap}>
+            <div className={styles.cachePreviewHeader}>
+              <strong>{allEntries.length}</strong> entries parsed — preview of first {Math.min(3, allEntries.length)}:
+            </div>
+            <div className={styles.cachePreviewList}>
+              {preview!.map((entry, i) => (
+                <pre key={i} className={styles.cachePreviewEntry}>
+                  {JSON.stringify(entry, null, 2)}
+                </pre>
+              ))}
+            </div>
+            {importError && (
+              <div className={styles.cacheError}>⚠ {importError}</div>
+            )}
+            <div className={styles.cachePreviewActions}>
+              <button
+                className={styles.cacheConfirmBtn}
+                onClick={handleConfirm}
+                disabled={importing}
+              >
+                {importing ? "Importing…" : `Confirm — import ${allEntries.length} entries`}
+              </button>
+              <button className={styles.cacheCancelBtn} onClick={handleCancel}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <textarea
+              className={styles.cacheTextarea}
+              placeholder="Paste the full contents of sf-opportunity-cache.json here…"
+              value={jsonText}
+              onChange={(e) => {
+                setJsonText(e.target.value);
+                setParseError(null);
+              }}
+              spellCheck={false}
+            />
+            {parseError && (
+              <div className={styles.cacheError}>⚠ {parseError}</div>
+            )}
+            <button
+              className={styles.cacheParseBtn}
+              onClick={handleParse}
+              disabled={!jsonText.trim()}
+            >
+              Parse JSON
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
   const [engagements, setEngagements] = useState<Engagement[]>([]);
@@ -57,10 +229,24 @@ export default function HomePage() {
     date_from: "",
     date_to: "",
     sst_id: "",
-    search: ""
+    search: "",
+    outcomes: []
   });
   const [exported, setExported] = useState(false);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [showCachePanel, setShowCachePanel] = useState(false);
+  const [outcomeDropdownOpen, setOutcomeDropdownOpen] = useState(false);
+  const outcomeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (outcomeRef.current && !outcomeRef.current.contains(e.target as Node)) {
+        setOutcomeDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -102,6 +288,10 @@ export default function HomePage() {
       )
         return false;
     }
+    if (filters.outcomes.length > 0) {
+      const label = e.outcome ? (OUTCOME_LABELS[e.outcome] ?? e.outcome) : "";
+      if (!filters.outcomes.includes(label)) return false;
+    }
     return true;
   });
 
@@ -141,14 +331,17 @@ export default function HomePage() {
 
   const getSFStatus = (outcome: string | null) => {
     const map: Record<string, string> = {
-      no_response: "No Reply",
-      no_issue: "Successful",
-      "followup-ro": "Not Started",
-      "followup-sales": "Not Started",
-      withdrawn: "Not Interested",
-      deferred: "Not Interested",
+      Contacted: "Successful",
+      Responded: "Successful",
+      "No Response": "No Reply",
+      "In Progress": "Successful",
+      Resolved: "Successful",
+      Escalated: "Successful",
+      "At Risk": "Not Interested",
     };
-    return outcome ? (map[outcome] ?? "Not Started") : "—";
+    if (!outcome) return "—";
+    const label = OUTCOME_LABELS[outcome] ?? outcome;
+    return map[label] ?? "Not Started";
   };
 
   return (
@@ -179,6 +372,12 @@ export default function HomePage() {
             </span>
             <span className={styles.statLabel}>selected</span>
           </div>
+          <button
+            className={`${styles.refreshBtn} ${showCachePanel ? styles.refreshBtnActive : ""}`}
+            onClick={() => setShowCachePanel((v) => !v)}
+          >
+            ⇅ Cache Import
+          </button>
           <button
             className={styles.refreshBtn}
             onClick={fetchData}
@@ -234,10 +433,56 @@ export default function HomePage() {
               <option key={id} value={id}>{name}</option>
             ))}
           </select>
+          <div className={styles.outcomeDropdown} ref={outcomeRef}>
+            <button
+              className={`${styles.select} ${styles.outcomeBtn} ${filters.outcomes.length > 0 ? styles.outcomeBtnActive : ""}`}
+              onClick={() => setOutcomeDropdownOpen((o) => !o)}
+              type="button"
+            >
+              {filters.outcomes.length === 0
+                ? "Outcome"
+                : `Outcome (${filters.outcomes.length})`}
+              <span className={styles.outcomeChevron}>{outcomeDropdownOpen ? "▲" : "▼"}</span>
+            </button>
+            {outcomeDropdownOpen && (
+              <div className={styles.outcomePanel}>
+                {OUTCOME_OPTIONS.map((opt) => {
+                  const checked = filters.outcomes.includes(opt);
+                  return (
+                    <label key={opt} className={styles.outcomeOption}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          setFilters((f) => ({
+                            ...f,
+                            outcomes: checked
+                              ? f.outcomes.filter((o) => o !== opt)
+                              : [...f.outcomes, opt]
+                          }))
+                        }
+                        className={styles.checkbox}
+                      />
+                      {opt}
+                    </label>
+                  );
+                })}
+                {filters.outcomes.length > 0 && (
+                  <button
+                    className={styles.outcomeClear}
+                    onClick={() => setFilters((f) => ({ ...f, outcomes: [] }))}
+                  >
+                    Clear selection
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
           {(filters.date_from ||
             filters.date_to ||
             filters.sst_id ||
-            filters.search) && (
+            filters.search ||
+            filters.outcomes.length > 0) && (
             <button
               className={styles.clearBtn}
               onClick={() =>
@@ -245,7 +490,8 @@ export default function HomePage() {
                   date_from: "",
                   date_to: "",
                   sst_id: "",
-                  search: ""
+                  search: "",
+                  outcomes: []
                 })
               }
             >
@@ -268,6 +514,11 @@ export default function HomePage() {
           </button>
         </div>
       </div>
+
+      {/* Cache Import Panel */}
+      {showCachePanel && (
+        <CachePanel onClose={() => setShowCachePanel(false)} />
+      )}
 
       {/* Error */}
       {error && (

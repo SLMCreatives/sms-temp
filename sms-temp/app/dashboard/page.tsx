@@ -5,7 +5,7 @@ export default async function Page() {
   const data = await getData();
 
   return (
-    <div className="flex flex-col mx-auto max-w-2xl lg:max-w-5xl items-start justify-start">
+    <div className="w-full">
       <StudentAttritionDashboard data={data} />
     </div>
   );
