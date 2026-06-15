@@ -32,7 +32,9 @@ const COLUMN_GROUPS = [
       { key: "status", label: "Status" },
       { key: "faculty_code", label: "Faculty" },
       { key: "programme_name", label: "Programme" },
-      { key: "campus_code", label: "Campus" }
+      { key: "campus_code", label: "Campus" },
+      { key: "sst_id", label: "SST ID" },
+      { key: "sst_name", label: "SST Name" }
     ]
   },
   {
@@ -225,6 +227,8 @@ export default function DataExport() {
         faculty_code: s.faculty_code,
         programme_name: s.programme_name,
         campus_code: s.campus_code,
+        sst_id: s.sst_id ?? null,
+        sst_name: SST_MEMBERS.find((m) => m.id === s.sst_id)?.name ?? null,
         payment_mode: s.a_payments?.payment_mode ?? null,
         payment_status: s.a_payments?.payment_status ?? null,
         ptptn_proof_status: s.a_payments?.ptptn_proof_status ?? null,
