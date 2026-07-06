@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DataExport from "@/components/new/data-export";
+import AddStudents from "@/components/new/add-students";
 
 const supabase = createClient();
 
@@ -109,6 +110,7 @@ export default function SSTManagement() {
       <Tabs defaultValue="export" className="w-full flex flex-col">
         <TabsList className="mb-6">
           <TabsTrigger value="export" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">Data Export</TabsTrigger>
+          <TabsTrigger value="add" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">Add Students</TabsTrigger>
           <TabsTrigger value="sst" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">SST Management</TabsTrigger>
         </TabsList>
 
@@ -176,6 +178,10 @@ export default function SSTManagement() {
 
         <TabsContent value="export">
           <DataExport />
+        </TabsContent>
+
+        <TabsContent value="add">
+          <AddStudents />
         </TabsContent>
       </Tabs>
     </div>

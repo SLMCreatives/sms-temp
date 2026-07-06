@@ -33,8 +33,9 @@ const FACULTY_OPTIONS = [
 
 const INTAKE_OPTIONS = [
   { value: "all", label: "All" },
-  { value: "MAR26", label: "MAR26" },
-  { value: "JAN26", label: "JAN26" }
+  { value: "July26", label: "July26" },
+  { value: "MAY26", label: "MAY26" },
+  { value: "MAR26", label: "MAR26" }
   /*   { value: "NOV25", label: "NOV25" }
    */
 ];

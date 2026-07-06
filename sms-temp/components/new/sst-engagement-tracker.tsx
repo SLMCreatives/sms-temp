@@ -85,9 +85,10 @@ export function SSTEngagementTracker({ data }: StudentMetricsProps) {
   });
 
   const intakes = [
-    { value: "all", label: "All (Mar-26, Jan-26)" },
-    { value: "MAR26", label: "March 2026" },
-    { value: "JAN26", label: "January 2026" }
+    { value: "all", label: "All (Jul-26, May-26, Mar-26)" },
+    { value: "July26", label: "July 2026" },
+    { value: "MAY26", label: "May 2026" },
+    { value: "MAR26", label: "March 2026" }
     /*     { value: "NOV25", label: "November 2025" }
      */
   ];

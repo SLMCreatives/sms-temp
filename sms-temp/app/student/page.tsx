@@ -8,9 +8,9 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/server";
 
 const intakes = [
+    { label: "July-26", value: "July26" },
   { label: "May-26", value: "MAY26" },
-  { label: "Mar-26", value: "MAR26" },
-  { label: "Jan-26", value: "JAN26" }
+  { label: "Mar-26", value: "MAR26" }
 ];
 
 export const dynamic = "force-dynamic";

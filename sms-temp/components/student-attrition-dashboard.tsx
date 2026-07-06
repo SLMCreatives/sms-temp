@@ -12,7 +12,7 @@ interface StudentMetricsProps {
   data: Student[];
 }
 
-type IntakeTab = "TOTAL" | "JAN26" | "MAR26" | "MAY26";
+type IntakeTab = "TOTAL" | "July26" | "MAR26" | "MAY26";
 
 const FACULTY_LABELS: Record<string, string> = {
   FOB: "FOB",
@@ -28,15 +28,15 @@ function pct(n: number, total: number) {
 function IntakeMovementSection({ data }: { data: Student[] }) {
   const [activeTab, setActiveTab] = useState<IntakeTab>("TOTAL");
 
-  const jan26 = data.filter((s) => s.intake_code === "JAN26");
+  const jul26 = data.filter((s) => s.intake_code === "July26");
   const mar26 = data.filter((s) => s.intake_code === "MAR26");
   const may26 = data.filter((s) => s.intake_code === "MAY26");
 
   const cohort =
     activeTab === "TOTAL"
       ? data
-      : activeTab === "JAN26"
-        ? jan26
+      : activeTab === "July26"
+        ? jul26
         : activeTab === "MAR26"
           ? mar26
           : may26;
@@ -71,7 +71,7 @@ function IntakeMovementSection({ data }: { data: Student[] }) {
   });
   const levelRows = Array.from(levelMap.entries()).sort((a, b) => b[1] - a[1]);
 
-  const tabs: IntakeTab[] = ["TOTAL", "JAN26", "MAR26", "MAY26"];
+  const tabs: IntakeTab[] = ["TOTAL", "July26", "MAR26", "MAY26"];
 
   return (
     <div className="flex flex-col gap-6">
@@ -91,8 +91,8 @@ function IntakeMovementSection({ data }: { data: Student[] }) {
             <span className="ml-2 text-xs text-muted-foreground">
               {tab === "TOTAL"
                 ? data.length
-                : tab === "JAN26"
-                  ? jan26.length
+                : tab === "July26"
+                  ? jul26.length
                   : tab === "MAR26"
                     ? mar26.length
                     : may26.length}
@@ -253,11 +253,11 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
   const online_students = data.filter(
     (student) =>
       student.study_mode === "Online" &&
-      ["JAN26", "MAR26", "MAY26"].includes(student.intake_code)
+      ["July26", "MAR26", "MAY26"].includes(student.intake_code)
   );
 
   const mar26 = online_students.filter((s) => s.intake_code === "MAR26");
-  const jan26 = online_students.filter((s) => s.intake_code === "JAN26");
+  const jul26 = online_students.filter((s) => s.intake_code === "July26");
 
   return (
     <div className="flex flex-col w-full">
@@ -291,9 +291,9 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
               <CarouselItem>
                 <div className="w-full mx-auto">
                   <h3 className="text-xl font-semibold text-foreground mb-4">
-                    January 2026
+                    July 2026
                   </h3>
-                  <StudentMetrics data={jan26} />
+                  <StudentMetrics data={jul26} />
                 </div>
               </CarouselItem>
             </CarouselContent>
