@@ -339,8 +339,12 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     filterFn: (row, _columnId, filterValue) => {
       if (!filterValue) return true;
       const pm = row.original.a_payments?.payment_mode ?? "";
+      const isSelf = pm.toLowerCase().includes("self"); // "SELF", "Self Paying", etc.
+      const isPtptn = pm.toUpperCase().includes("PTPTN");
+      if (filterValue === "SELF") return isSelf;
+      if (filterValue === "PTPTN") return isPtptn;
       // "Other" selects everything that isn't SELF or PTPTN (incl. blank/legacy values)
-      if (filterValue === "Other") return pm !== "PTPTN" && pm !== "SELF";
+      if (filterValue === "Other") return !isSelf && !isPtptn;
       return pm === filterValue;
     },
     header: ({}) => {

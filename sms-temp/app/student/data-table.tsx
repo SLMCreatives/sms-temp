@@ -47,7 +47,6 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { DataTableViewOptions } from "./view-options";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useRouter } from "next/navigation";
 
@@ -143,7 +142,7 @@ export function DataTable<TData, TValue>({
       )}
       <div className="col-span-2 max-h-fit row-span-3 rounded-2xl container p-4 drop-shadow-xl relative border-0 ">
         <div className="flex items-center pb-4 w-full gap-2 border-b">
-          <div className="flex flex-row gap-2 w-full items-center">
+          <div className="flex flex-row gap-2 flex-1 min-w-0 items-center">
             <Search className="w-4 h-4 text-primary" />
             <Input
               value={
@@ -354,7 +353,6 @@ export function DataTable<TData, TValue>({
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <DataTableViewOptions table={table} />
             <p className="text-xs italic text-muted-foreground">
               {filteredCount}/{data.length}
             </p>
