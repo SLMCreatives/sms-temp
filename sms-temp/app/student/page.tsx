@@ -79,7 +79,7 @@ export default async function DemoPage() {
            */}{" "}
         </div>
         <div className="hidden lg:flex ">
-          <Tabs defaultValue="MAY26" className="flex flex-col gap-2">
+          <Tabs defaultValue="July26" className="flex flex-col gap-2">
             <TabsList className="flex gap-2 flex-row items-center justify-between ">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <p className="text-muted-foreground">Intakes:</p>

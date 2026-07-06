@@ -336,6 +336,13 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
   {
     accessorKey: "a_payments.payment_mode",
     id: "payment_mode",
+    filterFn: (row, _columnId, filterValue) => {
+      if (!filterValue) return true;
+      const pm = row.original.a_payments?.payment_mode ?? "";
+      // "Other" selects everything that isn't SELF or PTPTN (incl. blank/legacy values)
+      if (filterValue === "Other") return pm !== "PTPTN" && pm !== "SELF";
+      return pm === filterValue;
+    },
     header: ({}) => {
       return (
         <div className="w-full flex items-center justify-center">
