@@ -103,24 +103,22 @@ export function DataTable<TData, TValue>({
     router.refresh();
   };
 
-  // Students with 0 course visits — all SST for manager, own for SST member
-  const allStudents = data as StudentDashboardRow[];
+  // Zero-login count reflects the table's currently visible (filtered) rows —
+  // all SST for manager, own for SST member
+  const visibleStudents = table
+    .getFilteredRowModel()
+    .rows.map((r) => r.original as StudentDashboardRow);
   const scopedStudents = isManager
-    ? allStudents
+    ? visibleStudents
     : userSstId
-      ? allStudents.filter((s) => s.sst_id === userSstId)
+      ? visibleStudents.filter((s) => s.sst_id === userSstId)
       : [];
   const zeroLoginStudents = scopedStudents.filter(
-    (s) =>
-      s.study_mode === "Online" &&
-      s.a_lms_activity != null &&
-      s.a_lms_activity.course_visits === 0
+    (s) => s.a_lms_activity != null && s.a_lms_activity.course_visits === 0
   );
-  const totalIntake = allStudents.filter(
-    (s) => s.study_mode === "Online"
-  ).length;
-  const zeroLoginPct = totalIntake
-    ? Math.round((zeroLoginStudents.length / totalIntake) * 100)
+  const totalVisible = scopedStudents.length;
+  const zeroLoginPct = totalVisible
+    ? Math.round((zeroLoginStudents.length / totalVisible) * 100)
     : 0;
   const showBanner = isManager || !!userSstId;
 
@@ -133,7 +131,7 @@ export function DataTable<TData, TValue>({
             {isManager ? "All SST" : "My Students"} — Zero Logins
           </span>
           <span className="text-sm font-mono text-red-700 dark:text-red-300">
-            {zeroLoginStudents.length} / {totalIntake}
+            {zeroLoginStudents.length} / {totalVisible}
           </span>
           <span className="text-xs rounded-full bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200 px-2 py-0.5 font-mono font-semibold">
             {zeroLoginPct}%

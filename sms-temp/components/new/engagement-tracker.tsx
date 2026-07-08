@@ -29,11 +29,13 @@ interface StudentEngagementRow {
   a_engagements: { id: string }[];
 }
 
-function getDaysUntilFriday(): { daysUntilFriday: number; fridayDate: Date } {
+function getCurrentWeekFriday(): { daysUntilFriday: number; fridayDate: Date } {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const dow = today.getDay();
-  const daysUntilFriday = dow === 5 ? 0 : dow < 5 ? 5 - dow : 6;
+  // Days since Monday (ISO week starts Monday): Mon=0 ... Sun=6
+  const isoDow = (today.getDay() + 6) % 7;
+  // Friday is the 5th day of the ISO week (index 4); negative on Sat/Sun (already passed)
+  const daysUntilFriday = 4 - isoDow;
   const fridayDate = new Date(today);
   fridayDate.setDate(today.getDate() + daysUntilFriday);
   return { daysUntilFriday, fridayDate };
@@ -57,7 +59,7 @@ export function EngagementTracker() {
       let query = supabase
         .from("a_students")
         .select("matric_no, sst_id, a_engagements(id)")
-        .eq("intake_code", "MAY26");
+        .eq("intake_code", "July26");
 
       if (!isSulaiman) {
         const exactId = SST_NAME_TO_ID[fullName];
@@ -76,8 +78,8 @@ export function EngagementTracker() {
     });
   }, []);
 
-  const { daysUntilFriday, fridayDate } = getDaysUntilFriday();
-  const daysRemaining = daysUntilFriday + 1;
+  const { daysUntilFriday, fridayDate } = getCurrentWeekFriday();
+  const daysRemaining = Math.max(daysUntilFriday + 1, 0);
 
   const fridayLabel = fridayDate.toLocaleDateString("en-MY", {
     day: "numeric",
