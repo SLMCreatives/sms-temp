@@ -8,9 +8,8 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/server";
 
 const intakes = [
-    { label: "July-26", value: "July26" },
-  { label: "May-26", value: "MAY26" },
-  { label: "Mar-26", value: "MAR26" }
+  { label: "Sept-26", value: "Sep-26" },
+  { label: "July-26", value: "July26" }
 ];
 
 export const dynamic = "force-dynamic";
@@ -23,11 +22,11 @@ export default async function DemoPage() {
   const MANAGER_EMAIL = "sulaiman.munaff@unitar.my";
   const isManager = user?.email === MANAGER_EMAIL;
 
-  // For non-managers, resolve their sst_id from a_sst by login email
+  // For non-managers, resolve their sst_id from sst by login email
   let userSstId: number | null = null;
   if (!isManager && user?.email) {
     const { data: sstRow } = await supabase
-      .from("a_sst")
+      .from("sst")
       .select("id")
       .eq("email", user.email)
       .maybeSingle();
@@ -54,7 +53,7 @@ export default async function DemoPage() {
 
       <div className="flex flex-col">
         <div className="lg:hidden flex">
-          <Tabs defaultValue="MAY26" className="flex flex-col gap-2">
+          <Tabs defaultValue="Sep-26" className="flex flex-col gap-2">
             <TabsList className="flex gap-2 flex-row items-center justify-between">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <p className="text-muted-foreground">Intakes:</p>
@@ -79,7 +78,7 @@ export default async function DemoPage() {
            */}{" "}
         </div>
         <div className="hidden lg:flex ">
-          <Tabs defaultValue="July26" className="flex flex-col gap-2">
+          <Tabs defaultValue="Sep-26" className="flex flex-col gap-2">
             <TabsList className="flex gap-2 flex-row items-center justify-between ">
               <div className="flex flex-row gap-2 items-center justify-center">
                 <p className="text-muted-foreground">Intakes:</p>

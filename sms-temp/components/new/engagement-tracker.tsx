@@ -10,16 +10,12 @@ const supabase = createClient();
 const SST_NAME_TO_ID: Record<string, number> = {
   Amirul: 1,
   Farzana: 2,
-  Najwa: 3,
-  Ayu: 4,
   Miru: 6
 };
 
 const SST_ID_TO_NAME: Record<number, string> = {
   1: "Amirul",
   2: "Farzana",
-  3: "Najwa",
-  4: "Ayu",
   6: "Miru"
 };
 

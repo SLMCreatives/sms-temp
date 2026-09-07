@@ -28,8 +28,6 @@ const supabase = createClient();
 const SST_NAME_TO_ID: Record<string, number> = {
   Amirul: 1,
   Farzana: 2,
-  Najwa: 3,
-  Ayu: 4,
   Miru: 6
 };
 

@@ -93,13 +93,16 @@ const STATUS_OPTIONS = ["Active", "Withdraw", "Deferred", "At Risk"];
 const FACULTY_OPTIONS = ["FOB", "FEH", "FAiFT"];
 const STUDY_MODE_OPTIONS = ["Online", "Conventional"];
 const INTAKE_QUERY_TABLE = "a_students" as const;
+// Inactive members stay listed so historical exports still resolve a name
 const SST_MEMBERS = [
-  { id: 1, name: "Amirul" },
-  { id: 2, name: "Farzana" },
-  { id: 3, name: "Najwa" },
-  { id: 4, name: "Ayu" },
-  { id: 6, name: "Miru" }
+  { id: 1, name: "Amirul", active: true },
+  { id: 2, name: "Farzana", active: true },
+  { id: 3, name: "Najwa", active: false },
+  { id: 4, name: "Ayu", active: false },
+  { id: 6, name: "Miru", active: true }
 ];
+
+const ACTIVE_SST_MEMBERS = SST_MEMBERS.filter((m) => m.active);
 
 type StudentRow = Student & {
   a_payments: Payment | null;
@@ -308,7 +311,7 @@ export default function DataExport() {
           <div className="space-y-2">
             <p className="text-sm font-semibold">SST</p>
             <div className="flex flex-wrap gap-2">
-              {SST_MEMBERS.map((sst) => (
+              {ACTIVE_SST_MEMBERS.map((sst) => (
                 <Badge
                   key={sst.id}
                   variant="outline"

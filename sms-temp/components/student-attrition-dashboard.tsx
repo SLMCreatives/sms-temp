@@ -12,7 +12,7 @@ interface StudentMetricsProps {
   data: Student[];
 }
 
-type IntakeTab = "TOTAL" | "July26" | "MAR26" | "MAY26";
+type IntakeTab = "TOTAL" | "Sep-26" | "July26" | "MAR26" | "MAY26";
 
 const FACULTY_LABELS: Record<string, string> = {
   FOB: "FOB",
@@ -28,18 +28,14 @@ function pct(n: number, total: number) {
 function IntakeMovementSection({ data }: { data: Student[] }) {
   const [activeTab, setActiveTab] = useState<IntakeTab>("TOTAL");
 
-  const jul26 = data.filter((s) => s.intake_code === "July26");
-  const mar26 = data.filter((s) => s.intake_code === "MAR26");
-  const may26 = data.filter((s) => s.intake_code === "MAY26");
+  const byIntake: Record<Exclude<IntakeTab, "TOTAL">, Student[]> = {
+    "Sep-26": data.filter((s) => s.intake_code === "Sep-26"),
+    July26: data.filter((s) => s.intake_code === "July26"),
+    MAR26: data.filter((s) => s.intake_code === "MAR26"),
+    MAY26: data.filter((s) => s.intake_code === "MAY26")
+  };
 
-  const cohort =
-    activeTab === "TOTAL"
-      ? data
-      : activeTab === "July26"
-        ? jul26
-        : activeTab === "MAR26"
-          ? mar26
-          : may26;
+  const cohort = activeTab === "TOTAL" ? data : byIntake[activeTab];
 
   const total = cohort.length;
 
@@ -71,7 +67,7 @@ function IntakeMovementSection({ data }: { data: Student[] }) {
   });
   const levelRows = Array.from(levelMap.entries()).sort((a, b) => b[1] - a[1]);
 
-  const tabs: IntakeTab[] = ["TOTAL", "July26", "MAR26", "MAY26"];
+  const tabs: IntakeTab[] = ["TOTAL", "Sep-26", "July26", "MAR26", "MAY26"];
 
   return (
     <div className="flex flex-col gap-6">
@@ -89,13 +85,7 @@ function IntakeMovementSection({ data }: { data: Student[] }) {
           >
             {tab === "TOTAL" ? "Total" : tab}
             <span className="ml-2 text-xs text-muted-foreground">
-              {tab === "TOTAL"
-                ? data.length
-                : tab === "July26"
-                  ? jul26.length
-                  : tab === "MAR26"
-                    ? mar26.length
-                    : may26.length}
+              {tab === "TOTAL" ? data.length : byIntake[tab].length}
             </span>
           </button>
         ))}
@@ -253,7 +243,7 @@ export function StudentAttritionDashboard({ data }: StudentMetricsProps) {
   const online_students = data.filter(
     (student) =>
       student.study_mode === "Online" &&
-      ["July26", "MAR26", "MAY26"].includes(student.intake_code)
+      ["Sep-26", "July26", "MAR26", "MAY26"].includes(student.intake_code)
   );
 
   const mar26 = online_students.filter((s) => s.intake_code === "MAR26");

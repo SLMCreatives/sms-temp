@@ -32,16 +32,6 @@ const data = {
       name: "Farzana",
       logo: CircleUserRound,
       plan: "GA"
-    },
-    {
-      name: "Ayu",
-      logo: CircleUserRound,
-      plan: "Executive"
-    },
-    {
-      name: "Najwa",
-      logo: CircleUserRound,
-      plan: "Executive"
     }
   ],
   navMain: [

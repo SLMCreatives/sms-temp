@@ -186,9 +186,7 @@ export default function EditStudent({
   const sstMembers = [
     { value: "1", label: "Amirul" },
     { value: "2", label: "Farzana" },
-    { value: "3", label: "Najwa" },
-    { value: "4", label: "Ayu" },
-    { value: "5", label: "Miru" }
+    { value: "6", label: "Miru" }
   ];
 
   const studentFields = profile.filter((item) => item.table === "a_students");
