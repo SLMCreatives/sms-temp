@@ -8,16 +8,15 @@ import {
   CardHeader,
   CardTitle
 } from "../ui/card";
-import {
-  AlertTriangle,
-  BanknoteArrowUp,
-  GraduationCap,
-  MessageCircle,
-  UserCircle
-} from "lucide-react";
+import { AlertTriangle, BanknoteArrowUp, UserCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import FiltersSection from "./filters-section";
+import FiltersSection, {
+  ALL,
+  emptyFilters,
+  StudentFilters
+} from "./filters-section";
 import { StudentDashboardRow } from "@/lib/types/database";
+import { getStudentLevel, levelOptionsFrom } from "@/lib/student-level";
 import {
   Drawer,
   DrawerContent,
@@ -28,9 +27,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import StudentEngagement from "./student-engagement";
 import StudentInfo from "./student-info";
-import StudentLMSActivity from "./student-lms";
 import StudentPayment from "./student-payment";
-import StudentSOS from "./student-sos";
 
 export const tabs = [
   {
@@ -40,22 +37,10 @@ export const tabs = [
     color: "#4f46e5"
   },
   {
-    value: "lms-activity",
-    label: "CN Activity",
-    icon: GraduationCap,
-    color: "#059669"
-  },
-  {
     value: "payment",
     label: "Payment",
     icon: BanknoteArrowUp,
     color: "#d97706"
-  },
-  {
-    value: "sos",
-    label: "SOS",
-    icon: MessageCircle,
-    color: "#ef4444"
   },
   {
     value: "escalate",
@@ -71,18 +56,54 @@ export default function NewStudentList({
   data: StudentDashboardRow[];
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<StudentFilters>(emptyFilters);
   const [displayLimit, setDisplayLimit] = useState(20);
   const observerTarget = useRef(null);
 
+  // Options come from the rows in scope so empty levels/campuses never appear.
+  const levelOptions = useMemo(() => levelOptionsFrom(data), [data]);
+  const campusOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(data.map((s) => s.campus_code).filter(Boolean) as string[])
+      ).sort(),
+    [data]
+  );
+
+  const matchesPaymentMode = (mode: string | undefined, filter: string) => {
+    if (filter === ALL) return true;
+    const pm = mode ?? "";
+    const isSelf = pm.toLowerCase().includes("self");
+    const isPtptn = pm.toUpperCase().includes("PTPTN");
+    if (filter === "SELF") return isSelf;
+    if (filter === "PTPTN") return isPtptn;
+    return !isSelf && !isPtptn;
+  };
+
   const filteredStudents = useMemo(() => {
     const query = searchQuery.toLowerCase();
-    return data.filter(
-      (student) =>
+    return data.filter((student) => {
+      const matchesQuery =
         student.full_name.toLowerCase().includes(query) ||
         student.email?.toLowerCase().includes(query) ||
-        student.matric_no.toLowerCase().includes(query)
-    );
-  }, [data, searchQuery]);
+        student.matric_no.toLowerCase().includes(query);
+      if (!matchesQuery) return false;
+      if (
+        filters.study_level !== ALL &&
+        getStudentLevel(student.programme_name) !== filters.study_level
+      )
+        return false;
+      if (
+        filters.campus_code !== ALL &&
+        student.campus_code !== filters.campus_code
+      )
+        return false;
+      return matchesPaymentMode(
+        student.a_payments?.payment_mode,
+        filters.payment_mode
+      );
+    });
+  }, [data, searchQuery, filters]);
 
   const visibleStudents = useMemo(() => {
     return filteredStudents.slice(0, displayLimit);
@@ -111,17 +132,21 @@ export default function NewStudentList({
   // Reset limit when searching or filtering
   useEffect(() => {
     setDisplayLimit(20);
-  }, [searchQuery]);
+  }, [searchQuery, filters]);
 
   return (
     <>
       <div className="flex flex-col items-center justify-between mb-4 min-w-3xl px-4">
-        <div className="flex flex-row items-center w-full gap-2">
+        <div className="flex flex-col w-full gap-1">
           <FiltersSection
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            filters={filters}
+            setFilters={setFilters}
+            levelOptions={levelOptions}
+            campusOptions={campusOptions}
           />
-          <p className="text-xs italic text-muted-foreground text-nowrap">
+          <p className="text-xs italic text-muted-foreground text-nowrap self-end">
             {filteredStudents.length} / {data.length}
           </p>
         </div>
@@ -191,22 +216,10 @@ export default function NewStudentList({
                         <StudentInfo student={student} />
                       </TabsContent>
                       <TabsContent
-                        value="lms-activity"
-                        className="items-start w-full justify-center"
-                      >
-                        <StudentLMSActivity student={student} />
-                      </TabsContent>
-                      <TabsContent
                         value="payment"
                         className="items-start w-full justify-center"
                       >
                         <StudentPayment student={student} />
-                      </TabsContent>
-                      <TabsContent
-                        value="sos"
-                        className="items-start w-full justify-center"
-                      >
-                        <StudentSOS student={student} />
                       </TabsContent>
                       <TabsContent
                         value="escalate"

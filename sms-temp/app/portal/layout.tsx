@@ -18,7 +18,7 @@ export default function ProtectedLayout({
           <AppSidebar />
           <SidebarInset>
             <SidebarTrigger className=" sticky top-2 left-2 z-40 md:hidden " />
-            <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto  min-h-screen lg:pl-[250px] dark:bg-black items-start justify-start py-0">
+            <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto  min-h-screen dark:bg-black items-start justify-start py-0">
               <Toaster position="top-right" richColors />
               {children}
             </div>

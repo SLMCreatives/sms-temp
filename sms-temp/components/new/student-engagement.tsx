@@ -1,58 +1,15 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { MessageSquarePlus, Trash } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger
-} from "../ui/sheet";
+import { Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { StudentDashboardRow } from "@/lib/types/database";
-import { NewEngagementForm } from "./engagement-form";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-const sstMembers = [
-  {
-    id: 1,
-    name: "Amirul",
-    image: "sst/amirul.png"
-  },
-  {
-    id: 2,
-    name: "Farzana",
-    image: "sst/farzana.png"
-  },
-  {
-    id: 4,
-    name: "Ayu",
-    image: "sst/ayu.jpeg"
-  },
-  {
-    id: 3,
-    name: "Najwa",
-    image: "sst/najwa.png"
-  },
-  {
-    id: 6,
-    name: "Miru",
-    image: "sst/miru.png"
-  }
-];
-
-const engagementTabs = [
-  {
-    label: "Engagements",
-    value: "student.a_engagements ? student.a_engagements.length : 0",
-    icon: MessageSquarePlus
-  }
-];
+import { getSstById } from "@/lib/sst-members";
 
 export default function StudentEngagement({
   student
@@ -94,39 +51,21 @@ export default function StudentEngagement({
       ) || [];
 
   return (
-    <div className="flex flex-col gap-2 ml-2 relative">
-      <div className="absolute top-0 right-0">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant={"outline"} size={"sm"} className="w-fit ">
-              +
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="right"
-            className="w-full h-full overflow-y-scroll lg:w-1/2"
-          >
-            <SheetHeader>
-              <SheetTitle>Add Engagement</SheetTitle>
-            </SheetHeader>
-            <NewEngagementForm matric_no={student.matric_no} />
-          </SheetContent>
-        </Sheet>
+    <div className="flex flex-col gap-3 relative">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          Engagement history
+        </span>
+        <span className="text-[11px] tabular-nums text-muted-foreground">
+          {engagements.length}
+        </span>
       </div>
-      <div className="flex flex-col gap-2 items-start">
-        {engagementTabs.map((tab) => (
-          <div
-            key={tab.value}
-            className="grid grid-cols-[auto,auto,1fr] items-center gap-3"
-          >
-            <tab.icon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <p className="text-sm text-muted-foreground">{tab.label}</p>
-            <p className="font-medium text-xs break-all text-right line-clamp-1">
-              {eval(tab.value)}
-            </p>
-          </div>
-        ))}
-      </div>
+      {engagements.length === 0 && (
+        <p className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">
+          No engagements recorded yet. Ticking a check on the Checks tab adds an
+          entry here.
+        </p>
+      )}
       {engagements && (
         <div className="space-y-2">
           {engagements.map((engagement, index) => (
@@ -140,10 +79,7 @@ export default function StudentEngagement({
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
                     src={
-                      engagement.sst_id
-                        ? sstMembers.find((sst) => sst.id === engagement.sst_id)
-                            ?.image
-                        : ""
+                      getSstById(engagement.sst_id)?.image ?? ""
                     }
                   />
                   <AvatarFallback>{engagement.sst_id}</AvatarFallback>

@@ -22,8 +22,9 @@ import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { SST_MEMBERS, getSstById } from "@/lib/sst-members";
 
-type SSTID = "1" | "2" | "3" | "4" | "6";
+type SSTID = string;
 
 interface ChangePaymentFormProps {
   matric_no: string;
@@ -68,38 +69,19 @@ export default function NewChangeSSTForm({
   };
 
   const [open, setClose] = useState(false);
+  // Resolves retired members too, so existing assignments still show a name.
+  const assigned = getSstById(Number(sst_id));
 
   return (
     <Dialog open={open} onOpenChange={setClose}>
       <DialogTrigger asChild>
         <Badge
           variant="outline"
-          className={`
-           cursor-pointer hover:opacity-80 transition text-xs border-0 ${
-             sst_id === "1"
-               ? "bg-blue-200 dark:bg-blue-600"
-               : sst_id === "2"
-                 ? "bg-amber-200 dark:bg-amber-600"
-                 : sst_id === "3"
-                   ? "bg-green-200 dark:bg-green-600"
-                   : sst_id === "4"
-                     ? "bg-pink-200 dark:bg-pink-600"
-                     : sst_id === "6"
-                       ? "bg-violet-200 dark:bg-violet-600"
-                       : "bg-muted text-muted-foreground"
-           } `}
+          className={`cursor-pointer hover:opacity-80 transition text-xs ${
+            assigned?.badgeClass ?? "border-0 bg-muted text-muted-foreground"
+          }`}
         >
-          {sst_id === "1"
-            ? "Amirul"
-            : sst_id === "2"
-              ? "Farzana"
-              : sst_id === "3"
-                ? "Najwa"
-                : sst_id === "4"
-                  ? "Ayu"
-                  : sst_id === "6"
-                    ? "Miru"
-                    : "-"}
+          {assigned?.name ?? "-"}
         </Badge>
       </DialogTrigger>
       <DialogContent className="w-fit">
@@ -122,9 +104,11 @@ export default function NewChangeSSTForm({
               <SelectValue placeholder="Assign SST" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">Amirul</SelectItem>
-              <SelectItem value="2">Farzana</SelectItem>
-              <SelectItem value="6">Miru</SelectItem>
+              {SST_MEMBERS.map((member) => (
+                <SelectItem key={member.id} value={String(member.id)}>
+                  {member.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <DialogClose asChild>

@@ -13,16 +13,17 @@ import {
   SelectTrigger,
   SelectValue
 } from "../ui/select";
+import { SST_MEMBERS } from "@/lib/sst-members";
 
 interface StudentMetricsProps {
   data: Student[];
 }
 
-const sstMembers = [
-  { value: 1, label: "Amirul", image: "/sst/amirul.png" },
-  { value: 2, label: "Farzana", image: "/sst/farzana.png" },
-  { value: 6, label: "Miruthala" }
-];
+const sstMembers = SST_MEMBERS.map((member) => ({
+  value: member.id,
+  label: member.name,
+  image: member.image
+}));
 
 export function SSTEngagementTracker({ data }: StudentMetricsProps) {
   const [filteredIntake, setFilteredIntake] = useState("all");

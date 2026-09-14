@@ -6,6 +6,7 @@ import {
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { IntakeProvider } from "@/components/new/intake-context";
 
 export default function ProtectedLayout({
   children
@@ -13,22 +14,33 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col items-center">
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <SidebarTrigger className=" sticky top-2 left-2 z-40 md:hidden " />
-            <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto lg:pl-[250px] dark:bg-black">
-              <Toaster position="top-right" richColors />
-              <div className="fixed top-4 right-4">
-                <UserProfile />
-              </div>
-              {children}
+    // AppSidebar uses variant="inset", so the page sits on the sidebar colour
+    // and the content floats above it as a rounded panel.
+    <IntakeProvider>
+      <SidebarProvider className="bg-sidebar">
+        <AppSidebar />
+        {/*
+        min-w-0 lets the table scroll horizontally instead of stretching the
+        flex row. No overflow-hidden here — it would make this a scrollport and
+        stop the sticky header and record rail from sticking.
+      */}
+        <SidebarInset className="min-w-0">
+          <Toaster position="top-right" richColors />
+
+          <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+            <SidebarTrigger className="-ml-1" />
+            <span className="text-sm font-semibold tracking-tight">SST.MS</span>
+            <span className="hidden text-xs text-muted-foreground md:inline">
+              Student Success Team Management System
+            </span>
+            <div className="ml-auto">
+              <UserProfile />
             </div>
-          </SidebarInset>
-        </SidebarProvider>
-      </div>
-    </main>
+          </header>
+
+          <div className="min-w-0 flex-1 px-4 py-5 lg:px-6">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </IntakeProvider>
   );
 }

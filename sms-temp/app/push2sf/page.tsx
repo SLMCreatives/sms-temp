@@ -10,6 +10,7 @@ import {
   mapEngagementToSFTask
 } from "@/lib/sf-mapping";
 import styles from "./page.module.css";
+import { SST_MEMBERS, SST_NAMES } from "@/lib/sst-members";
 
 type FilterState = {
   date_from: string;
@@ -29,13 +30,6 @@ const OUTCOME_OPTIONS = [
   "At Risk",
 ];
 
-const SST_NAMES: Record<number, string> = {
-  1: "Amirul",
-  2: "Farzana",
-  3: "Najwa",
-  4: "Ayu",
-  6: "Miru"
-};
 
 const SENTIMENT_COLORS: Record<string, string> = {
   Positive: "#16a34a",
@@ -429,8 +423,10 @@ export default function HomePage() {
             }
           >
             <option value="">All SST</option>
-            {Object.entries(SST_NAMES).map(([id, name]) => (
-              <option key={id} value={id}>{name}</option>
+            {SST_MEMBERS.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
             ))}
           </select>
           <div className={styles.outcomeDropdown} ref={outcomeRef}>

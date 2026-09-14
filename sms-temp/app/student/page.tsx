@@ -1,129 +1,18 @@
-import { newStudentColumns } from "./studentColumns";
-import NewStudentList from "@/components/new/student-list";
-import { DataTable } from "./data-table";
 import { getData } from "./getData";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/server";
-
-const intakes = [
-  { label: "Sept-26", value: "Sep-26" },
-  { label: "July-26", value: "July26" }
-];
+import { getViewer } from "./get-viewer";
+import StudentWorkspace from "./student-workspace";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 600;
 
-export default async function DemoPage() {
-  const [data, supabase] = await Promise.all([getData(), createClient()]);
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const MANAGER_EMAIL = "sulaiman.munaff@unitar.my";
-  const isManager = user?.email === MANAGER_EMAIL;
-
-  // For non-managers, resolve their sst_id from sst by login email
-  let userSstId: number | null = null;
-  if (!isManager && user?.email) {
-    const { data: sstRow } = await supabase
-      .from("sst")
-      .select("id")
-      .eq("email", user.email)
-      .maybeSingle();
-    userSstId = sstRow?.id ?? null;
-  }
-
-  const filterIntakes = (intakeCode: string) => {
-    const filteredData = data.filter(
-      (student) => student.intake_code === intakeCode
-    );
-    return filteredData;
-  };
+export default async function StudentsPage() {
+  const [data, viewer] = await Promise.all([getData(), getViewer()]);
 
   return (
-    <div className="flex flex-col mx-auto max-w-2xl lg:max-w-full lg:w-[100vw] lg:justify-center -mt-20 dark:bg-black">
-      <div className="flex flex-row w-full pt-6 pb-2 justify-between">
-        <div className="flex flex-row gap-1 items-end justify-between w-full">
-          <h4 className="font-bold text-3xl ">SST.MS</h4>
-          <h1 className="font-thin text-xl flex justify-between items-center sr-only">
-            Student Success Team Management System
-          </h1>
-        </div>
-      </div>
-
-      <div className="flex flex-col">
-        <div className="lg:hidden flex">
-          <Tabs defaultValue="Sep-26" className="flex flex-col gap-2">
-            <TabsList className="flex gap-2 flex-row items-center justify-between">
-              <div className="flex flex-row gap-2 items-center justify-center">
-                <p className="text-muted-foreground">Intakes:</p>
-                {intakes.map((intake) => (
-                  <TabsTrigger
-                    key={intake.value}
-                    value={intake.value}
-                    className="data-[state=active]:bg-cyan-100 data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-cyan-600 dark:data-[state=active]:text-muted-foreground"
-                  >
-                    {intake.label}
-                  </TabsTrigger>
-                ))}
-              </div>
-            </TabsList>
-            {intakes.map((intake) => (
-              <TabsContent key={intake.value} value={intake.value}>
-                <NewStudentList data={filterIntakes(intake.value)} />
-              </TabsContent>
-            ))}
-          </Tabs>
-          {/*           <NewStudentList data={data} />
-           */}{" "}
-        </div>
-        <div className="hidden lg:flex ">
-          <Tabs defaultValue="Sep-26" className="flex flex-col gap-2">
-            <TabsList className="flex gap-2 flex-row items-center justify-between ">
-              <div className="flex flex-row gap-2 items-center justify-center">
-                <p className="text-muted-foreground">Intakes:</p>
-                {intakes.map((intake) => (
-                  <TabsTrigger
-                    key={intake.value}
-                    value={intake.value}
-                    className="data-[state=active]:bg-cyan-100 data-[state=active]:text-primary-foreground dark:data-[state=active]:bg-cyan-600 dark:data-[state=active]:text-muted-foreground"
-                  >
-                    {intake.label}
-                  </TabsTrigger>
-                ))}
-              </div>
-            </TabsList>
-            {intakes.map((intake) => (
-              <TabsContent key={intake.value} value={intake.value}>
-                <DataTable
-                  data={filterIntakes(intake.value)}
-                  columns={newStudentColumns}
-                  userSstId={userSstId}
-                  isManager={isManager}
-                />
-              </TabsContent>
-            ))}
-          </Tabs>
-
-          {/* 
-          {intakes.map((intake) => (
-            <DataTable
-              key={intake.value}
-              data={filterIntakes(intake.value)}
-              columns={newStudentColumns}
-            />
-          ))} */}
-          {/*  <DataTable data={data} columns={newStudentColumns} /> */}
-          <Button
-            asChild
-            size="sm"
-            variant={"outline"}
-            onClick={() => toast.success("Toaster")}
-          >
-            Test Toaster
-          </Button>
-        </div>
-      </div>
-    </div>
+    <StudentWorkspace
+      data={data}
+      currentSst={viewer.sst}
+      isManager={viewer.isManager}
+    />
   );
 }

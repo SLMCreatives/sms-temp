@@ -21,15 +21,10 @@ import { Separator } from "@/components/ui/separator";
 import { MessageCircleMore, MessageSquare, Send } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
+import { resolveSstByName } from "@/lib/sst-members";
 
 const supabase = createClient();
 
-// Maps auth user full_name to the numeric sst_id in the database
-const SST_NAME_TO_ID: Record<string, number> = {
-  Amirul: 1,
-  Farzana: 2,
-  Miru: 6
-};
 
 interface EngagementFormData {
   matric_no: string;
@@ -70,20 +65,10 @@ export function NewEngagementForm({ matric_no }: EngagementFormProps) {
         data.user.user_metadata?.full_name ?? data.user.email ?? "";
       setHandledByName(fullName);
 
-      // Match the name to a known sst_id; try exact match then partial
-      const exactId = SST_NAME_TO_ID[fullName];
-      if (exactId) {
-        setFormData((prev) => ({ ...prev, sst_id: exactId }));
-        return;
-      }
-      const partialKey = Object.keys(SST_NAME_TO_ID).find((name) =>
-        fullName.toLowerCase().includes(name.toLowerCase())
-      );
-      if (partialKey) {
-        setFormData((prev) => ({
-          ...prev,
-          sst_id: SST_NAME_TO_ID[partialKey]
-        }));
+      // Match the signed-in name to a member on the roster
+      const member = resolveSstByName(fullName);
+      if (member) {
+        setFormData((prev) => ({ ...prev, sst_id: member.id }));
       }
     });
   }, []);

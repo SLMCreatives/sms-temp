@@ -90,19 +90,11 @@ const LABEL_MAP = Object.fromEntries(
 );
 
 const STATUS_OPTIONS = ["Active", "Withdraw", "Deferred", "At Risk"];
+import { SST_MEMBERS, getSstById } from "@/lib/sst-members";
 const FACULTY_OPTIONS = ["FOB", "FEH", "FAiFT"];
 const STUDY_MODE_OPTIONS = ["Online", "Conventional"];
 const INTAKE_QUERY_TABLE = "a_students" as const;
-// Inactive members stay listed so historical exports still resolve a name
-const SST_MEMBERS = [
-  { id: 1, name: "Amirul", active: true },
-  { id: 2, name: "Farzana", active: true },
-  { id: 3, name: "Najwa", active: false },
-  { id: 4, name: "Ayu", active: false },
-  { id: 6, name: "Miru", active: true }
-];
 
-const ACTIVE_SST_MEMBERS = SST_MEMBERS.filter((m) => m.active);
 
 type StudentRow = Student & {
   a_payments: Payment | null;
@@ -231,7 +223,7 @@ export default function DataExport() {
         programme_name: s.programme_name,
         campus_code: s.campus_code,
         sst_id: s.sst_id ?? null,
-        sst_name: SST_MEMBERS.find((m) => m.id === s.sst_id)?.name ?? null,
+        sst_name: getSstById(s.sst_id)?.name ?? null,
         payment_mode: s.a_payments?.payment_mode ?? null,
         payment_status: s.a_payments?.payment_status ?? null,
         ptptn_proof_status: s.a_payments?.ptptn_proof_status ?? null,
@@ -311,7 +303,7 @@ export default function DataExport() {
           <div className="space-y-2">
             <p className="text-sm font-semibold">SST</p>
             <div className="flex flex-wrap gap-2">
-              {ACTIVE_SST_MEMBERS.map((sst) => (
+              {SST_MEMBERS.map((sst) => (
                 <Badge
                   key={sst.id}
                   variant="outline"

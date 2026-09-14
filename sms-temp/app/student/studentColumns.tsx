@@ -7,15 +7,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { StudentDashboardRow } from "@/lib/types/database";
 import { ColumnDef } from "@tanstack/react-table";
 import {
-  AlertTriangle,
   ArrowUpDown,
   CheckCheck,
+  Laptop,
   MessageCircle,
   Phone,
+  School,
+  TriangleAlert,
   XCircle
 } from "lucide-react";
 import Link from "next/link";
-
+import { getSstById } from "@/lib/sst-members";
+import { getStudentLevel } from "@/lib/student-level";
+import { getChecks } from "@/lib/student-progress";
 
 export type Engagements = {
   [x: string]: string | number | Date;
@@ -194,6 +198,68 @@ export const studentColumns: ColumnDef<Students>[] = [
   }
 ];
 
+/** Two-letter monogram for the row avatar. */
+export function initialsOf(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/** Deterministic avatar tint so the same student keeps the same colour. */
+const AVATAR_TINTS = [
+  "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-200",
+  "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200",
+  "bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-200",
+  "bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-200",
+  "bg-rose-100 text-rose-700 dark:bg-rose-900/60 dark:text-rose-200",
+  "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/60 dark:text-cyan-200"
+];
+
+function tintFor(key: string) {
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) | 0;
+  return AVATAR_TINTS[Math.abs(hash) % AVATAR_TINTS.length];
+}
+
+/** Small coloured dot + label, quieter than a filled pill on every row. */
+function StatusDot({ tone, label }: { tone: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+      <span className={`h-1.5 w-1.5 rounded-full ${tone}`} />
+      <span className="text-[11px]">{label}</span>
+    </span>
+  );
+}
+
+/** Weekly course-progress cell: a thin bar with the value beneath it. */
+function ProgressCell({ value }: { value: number }) {
+  const pct = Math.round((value ?? 0) * 100);
+  const bar =
+    pct === 0
+      ? "bg-red-400 dark:bg-red-500"
+      : pct < 40
+        ? "bg-amber-400 dark:bg-amber-500"
+        : "bg-emerald-400 dark:bg-emerald-500";
+  return (
+    <div className="flex flex-col items-center gap-1 min-w-[42px]">
+      <div className="h-1 w-9 rounded-full bg-muted overflow-hidden">
+        <div
+          className={`h-full rounded-full ${bar}`}
+          style={{ width: `${Math.max(pct, pct === 0 ? 0 : 4)}%` }}
+        />
+      </div>
+      <span
+        className={`text-[10px] tabular-nums ${
+          pct === 0 ? "text-red-600 dark:text-red-400 font-semibold" : "text-muted-foreground"
+        }`}
+      >
+        {pct}%
+      </span>
+    </div>
+  );
+}
+
 export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
   {
     id: "select",
@@ -212,67 +278,51 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="mr-2"
       />
     ),
     enableSorting: false,
-    enableHiding: true,
-    size: 10
-  },
-  {
-    header: "WhatsApp",
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center w-full">
-        <WhatsAppCell
-          phone={row.original.phone}
-          studentName={row.original.full_name}
-        />
-      </div>
-    ),
-    size: 10
-  },
-  /* {
-    header: "Intake",
-    id: "intake",
-    accessorKey: "intake_code",
-    cell: ({ row }) => {
-      return <div>{row.original.intake_code}</div>;
-    },
-    enableSorting: false,
-    enableColumnFilter: false
-  }, */ {
-    accessorKey: "campus_code",
-    id: "Campus Code",
-    header: "Campus",
-    cell: ({ row }) => {
-      return (
-        <div className="text-center w-full">
-          {row.original.campus_code || "-"}
-        </div>
-      );
-    }
-  },
-  {
-    accessorKey: "matric_no",
-    header: "Matrix ID",
-    id: "Matric No"
+    enableHiding: false,
+    size: 32
   },
   {
     accessorKey: "full_name",
     id: "name",
-    header: "Full Name",
+    header: "Student",
+    enableHiding: false,
     cell: ({ row }) => {
-      const lms = row.original.a_lms_activity;
-      const zeroLogin =
-        row.original.study_mode === "Online" &&
-        (lms?.course_visits ?? 0) === 0;
+      const s = row.original;
+      const lms = s.a_lms_activity;
+      const zeroLogin = s.study_mode === "Online" && (lms?.course_visits ?? 0) === 0;
       return (
-        <div className="flex items-center gap-1.5">
-          {zeroLogin && (
-            <AlertTriangle className="h-3.5 w-3.5 text-red-500 shrink-0" />
-          )}
-          <span className={zeroLogin ? "text-red-600 dark:text-red-400 font-medium" : ""}>
-            {row.original.full_name}
+        <div className="flex items-center gap-2.5 min-w-[210px]">
+          <span
+            className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[10px] font-semibold ${tintFor(
+              s.matric_no ?? s.full_name
+            )}`}
+          >
+            {initialsOf(s.full_name)}
+          </span>
+          <span className="flex flex-col min-w-0">
+            <span className="flex items-center gap-1.5">
+              <span className="truncate text-[13px] font-medium capitalize text-foreground">
+                {s.full_name?.toLowerCase()}
+              </span>
+              {s.at_risk && (
+                <TriangleAlert
+                  aria-label="Flagged at risk"
+                  className="h-3 w-3 shrink-0 text-amber-500"
+                />
+              )}
+              {zeroLogin && (
+                <span
+                  title="No CN logins"
+                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500"
+                />
+              )}
+            </span>
+            <span className="truncate font-mono text-[10px] text-muted-foreground">
+              {s.matric_no}
+            </span>
           </span>
         </div>
       );
@@ -285,7 +335,7 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
         row.original.a_engagements?.at(-1)?.outcome
       ).toLowerCase();
 
-      const search = filterValue.toLowerCase();
+      const search = String(filterValue).toLowerCase();
 
       return (
         name.includes(search) ||
@@ -296,220 +346,300 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     }
   },
   {
+    accessorKey: "campus_code",
+    id: "Campus Code",
+    header: "Campus",
+    filterFn: "equalsString",
+    cell: ({ row }) => (
+      <span className="text-[11px] text-muted-foreground">
+        {row.original.campus_code || "—"}
+      </span>
+    )
+  },
+  {
+    accessorFn: (row) => getStudentLevel(row.programme_name) ?? "",
+    id: "study_level",
+    header: "Level",
+    filterFn: "equalsString",
+    cell: ({ row }) => (
+      <span className="text-[11px] text-muted-foreground">
+        {getStudentLevel(row.original.programme_name) ?? "—"}
+      </span>
+    )
+  },
+  {
     accessorKey: "study_mode",
     id: "study_mode",
-    header: "Study Mode",
+    header: "Mode",
     cell: ({ row }) => {
+      const online = row.original.study_mode === "Online";
+      const Icon = online ? Laptop : School;
       return (
-        <div className="text-center w-full">
-          <Badge
-            variant={"outline"}
-            className={`${row.original.study_mode === "Online" ? "bg-purple-300 dark:bg-purple-800" : "bg-amber-300 dark:bg-amber-800"} border-0`}
-          >
-            {row.original.study_mode === "Online" ? "Online" : "Conventional"}
-          </Badge>
-        </div>
+        <span
+          className={`inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] ${
+            online
+              ? "text-violet-600 dark:text-violet-300"
+              : "text-amber-600 dark:text-amber-300"
+          }`}
+        >
+          <Icon className="h-3 w-3" />
+          {online ? "Online" : "Conv."}
+        </span>
       );
     }
   },
   {
     accessorKey: "status",
     id: "Status",
-    header: ({}) => {
-      return <div className="flex items-center justify-center">Status</div>;
-    },
+    header: "Status",
     cell: ({ row }) => {
       const s = row.original.status;
-      const cls =
-        s === "Active"   ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-0" :
-        s === "At Risk"  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 border-0" :
-        s === "Deferred" ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-0" :
-        s === "Withdraw" ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-0" :
-        "border-0";
+      const tone =
+        s === "Active"
+          ? "bg-emerald-500"
+          : s === "At Risk"
+            ? "bg-amber-500"
+            : s === "Deferred"
+              ? "bg-sky-500"
+              : s === "Withdraw"
+                ? "bg-red-500"
+                : "bg-muted-foreground";
+      return <StatusDot tone={tone} label={s ?? "—"} />;
+    }
+  },
+  {
+    // Three dots mirroring the check sequence on the record panel. Not
+    // sortable on purpose — the stat tiles above the table do the filtering.
+    id: "checks",
+    header: "Checks",
+    enableSorting: false,
+    filterFn: (row, _columnId, filterValue) => {
+      const checks = getChecks(row.original);
+      if (filterValue === "onboarding") return !checks[0].checked;
+      if (filterValue === "login")
+        return checks[0].checked && !checks[1].checked;
+      if (filterValue === "ptptn")
+        return checks[2].applicable && !checks[2].checked;
+      return true;
+    },
+    cell: ({ row }) => {
+      const checks = getChecks(row.original);
       return (
-        <div className="flex justify-center">
-          <Badge className={cls}>{s ?? "-"}</Badge>
-        </div>
+        <span className="flex items-center justify-center gap-1">
+          {checks.map((c) => (
+            <span
+              key={c.key}
+              title={`${c.label}: ${
+                !c.applicable
+                  ? "not applicable"
+                  : c.checked
+                    ? "done"
+                    : c.unlocked
+                      ? "pending"
+                      : "locked"
+              }`}
+              className={`h-2 w-2 rounded-full ${
+                !c.applicable
+                  ? "bg-muted-foreground/20"
+                  : c.checked
+                    ? "bg-emerald-500"
+                    : c.unlocked
+                      ? "bg-amber-400"
+                      : "bg-muted-foreground/30"
+              }`}
+            />
+          ))}
+        </span>
       );
     }
   },
   {
+    accessorKey: "at_risk",
+    id: "at_risk",
+    header: "Risk",
+    filterFn: (row, _columnId, filterValue) => {
+      if (typeof filterValue !== "boolean") return true;
+      return !!row.original.at_risk === filterValue;
+    },
+    cell: ({ row }) =>
+      row.original.at_risk ? (
+        <TriangleAlert className="h-3.5 w-3.5 text-amber-500" />
+      ) : (
+        <span className="text-[11px] text-muted-foreground">—</span>
+      )
+  },
+  {
     accessorKey: "a_payments.payment_mode",
     id: "payment_mode",
+    header: "Payment",
     filterFn: (row, _columnId, filterValue) => {
       if (!filterValue) return true;
       const pm = row.original.a_payments?.payment_mode ?? "";
-      const isSelf = pm.toLowerCase().includes("self"); // "SELF", "Self Paying", etc.
+      const isSelf = pm.toLowerCase().includes("self");
       const isPtptn = pm.toUpperCase().includes("PTPTN");
       if (filterValue === "SELF") return isSelf;
       if (filterValue === "PTPTN") return isPtptn;
-      // "Other" selects everything that isn't SELF or PTPTN (incl. blank/legacy values)
+      // "Other" selects everything that isn't SELF or PTPTN (incl. blank values)
       if (filterValue === "Other") return !isSelf && !isPtptn;
       return pm === filterValue;
     },
-    header: ({}) => {
-      return (
-        <div className="w-full flex items-center justify-center">
-          <p>Payment Mode</p>
-        </div>
-      );
-    },
     cell: ({ row }) => {
       const pm = row.original.a_payments?.payment_mode;
+      if (!pm) return <span className="text-[11px] text-muted-foreground">—</span>;
       const cls =
-        pm === "PTPTN" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-0" :
-        pm === "SELF"  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-0" :
-        pm             ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-0" :
-        "border-0";
+        pm === "PTPTN"
+          ? "border-emerald-200 text-emerald-700 dark:border-emerald-800 dark:text-emerald-300"
+          : pm.toLowerCase().includes("self")
+            ? "border-sky-200 text-sky-700 dark:border-sky-800 dark:text-sky-300"
+            : "border-amber-200 text-amber-700 dark:border-amber-800 dark:text-amber-300";
       return (
-        <div className="flex items-center justify-center">
-          <Badge className={cls}>{pm ?? "-"}</Badge>
-        </div>
+        <Badge
+          variant="outline"
+          className={`h-5 rounded-md px-1.5 text-[10px] font-medium ${cls}`}
+        >
+          {pm}
+        </Badge>
+      );
+    }
+  },
+  {
+    accessorKey: "a_payments.ptptn_proof_status",
+    id: "ptptn_proof_status",
+    header: "Proof",
+    filterFn: (row, _columnId, filterValue) => {
+      if (typeof filterValue !== "boolean") return true;
+      return !!row.original.a_payments?.ptptn_proof_status === filterValue;
+    },
+    cell: ({ row }) => {
+      const isPTPTN = row.original.a_payments?.payment_mode === "PTPTN";
+      const approved = row.original.a_payments?.ptptn_proof_status;
+      if (!isPTPTN) {
+        return (
+          <span className="text-[11px] text-muted-foreground">
+            {row.original.a_payments?.payment_status ?? "—"}
+          </span>
+        );
+      }
+      return approved ? (
+        <CheckCheck className="h-3.5 w-3.5 text-emerald-500" />
+      ) : (
+        <XCircle className="h-3.5 w-3.5 text-red-500" />
       );
     }
   },
   {
     accessorKey: "a_lms_activity.course_visits",
     id: "course_visits",
-    header: ({ column }) => {
-      return (
-        <div className="flex items-center justify-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            CN Visits
-            <ArrowUpDown className="ml-1 h-3 w-3" />
-          </Button>
-        </div>
-      );
+    header: ({ column }) => (
+      <button
+        type="button"
+        className="inline-flex items-center gap-1 hover:text-foreground"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Visits
+        <ArrowUpDown className="h-3 w-3" />
+      </button>
+    ),
+    filterFn: (row, _columnId, filterValue) => {
+      // Used by the "Zero logins" quick filter in the toolbar.
+      if (filterValue !== "zero") return true;
+      return (row.original.a_lms_activity?.course_visits ?? 0) === 0;
     },
     cell: ({ row }) => {
       const visits = row.original.a_lms_activity?.course_visits ?? 0;
       const cls =
         visits === 0
-          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold rounded px-2 py-0.5"
+          ? "text-red-600 dark:text-red-400 font-semibold"
           : visits < 5
-          ? "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-semibold rounded px-2 py-0.5"
-          : "";
-      return (
-        <div className="text-center w-full flex justify-center">
-          <span className={cls}>{visits}</span>
-        </div>
-      );
+            ? "text-amber-600 dark:text-amber-400 font-medium"
+            : "text-foreground";
+      return <span className={`tabular-nums text-[11px] ${cls}`}>{visits}</span>;
     }
   },
   {
     accessorKey: "a_lms_activity.cp_w1",
     id: "CP W1",
-    header: "CP W1",
-    cell: ({ row }) => {
-      const val = row.original.a_lms_activity?.cp_w1 ?? 0;
-      const cls =
-        val === 0
-          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold rounded px-2 py-0.5"
-          : "";
-      return (
-        <div className="text-center w-full flex justify-center">
-          <span className={cls}>
-            {val ? (val * 100).toFixed(0) + "%" : "0%"}
-          </span>
-        </div>
-      );
-    }
+    header: "W1",
+    cell: ({ row }) => <ProgressCell value={row.original.a_lms_activity?.cp_w1 ?? 0} />
   },
   {
     accessorKey: "a_lms_activity.cp_w2",
     id: "CP W2",
-    header: "CP W2",
-    cell: ({ row }) => {
-      const val = row.original.a_lms_activity?.cp_w2 ?? 0;
-      const cls =
-        val === 0
-          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold rounded px-2 py-0.5"
-          : "";
-      return (
-        <div className="text-center w-full flex justify-center">
-          <span className={cls}>
-            {val ? (val * 100).toFixed(0) + "%" : "0%"}
-          </span>
-        </div>
-      );
-    }
+    header: "W2",
+    cell: ({ row }) => <ProgressCell value={row.original.a_lms_activity?.cp_w2 ?? 0} />
   },
   {
     accessorKey: "a_lms_activity.cp_w3",
     id: "CP W3",
-    header: "CP W3",
+    header: "W3",
+    cell: ({ row }) => <ProgressCell value={row.original.a_lms_activity?.cp_w3 ?? 0} />
+  },
+  {
+    accessorKey: "a_engagements",
+    id: "No of Engagements",
+    header: "Eng.",
+    filterFn: (row, _columnId, filterValue) => {
+      // Used by the "Never engaged" quick filter in the toolbar.
+      if (filterValue !== "none") return true;
+      return (row.original.a_engagements?.length ?? 0) === 0;
+    },
     cell: ({ row }) => {
-      const val = row.original.a_lms_activity?.cp_w3 ?? 0;
-      const cls =
-        val === 0
-          ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-semibold rounded px-2 py-0.5"
-          : "";
+      const count = row.original.a_engagements?.length ?? 0;
       return (
-        <div className="text-center w-full flex justify-center">
-          <span className={cls}>
-            {val ? (val * 100).toFixed(0) + "%" : "0%"}
-          </span>
-        </div>
+        <span
+          className={`inline-flex h-5 min-w-5 items-center justify-center rounded-md px-1.5 text-[10px] font-semibold tabular-nums ${
+            count === 0
+              ? "bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-300"
+              : "bg-muted text-foreground"
+          }`}
+        >
+          {count}
+        </span>
       );
     }
   },
-
   {
-    accessorKey: "a_payments.ptptn_proof_status",
-    id: "ptptn_proof_status",
-    header: ({}) => {
-      return (
-        <div className="w-full flex items-center justify-center">
-          <p>Payment Status</p>
-        </div>
-      );
-    },
+    accessorKey: "a_engagements",
+    id: "Outcome",
+    header: ({ column }) => (
+      <button
+        type="button"
+        className="inline-flex items-center gap-1 hover:text-foreground"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Last outcome
+        <ArrowUpDown className="h-3 w-3" />
+      </button>
+    ),
     cell: ({ row }) => {
-      const isPTPTN = row.original.a_payments?.payment_mode === "PTPTN";
-      const approved = row.original.a_payments?.ptptn_proof_status;
+      const outcome = row.original.a_engagements?.at(-1)?.outcome;
       return (
-        <div className="flex items-center justify-center w-full">
-          {isPTPTN ? (
-            approved
-              ? <CheckCheck className="h-4 w-4 text-green-500" />
-              : <XCircle className="h-4 w-4 text-red-500" />
-          ) : (
-            <span className="text-xs">{row.original.a_payments?.payment_status ?? "-"}</span>
-          )}
-        </div>
+        <span className="block max-w-[130px] truncate text-[11px] text-muted-foreground">
+          {outcome ? outcome.replace(/[._-]/g, " ") : "—"}
+        </span>
       );
     }
   },
   {
     accessorKey: "sst_id",
     id: "sst_id",
-    header: ({}) => {
-      return (
-        <div className="w-full flex items-center justify-center">
-          <p>SST</p>
-        </div>
-      );
-    },
+    header: "Owner",
     cell: ({ row }) => {
-      const id = row.original.sst_id;
-      const sst: Record<number, { name: string; cls: string }> = {
-        1: { name: "Amirul",  cls: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-0" },
-        2: { name: "Farzana", cls: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-0" },
-        3: { name: "Najwa",   cls: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-0" },
-        4: { name: "Ayu",     cls: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300 border-0" },
-        6: { name: "Miru",    cls: "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-300 border-0" },
-      };
-      const member = id ? sst[id] : null;
+      const member = getSstById(row.original.sst_id);
+      if (!member) {
+        return <span className="text-[11px] text-muted-foreground">—</span>;
+      }
       return (
-        <div className="flex items-center justify-center">
-          {member
-            ? <Badge className={member.cls}>{member.name}</Badge>
-            : <span className="text-xs text-muted-foreground">-</span>
-          }
-        </div>
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+          <span
+            className={`grid h-5 w-5 place-items-center rounded-full text-[9px] font-semibold ${member.badgeClass}`}
+          >
+            {initialsOf(member.name)}
+          </span>
+          <span className="text-[11px] text-muted-foreground">
+            {member.name}
+          </span>
+        </span>
       );
     },
     enableSorting: true,
@@ -517,74 +647,17 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     filterFn: "equalsString"
   },
   {
-    accessorKey: "a_engagements",
-    id: "No of Engagements",
-    header: ({} = {}) => {
-      return (
-        <div className="w-full items-center justify-center">
-          <p>Engagements</p>
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center justify-center text-xs">
-          {row.original.a_engagements?.length}
-        </div>
-      );
-    }
-  },
-  {
-    accessorKey: "a_engagements",
-    id: "Outcome",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Outcome
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center justify-center text-xs">
-          {row.original.a_engagements?.at(-1)?.outcome}
-        </div>
-      );
-    }
-  },
-  {
-    header: "SOS",
-    id: "sos",
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center justify-center text-xs">
-          {Array.isArray(row.original.a_sos) &&
-          row.original.a_sos.length > 0 ? (
-            <CheckCheck className="h-4 w-4 text-green-500" />
-          ) : (
-            <XCircle className="h-4 w-4 text-red-500" />
-          )}
-        </div>
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      const sos = row.original.a_sos;
-
-      // If filterValue is true, ensure array exists and has items
-      if (filterValue === true) {
-        return Array.isArray(sos) && sos.length > 0;
-      }
-
-      // If filterValue is false, ensure array is empty or null
-      if (filterValue === false) {
-        return !Array.isArray(sos) || sos.length === 0;
-      }
-
-      return true; // "all" case (filterValue is undefined)
-    }
+    id: "WhatsApp",
+    header: "",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <div className="flex justify-end pr-1">
+        <WhatsAppCell
+          phone={row.original.phone}
+          studentName={row.original.full_name}
+        />
+      </div>
+    ),
+    size: 40
   }
 ];

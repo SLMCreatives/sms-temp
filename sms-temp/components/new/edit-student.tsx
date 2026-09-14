@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { StudentDashboardRow } from "@/lib/types/database";
+import { SST_MEMBERS } from "@/lib/sst-members";
 import {
   Dialog,
   DialogContent,
@@ -178,16 +179,15 @@ export default function EditStudent({
       value: student.sst_id,
       label: "Assigned SST",
       editable: true,
-      options: ["1", "2", "3", "4", "5"],
+      options: SST_MEMBERS.map((m) => String(m.id)),
       table: "a_students"
     }
   ];
 
-  const sstMembers = [
-    { value: "1", label: "Amirul" },
-    { value: "2", label: "Farzana" },
-    { value: "6", label: "Miru" }
-  ];
+  const sstMembers = SST_MEMBERS.map((member) => ({
+    value: String(member.id),
+    label: member.name
+  }));
 
   const studentFields = profile.filter((item) => item.table === "a_students");
   const paymentFields = profile.filter((item) => item.table === "a_payments");
@@ -360,8 +360,13 @@ export default function EditStudent({
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant={"secondary"} size="lg" className="group">
-            <Settings className="w-6 h-6 group-hover:animate-spin" />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Edit student"
+            className="group h-7 w-7 text-muted-foreground hover:text-foreground"
+          >
+            <Settings className="h-4 w-4 group-hover:animate-spin" />
           </Button>
         </DialogTrigger>
 

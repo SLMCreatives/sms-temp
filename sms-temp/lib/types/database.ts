@@ -17,6 +17,20 @@ export interface Student {
   a_lms_activity: LMSActivity | null;
   a_sos: SOS | null;
   campus_code: string | null;
+
+  // Engagement checks (see supabase/migrations/20260914_engagement_checks.sql).
+  // The PTPTN check has no column here — it reuses a_payments.ptptn_proof_status.
+  onboarding_checked: boolean | null;
+  onboarding_checked_at: string | null;
+  onboarding_checked_by: number | null;
+  login_checked: boolean | null;
+  login_checked_at: string | null;
+  login_checked_by: number | null;
+  /** Running remarks log — one textarea, a new line per contact. */
+  remarks: string | null;
+  at_risk: boolean | null;
+  at_risk_reason: string | null;
+  at_risk_intent: 'deciding' | 'defer' | 'withdraw' | null;
 }
 
 // 2. Payment Tracking

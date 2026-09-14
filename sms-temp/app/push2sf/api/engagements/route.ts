@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { SST_NAMES } from '@/lib/sst-members'
 
 type StudentJoin = {
   full_name: string | null
@@ -24,13 +25,6 @@ type EngagementRow = {
   a_students: StudentJoin | StudentJoin[] | null
 }
 
-const SST_NAMES: Record<number, string> = {
-  1: 'Amirul',
-  2: 'Farzana',
-  3: 'Najwa',
-  4: 'Ayu',
-  6: 'Miru',
-}
 
 export async function GET() {
   try {

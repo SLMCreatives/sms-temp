@@ -10,6 +10,7 @@ import {
   getPaginationRowModel,
   ColumnPinningState,
   ColumnFiltersState,
+  VisibilityState,
   getFilteredRowModel
 } from "@tanstack/react-table";
 
@@ -26,49 +27,175 @@ import { DataTablePagination } from "@/components/ui/paginationControls";
 import { NewStudentCard } from "@/components/new/student-card";
 import { StudentDashboardRow } from "@/lib/types/database";
 import {
-  AlertTriangle,
-  CheckCheck,
-  CheckCircle,
+  BanknoteArrowUp,
   Laptop,
-  RefreshCcw,
+  LogIn,
+  RotateCcw,
   School,
   Search,
-  UserCircle,
-  XCircle
+  SlidersHorizontal,
+  TriangleAlert,
+  UserCheck,
+  Users,
+  UserSearch,
+  X
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { SST_MEMBERS } from "@/lib/sst-members";
+import { levelOptionsFrom } from "@/lib/student-level";
+import { getChecks, getProgress } from "@/lib/student-progress";
+
+const ALL = "all";
+
+/** Readable names for ids that would otherwise show raw in the Columns menu. */
+const COLUMN_LABELS: Record<string, string> = {
+  sst_id: "Owner",
+  checks: "Checks",
+  at_risk: "At risk",
+  study_level: "Level",
+  study_mode: "Mode",
+  payment_mode: "Payment",
+  ptptn_proof_status: "Proof",
+  course_visits: "CN visits",
+  "No of Engagements": "Engagements"
+};
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  userSstId?: number | null;
-  isManager?: boolean;
+  /** Show the owner filter — only useful when viewing more than one caseload. */
+  showSstFilter?: boolean;
+  /** Describes the current scope in the first stat card. */
+  scopeLabel?: string;
+}
+
+/** Human-readable text for the active-filter chips under the toolbar. */
+function filterChipLabel(id: string, value: unknown) {
+  if (id === "ptptn_proof_status") return "PTPTN proof pending";
+  if (id === "course_visits") return "Zero CN logins";
+  if (id === "at_risk") return "Flagged at risk";
+  if (id === "No of Engagements") return "Never engaged";
+  if (id === "checks") {
+    if (value === "onboarding") return "Onboarding pending";
+    if (value === "login") return "Login check pending";
+    if (value === "ptptn") return "PTPTN check pending";
+    return "Checks incomplete";
+  }
+  if (id === "sst_id") {
+    const member = SST_MEMBERS.find((m) => String(m.id) === String(value));
+    return member ? `Owner: ${member.name}` : `Owner: ${String(value)}`;
+  }
+  if (id === "payment_mode") return `Payment: ${String(value)}`;
+  if (id === "Campus Code") return `Campus: ${String(value)}`;
+  if (id === "study_level") return `Level: ${String(value)}`;
+  if (id === "study_mode") return String(value);
+  return String(value);
+}
+
+/**
+ * A headline metric that doubles as a saved view — clicking it applies the
+ * matching column filter, clicking again clears it.
+ */
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  tone = "neutral",
+  active = false,
+  onClick
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number;
+  sub?: string;
+  tone?: "neutral" | "danger" | "warning";
+  active?: boolean;
+  onClick?: () => void;
+}) {
+  const accents = {
+    neutral: "text-muted-foreground",
+    danger: "text-red-600 dark:text-red-400",
+    warning: "text-amber-600 dark:text-amber-400"
+  };
+  const activeRing = {
+    neutral: "ring-foreground/30 bg-muted/50",
+    danger: "ring-red-400 bg-red-50 dark:bg-red-950/40",
+    warning: "ring-amber-400 bg-amber-50 dark:bg-amber-950/40"
+  };
+
+  const interactive = typeof onClick === "function";
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={!interactive}
+      aria-pressed={interactive ? active : undefined}
+      className={`group flex flex-col gap-2 rounded-xl border bg-card px-4 py-3 text-left transition ${
+        interactive ? "cursor-pointer hover:border-foreground/25 hover:shadow-sm" : "cursor-default"
+      } ${active ? `ring-2 ${activeRing[tone]}` : ""}`}
+    >
+      <span className="flex items-center gap-1.5">
+        <Icon className={`h-3.5 w-3.5 ${accents[tone]}`} />
+        <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
+      </span>
+      <span className="flex items-baseline gap-1.5">
+        <span
+          className={`text-2xl font-semibold leading-none tabular-nums ${
+            tone === "neutral" ? "text-foreground" : accents[tone]
+          }`}
+        >
+          {value}
+        </span>
+        {sub && (
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {sub}
+          </span>
+        )}
+      </span>
+      {interactive && (
+        <span className="text-[10px] text-muted-foreground/70">
+          {active ? "Filtering — click to clear" : "Click to filter"}
+        </span>
+      )}
+    </button>
+  );
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  userSstId,
-  isManager = false
+  showSstFilter = false,
+  scopeLabel = "In view"
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>({
-    left: ["select", "Matric No", "name"],
+    left: ["select", "name"],
     right: []
   });
   const [rowSelection, setRowSelection] = React.useState({});
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
@@ -84,361 +211,479 @@ export function DataTable<TData, TValue>({
       sorting,
       columnPinning,
       rowSelection,
+      columnVisibility,
       columnFilters
     },
     onColumnPinningChange: setColumnPinning,
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     enableMultiRowSelection: false,
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     autoResetPageIndex: false
   });
 
-  const router = useRouter();
-  const filteredCount = table.getFilteredRowModel().rows.length;
+  const rows = data as StudentDashboardRow[];
+  const searchRef = React.useRef<HTMLInputElement>(null);
 
-  const handleReset = () => {
-    table.resetColumnFilters();
-    table.resetSorting();
-    router.refresh();
+  // "/" focuses search, the way most CRMs do it.
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      const typing =
+        el?.tagName === "INPUT" ||
+        el?.tagName === "TEXTAREA" ||
+        el?.isContentEditable;
+      if (e.key === "/" && !typing) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Options come from the rows in scope, so a level or campus with no students
+  // never shows up as a dead end in the dropdown.
+  const levelOptions = React.useMemo(() => levelOptionsFrom(rows), [rows]);
+  const campusOptions = React.useMemo(
+    () =>
+      Array.from(
+        new Set(rows.map((s) => s.campus_code).filter(Boolean) as string[])
+      ).sort(),
+    [rows]
+  );
+
+  const getFilter = (id: string) =>
+    (table.getColumn(id)?.getFilterValue() as string) ?? ALL;
+  const setFilter = (id: string, value: string) =>
+    table.getColumn(id)?.setFilterValue(value === ALL ? undefined : value);
+
+  const search = (table.getColumn("name")?.getFilterValue() as string) ?? "";
+  const activeFilters = columnFilters.filter((f) => f.id !== "name");
+  const hasAnything =
+    activeFilters.length > 0 || search.length > 0 || sorting.length > 0;
+
+  /** Toggles one of the metric-card quick views on or off. */
+  const toggleQuickFilter = (id: string, value: unknown) => {
+    const column = table.getColumn(id);
+    if (!column) return;
+    column.setFilterValue(column.getFilterValue() === value ? undefined : value);
   };
 
-  // Zero-login count reflects the table's currently visible (filtered) rows —
-  // all SST for manager, own for SST member
-  const visibleStudents = table
+  const visible = table
     .getFilteredRowModel()
     .rows.map((r) => r.original as StudentDashboardRow);
-  const scopedStudents = isManager
-    ? visibleStudents
-    : userSstId
-      ? visibleStudents.filter((s) => s.sst_id === userSstId)
-      : [];
-  const zeroLoginStudents = scopedStudents.filter(
+
+  // Metrics follow the check sequence, so each tile is the next thing to work.
+  const onboardingPending = visible.filter(
+    (s) => !getChecks(s)[0].checked
+  ).length;
+  const loginPending = visible.filter((s) => {
+    const c = getChecks(s);
+    return c[0].checked && !c[1].checked;
+  }).length;
+  const ptptnPending = visible.filter((s) => {
+    const c = getChecks(s)[2];
+    return c.applicable && !c.checked;
+  }).length;
+  const atRisk = visible.filter((s) => !!s.at_risk).length;
+  const zeroLogin = visible.filter(
     (s) => s.a_lms_activity != null && s.a_lms_activity.course_visits === 0
-  );
-  const totalVisible = scopedStudents.length;
-  const zeroLoginPct = totalVisible
-    ? Math.round((zeroLoginStudents.length / totalVisible) * 100)
-    : 0;
-  const showBanner = isManager || !!userSstId;
+  ).length;
+  const allDone = visible.filter((s) => getProgress(s).complete).length;
+
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
 
   return (
-    <div className="grid grid-cols-3 gap-8 gap-y-4 py-2">
-      {showBanner && (
-        <div className="col-span-3 flex items-center gap-3 px-4 py-2.5 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
-          <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
-          <span className="text-sm font-semibold text-red-700 dark:text-red-300">
-            {isManager ? "All SST" : "My Students"} — Zero Logins
-          </span>
-          <span className="text-sm font-mono text-red-700 dark:text-red-300">
-            {zeroLoginStudents.length} / {totalVisible}
-          </span>
-          <span className="text-xs rounded-full bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200 px-2 py-0.5 font-mono font-semibold">
-            {zeroLoginPct}%
-          </span>
-        </div>
-      )}
-      <div className="col-span-2 max-h-fit row-span-3 rounded-2xl container p-4 drop-shadow-xl relative border-0 ">
-        <div className="flex items-center pb-4 w-full gap-2 border-b">
-          <div className="flex flex-row gap-2 flex-1 min-w-0 items-center">
-            <Search className="w-4 h-4 text-primary" />
-            <Input
-              value={
-                (table.getColumn("name")?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
-              }
-              className="text-left w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-              placeholder="Search name, matric number, status or outcome"
-            />
-          </div>
-          {/* <div>
-            <Selectß
-              value={
-                (table.getColumn("sst_id")?.getFilterValue() as string) ?? ""
-              }
-              onValueChange={(value) =>
-                table
-                  .getColumn("sst_id")
-                  ?.setFilterValue(value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="lg:w-fit w-full">
-                <SelectValue placeholder="SST" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>SST Members</SelectLabel>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="1">Amirul</SelectItem>
-                  <SelectItem value="2">Farzana</SelectItem>
-                  <SelectItem value="3">Najwa</SelectItem>
-                  <SelectItem value="4">Ayu</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div> */}
-
-          <div>
-            <Select
-              value={
-                (table.getColumn("Status")?.getFilterValue() as string) ?? ""
-              }
-              onValueChange={(value) =>
-                table
-                  .getColumn("Status")
-                  ?.setFilterValue(value === "all" ? "" : value)
-              }
-              defaultValue="Active"
-            >
-              <SelectTrigger className="lg:w-fit w-full border-0">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Status</SelectLabel>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="At Risk">At Risk</SelectItem>
-                  <SelectItem value="Deferred">Deferred</SelectItem>
-                  <SelectItem value="Withdraw">Withdraw</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Select
-              onValueChange={(value) => {
-                const column = table.getColumn("sos");
-                if (!column) return;
-
-                if (value === "all") {
-                  column.setFilterValue(undefined); // Clear filter
-                } else if (value === "submitted") {
-                  column.setFilterValue(true); // Signal to filter for length > 0
-                } else if (value === "not-submitted") {
-                  column.setFilterValue(false); // Signal to filter for length === 0
-                }
-              }}
-            >
-              <SelectTrigger className="lg:w-fit w-full border-0">
-                <SelectValue placeholder="SOS" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>SOS</SelectLabel>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="submitted">
-                    <CheckCheck className=" text-green-500 mr-2" />
-                  </SelectItem>
-                  <SelectItem value="not-submitted">
-                    <XCircle className="mr-2 text-red-500" />
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Select
-              value={
-                (table.getColumn("payment_mode")?.getFilterValue() as string) ??
-                ""
-              }
-              onValueChange={(value) =>
-                table
-                  .getColumn("payment_mode")
-                  ?.setFilterValue(value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="lg:w-fit w-full border-0">
-                <SelectValue placeholder="Payment Mode" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Payment Mode</SelectLabel>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="PTPTN">PTPTN</SelectItem>
-                  <SelectItem value="SELF">SELF</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <ToggleGroup
-            type="single"
-            variant={"default"}
-            spacing={2}
-            onValueChange={(value) => {
-              table
-                .getColumn("ptptn_proof_status")
-                ?.setFilterValue(value ? true : false);
-            }}
-            className="space-x-4"
-          >
-            <ToggleGroupItem
-              value="true"
-              aria-label="Toggle true"
-              className="data-[state=on]:bg-green-200 dark:data-[state=on]:bg-green-700 dark:data-[state=on]:text-white data-[state=on]:text-black data-[state=off]:bg-red-200 dark:data-[state=off]:bg-red-700 dark:data-[state=off]:text-white data-[state=off]:text-black"
-            >
-              <CheckCircle className="h-4 w-4" />
-            </ToggleGroupItem>
-          </ToggleGroup>
-
-          <ToggleGroup
-            type="single"
-            variant={"default"}
-            defaultValue="Online"
-            spacing={2}
-            onValueChange={(value) => {
-              table.getColumn("study_mode")?.setFilterValue(value);
-            }}
-            className="space-x-2"
-          >
-            <ToggleGroupItem
-              value="Online"
-              aria-label="Toggle Online"
-              className="data-[state=on]:bg-purple-200 dark:data-[state=on]:bg-purple-700 dark:data-[state=on]:text-white data-[state=on]:text-black"
-            >
-              <Laptop className="h-4 w-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="Conventional"
-              aria-label="Toggle Conventional"
-              className="data-[state=on]:bg-amber-200 dark:data-[state=on]:bg-amber-700 dark:data-[state=on]:text-white data-[state=on]:text-black"
-            >
-              <School className="h-4 w-4" />
-            </ToggleGroupItem>
-          </ToggleGroup>
-          {/*  <Switch
-            id="study_mode"
-            checked={
-              table.getColumn("study_mode")?.getFilterValue() === "Online"
-            }
-            onCheckedChange={(value) => {
-              table
-                .getColumn("study_mode")
-                ?.setFilterValue(value ? "Online" : "Conventional");
-            }}
-            defaultChecked={true}
-          /> */}
-          <div className="ml-auto flex flex-row gap-4 items-center">
-            <Select
-              value={
-                (table.getColumn("sst_id")?.getFilterValue() as string) ?? ""
-              }
-              onValueChange={(value) =>
-                table
-                  .getColumn("sst_id")
-                  ?.setFilterValue(value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="lg:w-fit w-full border-0">
-                <SelectValue placeholder="SST" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>SST Members</SelectLabel>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="1">Amirul</SelectItem>
-                  <SelectItem value="2">Farzana</SelectItem>
-                  <SelectItem value="6">Miru</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <p className="text-xs italic text-muted-foreground">
-              {filteredCount}/{data.length}
-            </p>
-          </div>
-          <div>
-            <Button variant="ghost" onClick={() => handleReset()}>
-              <RefreshCcw className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className={`${header.column.id === "name" ? "sticky left-0 z-20" : ""}`}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.index}
-                  data-state={row.getIsSelected() && "selected"}
-                  onClick={() => row.toggleSelected()}
-                  className="cursor-pointer"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={`${cell.column.id === "name" ? "sticky left-0 z-20 py-4 " : ""} ${row.getIsSelected() ? "font-bold " : "text-stone-500"} bg-white  dark:bg-black text-black dark:text-white`}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <DataTablePagination table={table} />
+    <div className="flex w-full flex-col gap-5">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+        <MetricCard
+          icon={Users}
+          label={scopeLabel}
+          value={visible.length}
+          sub={
+            visible.length
+              ? `${allDone} done`
+              : visible.length !== data.length
+                ? `of ${data.length}`
+                : undefined
+          }
+        />
+        <MetricCard
+          icon={UserCheck}
+          label="1 · Onboarding"
+          value={onboardingPending}
+          sub="pending"
+          tone={onboardingPending > 0 ? "danger" : "neutral"}
+          active={table.getColumn("checks")?.getFilterValue() === "onboarding"}
+          onClick={() => toggleQuickFilter("checks", "onboarding")}
+        />
+        <MetricCard
+          icon={LogIn}
+          label="2 · Zero login"
+          value={loginPending}
+          sub={zeroLogin ? `${zeroLogin} never logged in` : "pending"}
+          tone={loginPending > 0 ? "warning" : "neutral"}
+          active={table.getColumn("checks")?.getFilterValue() === "login"}
+          onClick={() => toggleQuickFilter("checks", "login")}
+        />
+        <MetricCard
+          icon={BanknoteArrowUp}
+          label="3 · PTPTN"
+          value={ptptnPending}
+          sub="pending"
+          tone={ptptnPending > 0 ? "warning" : "neutral"}
+          active={table.getColumn("checks")?.getFilterValue() === "ptptn"}
+          onClick={() => toggleQuickFilter("checks", "ptptn")}
+        />
+        <MetricCard
+          icon={TriangleAlert}
+          label="At risk"
+          value={atRisk}
+          sub="flagged"
+          tone={atRisk > 0 ? "danger" : "neutral"}
+          active={table.getColumn("at_risk")?.getFilterValue() === true}
+          onClick={() => toggleQuickFilter("at_risk", true)}
+        />
       </div>
-      <div className="flex flex-col gap-8 sticky top-6 ">
-        {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-          table
-            .getFilteredSelectedRowModel()
-            .rows.toReversed()
-            .map((row, index) => (
-              <div
-                className="rounded-2xl border bg-background p-4 drop-shadow-xl"
-                key={row.id}
+
+      <div className="grid grid-cols-1 items-start gap-5 2xl:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="min-w-0 overflow-hidden rounded-xl border bg-card">
+          <div className="flex flex-col gap-2.5 border-b px-3 py-2.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative min-w-[220px] flex-1">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  ref={searchRef}
+                  value={search}
+                  onChange={(event) =>
+                    table.getColumn("name")?.setFilterValue(event.target.value)
+                  }
+                  className="h-9 border-0 bg-muted/50 pl-8 pr-16 text-[13px] shadow-none focus-visible:ring-1"
+                  placeholder="Search name, matric, status or outcome"
+                />
+                {search ? (
+                  <button
+                    type="button"
+                    aria-label="Clear search"
+                    onClick={() => table.getColumn("name")?.setFilterValue("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                ) : (
+                  <kbd className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 rounded border bg-background px-1.5 font-mono text-[10px] text-muted-foreground sm:block">
+                    /
+                  </kbd>
+                )}
+              </div>
+
+              <Select
+                value={getFilter("study_level")}
+                onValueChange={(value) => setFilter("study_level", value)}
               >
+                <SelectTrigger className="h-9 w-auto gap-1.5 border-0 bg-muted/50 text-[13px]">
+                  <SelectValue placeholder="Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All levels</SelectItem>
+                  <SelectSeparator />
+                  {levelOptions.map((level) => (
+                    <SelectItem key={level} value={level}>
+                      {level}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={getFilter("Campus Code")}
+                onValueChange={(value) => setFilter("Campus Code", value)}
+              >
+                <SelectTrigger className="h-9 w-auto gap-1.5 border-0 bg-muted/50 text-[13px]">
+                  <SelectValue placeholder="Campus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All campuses</SelectItem>
+                  <SelectSeparator />
+                  {campusOptions.map((campus) => (
+                    <SelectItem key={campus} value={campus}>
+                      {campus}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={getFilter("payment_mode")}
+                onValueChange={(value) => setFilter("payment_mode", value)}
+              >
+                <SelectTrigger className="h-9 w-auto gap-1.5 border-0 bg-muted/50 text-[13px]">
+                  <SelectValue placeholder="Payment" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All methods</SelectItem>
+                  <SelectSeparator />
+                  <SelectItem value="PTPTN">PTPTN</SelectItem>
+                  <SelectItem value="SELF">Self paying</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={
+                  (table.getColumn("study_mode")?.getFilterValue() as string) ??
+                  ALL
+                }
+                onValueChange={(value) => setFilter("study_mode", value)}
+              >
+                <SelectTrigger className="h-9 w-auto gap-1.5 border-0 bg-muted/50 text-[13px]">
+                  <SelectValue placeholder="Mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All modes</SelectItem>
+                  <SelectSeparator />
+                  <SelectItem value="Online">
+                    <Laptop className="mr-2 h-3.5 w-3.5" />
+                    Online
+                  </SelectItem>
+                  <SelectItem value="Conventional">
+                    <School className="mr-2 h-3.5 w-3.5" />
+                    Conventional
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              {showSstFilter && (
+                <Select
+                  value={getFilter("sst_id")}
+                  onValueChange={(value) => setFilter("sst_id", value)}
+                >
+                  <SelectTrigger className="h-9 w-auto gap-1.5 border-0 bg-muted/50 text-[13px]">
+                    <SelectValue placeholder="Owner" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ALL}>All owners</SelectItem>
+                    <SelectSeparator />
+                    {SST_MEMBERS.map((member) => (
+                      <SelectItem key={member.id} value={String(member.id)}>
+                        {member.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              <div className="ml-auto flex items-center gap-1">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-9 gap-1.5">
+                      <SlidersHorizontal className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Columns</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    <DropdownMenuLabel className="text-xs">
+                      Visible columns
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {table
+                      .getAllColumns()
+                      .filter((column) => column.getCanHide())
+                      .map((column) => (
+                        <DropdownMenuCheckboxItem
+                          key={column.id}
+                          className="text-xs capitalize"
+                          checked={column.getIsVisible()}
+                          onCheckedChange={(value) =>
+                            column.toggleVisibility(!!value)
+                          }
+                        >
+                          {COLUMN_LABELS[column.id] ?? column.id}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 gap-1.5"
+                  disabled={!hasAnything}
+                  onClick={() => {
+                    table.resetColumnFilters();
+                    table.resetSorting();
+                  }}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Reset</span>
+                </Button>
+              </div>
+            </div>
+
+            {activeFilters.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {activeFilters.map((filter) => (
+                  <button
+                    key={filter.id}
+                    type="button"
+                    onClick={() =>
+                      table.getColumn(filter.id)?.setFilterValue(undefined)
+                    }
+                    className="inline-flex items-center gap-1 rounded-full border bg-background py-0.5 pl-2.5 pr-1.5 text-[11px] text-muted-foreground transition hover:border-foreground/25 hover:text-foreground"
+                  >
+                    {filterChipLabel(filter.id, filter.value)}
+                    <X className="h-3 w-3" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="max-h-[calc(100vh-22rem)] min-h-[320px] overflow-auto">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-t-0 hover:bg-transparent"
+                  >
+                    {headerGroup.headers.map((header) => {
+                      // Sticky lives on the cells, not on <thead> — browsers
+                      // only reliably honour position:sticky on th/td.
+                      const pinned =
+                        header.column.id === "select" ||
+                        header.column.id === "name";
+                      return (
+                      <TableHead
+                        key={header.id}
+                        className={`sticky top-0 h-9 whitespace-nowrap border-b bg-card px-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground ${
+                          pinned ? "z-40" : "z-30"
+                        } ${header.column.id === "select" ? "left-0" : ""} ${
+                          header.column.id === "name" ? "left-10" : ""
+                        }`}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => {
+                    const selected = row.getIsSelected();
+                    return (
+                      <TableRow
+                        key={row.id}
+                        data-state={selected && "selected"}
+                        onClick={() => row.toggleSelected()}
+                        className={`group cursor-pointer border-t transition-colors ${
+                          selected ? "bg-muted hover:bg-muted" : "hover:bg-muted"
+                        }`}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className={`h-11 px-3 py-0 align-middle ${
+                              cell.column.id === "select" ||
+                              cell.column.id === "name"
+                                ? // Pinned cells need an opaque background or
+                                  // scrolled columns show through them.
+                                  `sticky z-20 ${
+                                    selected
+                                      ? "bg-muted"
+                                      : "bg-card group-hover:bg-muted"
+                                  }`
+                                : ""
+                            } ${cell.column.id === "select" ? "left-0" : ""} ${
+                              cell.column.id === "name" ? "left-10" : ""
+                            }`}
+                          >
+                            {selected && cell.column.id === "select" && (
+                              <span className="absolute inset-y-0 left-0 w-0.5 bg-primary" />
+                            )}
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={columns.length} className="h-64">
+                      <div className="flex flex-col items-center justify-center gap-2 text-center">
+                        <UserSearch className="h-7 w-7 text-muted-foreground/40" />
+                        <p className="text-sm font-medium">
+                          No students match these filters
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Try clearing a filter or widening your search.
+                        </p>
+                        {hasAnything && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-1 h-8"
+                            onClick={() => {
+                              table.resetColumnFilters();
+                              table.resetSorting();
+                            }}
+                          >
+                            Clear all filters
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="border-t px-1">
+            <DataTablePagination table={table} />
+          </div>
+        </div>
+
+        {/*
+          One render only — the grid puts this in a side rail at 2xl and stacks
+          it under the table below that. Rendering it twice would mount the
+          engagement form twice.
+        */}
+        <aside className="2xl:sticky 2xl:top-20">
+          {selectedRows.length > 0 ? (
+            selectedRows
+              .toReversed()
+              .map((row, index) => (
                 <NewStudentCard
+                  key={row.id}
                   student={row.original as StudentDashboardRow}
                   index={index + 1}
+                  onClose={() => row.toggleSelected(false)}
                 />
-              </div>
-            ))
-        ) : (
-          <div className="flex w-full h-[250px] rounded-2xl border bg-background p-4 drop-shadow-xl items-center justify-center flex-col gap-2 text-muted-foreground">
-            <UserCircle width={50} height={50} className="w-10 h-10" />
-            <p>Select A Student To View Details</p>
-          </div>
-        )}
+              ))
+          ) : (
+            <div className="hidden h-[420px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-card/50 p-6 text-center 2xl:flex">
+              <UserSearch className="h-8 w-8 text-muted-foreground/30" />
+              <p className="text-sm font-medium">No student selected</p>
+              <p className="max-w-[220px] text-xs text-muted-foreground">
+                Pick a row to see contact details, CN activity, payment and
+                engagement history.
+              </p>
+            </div>
+          )}
+        </aside>
       </div>
     </div>
   );

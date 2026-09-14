@@ -3,6 +3,8 @@
 import StudentDetailsPage from "@/components/student-details";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState, use } from "react";
+import { redirect } from "next/navigation";
+import { getSstBySlug } from "@/lib/sst-members";
 import { Students } from "../studentColumns";
 import StudentDetailsPageC from "@/components/student-details-c";
 import StudentDetailsPageNov from "@/components/student-details-nov";
@@ -35,6 +37,8 @@ export default function StudentPage({
   params: Promise<{ matric_no: string }>;
 }) {
   const { matric_no } = use(params);
+  // /student/amirul is a team-member shortcut, not a matric number.
+  const sstShortcut = getSstBySlug(matric_no);
   const [student, setStudent] = useState<Students | null>(null);
   //const [studentData, setStudentData ] = useState<Students | null>(null)
   const [loading, setLoading] = useState(true);
@@ -95,6 +99,7 @@ export default function StudentPage({
   */
 
   useEffect(() => {
+    if (sstShortcut) return;
     async function fetchStudent() {
       setLoading(true);
       try {
@@ -125,7 +130,7 @@ export default function StudentPage({
     }
 
     fetchStudent();
-  }, [matric_no]);
+  }, [matric_no, sstShortcut]);
 
   //etStudent([].find((s: Students) => s.matric_no === matric_no) ?? null);
 
@@ -148,6 +153,7 @@ export default function StudentPage({
     fetchComments();
   }, [student]); */
 
+  if (sstShortcut) redirect(`/student/sst/${sstShortcut.slug}`);
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!student) return <div>No student found</div>;

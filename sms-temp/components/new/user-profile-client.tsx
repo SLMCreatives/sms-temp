@@ -32,7 +32,7 @@ export function UserProfileClient({
         </div>
       </PopoverTrigger>
       <PopoverContent
-        className="w-72 p-0"
+        className="w-[360px] p-0"
         align="end"
         side="left"
         alignOffset={-4}

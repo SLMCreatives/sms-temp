@@ -1,5 +1,18 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * The theme tokens in app/globals.css are complete oklch colours (e.g.
+ * `--card: oklch(1 0 0)`), not the bare HSL triplets shadcn used to ship. They
+ * must therefore be referenced as plain `var(--token)` — wrapping them in
+ * `hsl(...)` produces `hsl(oklch(...))`, which every browser discards as
+ * invalid, and that is what silently blanked out the semantic colours.
+ *
+ * `withAlpha` keeps the `/50` opacity modifiers working by mixing the token
+ * with transparent, which Tailwind v3 cannot do for a raw `var()` value.
+ */
+const withAlpha = (token: string) =>
+  `color-mix(in oklab, var(${token}) calc(<alpha-value> * 100%), transparent)`;
+
 export default {
   darkMode: ["class"],
   content: [
@@ -11,45 +24,57 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        background: withAlpha("--background"),
+        foreground: withAlpha("--foreground"),
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: withAlpha("--card"),
+          foreground: withAlpha("--card-foreground"),
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: withAlpha("--popover"),
+          foreground: withAlpha("--popover-foreground"),
         },
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: withAlpha("--primary"),
+          foreground: withAlpha("--primary-foreground"),
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: withAlpha("--secondary"),
+          foreground: withAlpha("--secondary-foreground"),
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: withAlpha("--muted"),
+          foreground: withAlpha("--muted-foreground"),
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: withAlpha("--accent"),
+          foreground: withAlpha("--accent-foreground"),
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: withAlpha("--destructive"),
+          foreground: withAlpha("--destructive-foreground"),
         },
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
+        border: withAlpha("--border"),
+        input: withAlpha("--input"),
+        ring: withAlpha("--ring"),
         chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
+          "1": withAlpha("--chart-1"),
+          "2": withAlpha("--chart-2"),
+          "3": withAlpha("--chart-3"),
+          "4": withAlpha("--chart-4"),
+          "5": withAlpha("--chart-5"),
+        },
+        // The sidebar palette was defined in CSS but never registered here, so
+        // `bg-sidebar` was never generated and the nav rendered transparent.
+        sidebar: {
+          DEFAULT: withAlpha("--sidebar"),
+          foreground: withAlpha("--sidebar-foreground"),
+          primary: withAlpha("--sidebar-primary"),
+          "primary-foreground": withAlpha("--sidebar-primary-foreground"),
+          accent: withAlpha("--sidebar-accent"),
+          "accent-foreground": withAlpha("--sidebar-accent-foreground"),
+          border: withAlpha("--sidebar-border"),
+          ring: withAlpha("--sidebar-ring"),
         },
       },
       borderRadius: {
