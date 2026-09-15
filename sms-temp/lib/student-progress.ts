@@ -3,14 +3,25 @@ import { StudentDashboardRow } from "@/lib/types/database";
 export type CheckKey = "onboarding" | "login" | "ptptn";
 
 /**
+ * Each check has three states rather than two, so "we have not asked yet" is
+ * distinct from "we asked and they have not done it".
+ *   null  -> not actioned yet (outstanding work)
+ *   true  -> confirmed done
+ *   false -> reported not done
+ */
+export type CheckAnswer = boolean | null;
+
+/**
  * The minimum a row needs for the checks to be derived. Lets lightweight
  * queries (the header tracker) reuse this without selecting every column.
  */
 export type ChecksInput = {
-  onboarding_checked?: boolean | null;
+  onboarding_checked?: CheckAnswer;
   onboarding_checked_at?: string | null;
-  login_checked?: boolean | null;
+  login_checked?: CheckAnswer;
   login_checked_at?: string | null;
+  ptptn_checked?: CheckAnswer;
+  ptptn_checked_at?: string | null;
   a_payments?: {
     payment_mode?: string | null;
     ptptn_proof_status?: boolean | null;
@@ -21,16 +32,20 @@ export type ChecksInput = {
 export type StudentCheck = {
   key: CheckKey;
   label: string;
-  /** What a tick means, shown under the label. */
-  checkedHint: string;
-  /** What leaving it empty means. */
-  uncheckedHint: string;
-  checked: boolean;
+  /** Wording for each of the three states. */
+  yesHint: string;
+  noHint: string;
+  pendingHint: string;
+  /** What the "reported not done" button says. */
+  noLabel: string;
+  answer: CheckAnswer;
+  /** True once someone has recorded an answer either way. */
+  answered: boolean;
   /** PTPTN only applies to students paying by PTPTN. */
   applicable: boolean;
-  /** Sequence gating — a step opens only once the one before it is ticked. */
+  /** Sequence gating — a step opens once the one before it has an answer. */
   unlocked: boolean;
-  checkedAt: string | null;
+  answeredAt: string | null;
 };
 
 export const STATUS_VALUES = [
@@ -59,52 +74,81 @@ function isPtptn(student: ChecksInput) {
     .includes("PTPTN");
 }
 
+/** Normalises undefined (column not selected) to null. */
+function answerOf(value: CheckAnswer | undefined): CheckAnswer {
+  return value === undefined ? null : value;
+}
+
 /**
- * The three checks in order. Each step unlocks only once the previous one is
- * ticked, so the team always works the same sequence.
+ * The three checks in order. A step unlocks once the previous one has an
+ * answer — including a negative one, so reporting "did not join" moves the
+ * student along instead of blocking the rest of the sequence.
  */
 export function getChecks(student: ChecksInput): StudentCheck[] {
-  const onboarding = !!student.onboarding_checked;
-  const login = !!student.login_checked;
+  const onboarding = answerOf(student.onboarding_checked);
+  const login = answerOf(student.login_checked);
+
+  // Fall back to the payments row so proof recorded outside this flow still
+  // reads as a confirmed PTPTN check.
+  const ptptn =
+    answerOf(student.ptptn_checked) ??
+    (student.a_payments?.ptptn_proof_status === true ? true : null);
+
   const ptptnApplies = isPtptn(student);
 
   return [
     {
       key: "onboarding",
       label: "Onboarding check",
-      checkedHint: "Responded / joined the onboarding session",
-      uncheckedHint: "No response yet",
-      checked: onboarding,
+      yesHint: "Responded / joined the onboarding session",
+      noHint: "Did not join the onboarding session",
+      pendingHint: "Not actioned yet",
+      noLabel: "Did not join",
+      answer: onboarding,
+      answered: onboarding !== null,
       applicable: true,
       unlocked: true,
-      checkedAt: student.onboarding_checked_at ?? null
+      answeredAt: student.onboarding_checked_at ?? null
     },
     {
       key: "login",
       label: "Zero login check",
-      checkedHint: "CN login confirmed — all okay",
-      uncheckedHint: "No response on CN login",
-      checked: login,
+      yesHint: "CN login confirmed — all okay",
+      noHint: "Has not logged in to CN yet",
+      pendingHint: "Not actioned yet",
+      noLabel: "No CN login",
+      answer: login,
+      answered: login !== null,
       applicable: true,
-      unlocked: onboarding,
-      checkedAt: student.login_checked_at ?? null
+      unlocked: onboarding !== null,
+      answeredAt: student.login_checked_at ?? null
     },
     {
       key: "ptptn",
       label: "PTPTN application",
-      checkedHint: "Applied and submitted proof",
-      uncheckedHint: "Not applied yet",
-      checked: !!student.a_payments?.ptptn_proof_status,
+      yesHint: "Applied and submitted proof",
+      noHint: "Has not applied for PTPTN yet",
+      pendingHint: "Not actioned yet",
+      noLabel: "Not applied",
+      answer: ptptn,
+      answered: ptptn !== null,
       applicable: ptptnApplies,
-      unlocked: onboarding && login,
-      checkedAt: ptptnApplies ? (student.a_payments?.updated_at ?? null) : null
+      unlocked: onboarding !== null && login !== null,
+      answeredAt:
+        student.ptptn_checked_at ??
+        (ptptnApplies ? (student.a_payments?.updated_at ?? null) : null)
     }
   ];
 }
 
 export type Progress = {
+  /** Checks that have an answer either way — this is the work completed. */
   done: number;
   total: number;
+  /** Of the answered ones, how many came back positive. */
+  positive: number;
+  /** How many were reported as not done. */
+  declined: number;
   complete: boolean;
   /** The step the team should work next, or null when nothing is outstanding. */
   next: StudentCheck | null;
@@ -112,11 +156,15 @@ export type Progress = {
 
 export function getProgress(student: ChecksInput): Progress {
   const applicable = getChecks(student).filter((c) => c.applicable);
-  const done = applicable.filter((c) => c.checked).length;
-  const next = applicable.find((c) => !c.checked) ?? null;
+  const done = applicable.filter((c) => c.answered).length;
+  const positive = applicable.filter((c) => c.answer === true).length;
+  const declined = applicable.filter((c) => c.answer === false).length;
+  const next = applicable.find((c) => !c.answered) ?? null;
   return {
     done,
     total: applicable.length,
+    positive,
+    declined,
     complete: done === applicable.length,
     next
   };
@@ -149,4 +197,20 @@ export function suggestStatus(student: StudentDashboardRow): {
 /** True when the suggestion differs from what is stored on the student. */
 export function statusNeedsAttention(student: StudentDashboardRow) {
   return suggestStatus(student).status !== student.status;
+}
+
+/** Colour for the three-state dot used in the table and the tracker. */
+export function checkDotClass(check: StudentCheck) {
+  if (!check.applicable) return "bg-muted-foreground/20";
+  if (check.answer === true) return "bg-emerald-500";
+  if (check.answer === false) return "bg-red-500";
+  return check.unlocked ? "bg-amber-400" : "bg-muted-foreground/30";
+}
+
+/** Short state word for tooltips. */
+export function checkStateLabel(check: StudentCheck) {
+  if (!check.applicable) return "not applicable";
+  if (check.answer === true) return "confirmed";
+  if (check.answer === false) return check.noLabel.toLowerCase();
+  return check.unlocked ? "pending" : "locked";
 }

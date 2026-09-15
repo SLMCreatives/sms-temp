@@ -96,6 +96,7 @@ function filterChipLabel(id: string, value: unknown) {
     if (value === "onboarding") return "Onboarding pending";
     if (value === "login") return "Login check pending";
     if (value === "ptptn") return "PTPTN check pending";
+    if (value === "declined") return "Reported not done";
     return "Checks incomplete";
   }
   if (id === "sst_id") {
@@ -276,28 +277,37 @@ export function DataTable<TData, TValue>({
     .rows.map((r) => r.original as StudentDashboardRow);
 
   // Metrics follow the check sequence, so each tile is the next thing to work.
+  // "Pending" means unanswered — a reported "no" counts as done, not outstanding.
   const onboardingPending = visible.filter(
-    (s) => !getChecks(s)[0].checked
+    (s) => !getChecks(s)[0].answered
   ).length;
   const loginPending = visible.filter((s) => {
     const c = getChecks(s);
-    return c[0].checked && !c[1].checked;
+    return c[0].answered && !c[1].answered;
   }).length;
   const ptptnPending = visible.filter((s) => {
     const c = getChecks(s)[2];
-    return c.applicable && !c.checked;
+    return c.applicable && !c.answered;
   }).length;
+
+  // How many came back negative, shown as the sub-label on each tile.
+  const declined = [0, 1, 2].map(
+    (i) =>
+      visible.filter((s) => {
+        const c = getChecks(s)[i];
+        return c.applicable && c.answer === false;
+      }).length
+  );
+
   const atRisk = visible.filter((s) => !!s.at_risk).length;
-  const zeroLogin = visible.filter(
-    (s) => s.a_lms_activity != null && s.a_lms_activity.course_visits === 0
-  ).length;
   const allDone = visible.filter((s) => getProgress(s).complete).length;
 
   const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const hasSelection = selectedRows.length > 0;
 
   return (
-    <div className="flex w-full flex-col gap-5">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+    <div className="flex w-full flex-col gap-5 xl:min-h-0 xl:flex-1">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:shrink-0 xl:grid-cols-5">
         <MetricCard
           icon={Users}
           label={scopeLabel}
@@ -314,7 +324,7 @@ export function DataTable<TData, TValue>({
           icon={UserCheck}
           label="1 · Onboarding"
           value={onboardingPending}
-          sub="pending"
+          sub={declined[0] ? `pending · ${declined[0]} did not join` : "pending"}
           tone={onboardingPending > 0 ? "danger" : "neutral"}
           active={table.getColumn("checks")?.getFilterValue() === "onboarding"}
           onClick={() => toggleQuickFilter("checks", "onboarding")}
@@ -323,7 +333,7 @@ export function DataTable<TData, TValue>({
           icon={LogIn}
           label="2 · Zero login"
           value={loginPending}
-          sub={zeroLogin ? `${zeroLogin} never logged in` : "pending"}
+          sub={declined[1] ? `pending · ${declined[1]} no login` : "pending"}
           tone={loginPending > 0 ? "warning" : "neutral"}
           active={table.getColumn("checks")?.getFilterValue() === "login"}
           onClick={() => toggleQuickFilter("checks", "login")}
@@ -332,7 +342,7 @@ export function DataTable<TData, TValue>({
           icon={BanknoteArrowUp}
           label="3 · PTPTN"
           value={ptptnPending}
-          sub="pending"
+          sub={declined[2] ? `pending · ${declined[2]} not applied` : "pending"}
           tone={ptptnPending > 0 ? "warning" : "neutral"}
           active={table.getColumn("checks")?.getFilterValue() === "ptptn"}
           onClick={() => toggleQuickFilter("checks", "ptptn")}
@@ -348,9 +358,13 @@ export function DataTable<TData, TValue>({
         />
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-5 2xl:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="min-w-0 overflow-hidden rounded-xl border bg-card">
-          <div className="flex flex-col gap-2.5 border-b px-3 py-2.5">
+      <div
+        className={`grid grid-cols-1 items-start gap-5 xl:min-h-0 xl:flex-1 xl:grid-rows-[minmax(0,1fr)] xl:items-stretch ${
+          hasSelection ? "xl:grid-cols-[minmax(0,1fr)_380px]" : "xl:grid-cols-1"
+        }`}
+      >
+        <div className="flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card xl:min-h-0">
+          <div className="flex shrink-0 flex-col gap-2.5 border-b px-3 py-2.5">
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative min-w-[220px] flex-1">
                 <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -541,7 +555,9 @@ export function DataTable<TData, TValue>({
             )}
           </div>
 
-          <div className="max-h-[calc(100vh-22rem)] min-h-[320px] overflow-auto">
+          {/* Owns the leftover height at xl+, so the sticky header and the
+              horizontal scrollbar stay on screen together. */}
+          <div className="min-h-[320px] max-h-[60vh] overflow-auto xl:max-h-none xl:min-h-0 xl:flex-1">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -651,39 +667,28 @@ export function DataTable<TData, TValue>({
             </Table>
           </div>
 
-          <div className="border-t px-1">
+          <div className="shrink-0 border-t px-1">
             <DataTablePagination table={table} />
           </div>
         </div>
 
         {/*
-          One render only — the grid puts this in a side rail at 2xl and stacks
-          it under the table below that. Rendering it twice would mount the
-          engagement form twice.
+          Rendered once only — the grid places it in the side rail at xl and
+          stacks it under the table below that. Rendering it twice would mount
+          the engagement form twice.
         */}
-        <aside className="2xl:sticky 2xl:top-20">
-          {selectedRows.length > 0 ? (
-            selectedRows
-              .toReversed()
-              .map((row, index) => (
-                <NewStudentCard
-                  key={row.id}
-                  student={row.original as StudentDashboardRow}
-                  index={index + 1}
-                  onClose={() => row.toggleSelected(false)}
-                />
-              ))
-          ) : (
-            <div className="hidden h-[420px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-card/50 p-6 text-center 2xl:flex">
-              <UserSearch className="h-8 w-8 text-muted-foreground/30" />
-              <p className="text-sm font-medium">No student selected</p>
-              <p className="max-w-[220px] text-xs text-muted-foreground">
-                Pick a row to see contact details, CN activity, payment and
-                engagement history.
-              </p>
-            </div>
-          )}
-        </aside>
+        {hasSelection && (
+          <aside className="xl:min-h-0 xl:overflow-y-auto">
+            {selectedRows.toReversed().map((row, index) => (
+              <NewStudentCard
+                key={row.id}
+                student={row.original as StudentDashboardRow}
+                index={index + 1}
+                onClose={() => row.toggleSelected(false)}
+              />
+            ))}
+          </aside>
+        )}
       </div>
     </div>
   );

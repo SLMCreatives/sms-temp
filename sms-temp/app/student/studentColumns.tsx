@@ -19,7 +19,11 @@ import {
 import Link from "next/link";
 import { getSstById } from "@/lib/sst-members";
 import { getStudentLevel } from "@/lib/student-level";
-import { getChecks } from "@/lib/student-progress";
+import {
+  checkDotClass,
+  checkStateLabel,
+  getChecks
+} from "@/lib/student-progress";
 
 export type Engagements = {
   [x: string]: string | number | Date;
@@ -415,11 +419,14 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     enableSorting: false,
     filterFn: (row, _columnId, filterValue) => {
       const checks = getChecks(row.original);
-      if (filterValue === "onboarding") return !checks[0].checked;
+      // "pending" means nobody has answered the step yet, either way.
+      if (filterValue === "onboarding") return !checks[0].answered;
       if (filterValue === "login")
-        return checks[0].checked && !checks[1].checked;
+        return checks[0].answered && !checks[1].answered;
       if (filterValue === "ptptn")
-        return checks[2].applicable && !checks[2].checked;
+        return checks[2].applicable && !checks[2].answered;
+      if (filterValue === "declined")
+        return checks.some((c) => c.applicable && c.answer === false);
       return true;
     },
     cell: ({ row }) => {
@@ -429,24 +436,8 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
           {checks.map((c) => (
             <span
               key={c.key}
-              title={`${c.label}: ${
-                !c.applicable
-                  ? "not applicable"
-                  : c.checked
-                    ? "done"
-                    : c.unlocked
-                      ? "pending"
-                      : "locked"
-              }`}
-              className={`h-2 w-2 rounded-full ${
-                !c.applicable
-                  ? "bg-muted-foreground/20"
-                  : c.checked
-                    ? "bg-emerald-500"
-                    : c.unlocked
-                      ? "bg-amber-400"
-                      : "bg-muted-foreground/30"
-              }`}
+              title={`${c.label}: ${checkStateLabel(c)}`}
+              className={`h-2 w-2 rounded-full ${checkDotClass(c)}`}
             />
           ))}
         </span>

@@ -5,7 +5,12 @@ import { ListChecks, Loader2, Search } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 import { SST_MEMBERS, resolveSstByName, getSstById } from "@/lib/sst-members";
-import { getChecks, getProgress } from "@/lib/student-progress";
+import {
+  checkDotClass,
+  checkStateLabel,
+  getChecks,
+  getProgress
+} from "@/lib/student-progress";
 import { INTAKES, intakeLabel } from "@/lib/intakes";
 import { useIntake } from "./intake-context";
 import { Input } from "../ui/input";
@@ -26,17 +31,22 @@ type TrackerRow = {
 
 const CHECK_LABELS = ["Onboarding", "Zero login", "PTPTN"];
 
-/** done / total for one check across a set of students. */
+/** Answered / confirmed / reported-no for one check across a set of students. */
 function checkTally(rows: TrackerRow[], index: number) {
   let done = 0;
+  let yes = 0;
+  let no = 0;
   let total = 0;
   for (const r of rows) {
     const c = getChecks(r)[index];
     if (!c.applicable) continue;
     total += 1;
-    if (c.checked) done += 1;
+    if (!c.answered) continue;
+    done += 1;
+    if (c.answer === true) yes += 1;
+    else no += 1;
   }
-  return { done, total };
+  return { done, total, yes, no };
 }
 
 function Bar({ done, total }: { done: number; total: number }) {
@@ -207,6 +217,17 @@ export function EngagementTracker() {
                   <p className="mt-0.5 text-[9px] leading-tight text-muted-foreground">
                     {CHECK_LABELS[i]}
                   </p>
+                  <p className="mt-0.5 text-[9px] leading-tight tabular-nums">
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      {t.yes} yes
+                    </span>
+                    {t.no > 0 && (
+                      <span className="text-red-600 dark:text-red-400">
+                        {" · "}
+                        {t.no} no
+                      </span>
+                    )}
+                  </p>
                 </div>
               ))}
             </div>
@@ -297,24 +318,8 @@ export function EngagementTracker() {
                         {checks.map((c) => (
                           <span
                             key={c.key}
-                            title={`${c.label}: ${
-                              !c.applicable
-                                ? "not applicable"
-                                : c.checked
-                                  ? "done"
-                                  : c.unlocked
-                                    ? "pending"
-                                    : "locked"
-                            }`}
-                            className={`h-2 w-2 rounded-full ${
-                              !c.applicable
-                                ? "bg-muted-foreground/20"
-                                : c.checked
-                                  ? "bg-emerald-500"
-                                  : c.unlocked
-                                    ? "bg-amber-400"
-                                    : "bg-muted-foreground/30"
-                            }`}
+                            title={`${c.label}: ${checkStateLabel(c)}`}
+                            className={`h-2 w-2 rounded-full ${checkDotClass(c)}`}
                           />
                         ))}
                       </span>

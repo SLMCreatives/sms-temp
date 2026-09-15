@@ -8,7 +8,8 @@ import {
   Loader2,
   Lock,
   PenLine,
-  TriangleAlert
+  TriangleAlert,
+  X
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,6 +29,7 @@ import { useCurrentSst } from "@/hooks/use-current-sst";
 import {
   AT_RISK_INTENTS,
   AtRiskIntent,
+  CheckAnswer,
   CheckKey,
   getChecks,
   getProgress,
@@ -88,51 +90,38 @@ export default function StudentChecks({
     });
   };
 
-  const toggleCheck = async (key: CheckKey, next: boolean) => {
+  /**
+   * Writes one of the three states. Clicking the active button again passes
+   * null, which puts the check back to "not actioned yet".
+   */
+  const answerCheck = async (key: CheckKey, next: CheckAnswer) => {
     setBusy(key);
     const now = new Date().toISOString();
-    let error = null;
+    const stamp = next === null ? null : now;
+    const by = next === null ? null : (member?.id ?? null);
 
-    if (key === "ptptn") {
-      // PTPTN reuses the payments row so the existing proof metric stays true.
-      const { data: existing } = await supabase
-        .from("a_payments")
-        .select("matric_no")
-        .eq("matric_no", student.matric_no)
-        .maybeSingle();
+    const columns: Record<CheckKey, Record<string, unknown>> = {
+      onboarding: {
+        onboarding_checked: next,
+        onboarding_checked_at: stamp,
+        onboarding_checked_by: by
+      },
+      login: {
+        login_checked: next,
+        login_checked_at: stamp,
+        login_checked_by: by
+      },
+      ptptn: {
+        ptptn_checked: next,
+        ptptn_checked_at: stamp,
+        ptptn_checked_by: by
+      }
+    };
 
-      const res = existing
-        ? await supabase
-            .from("a_payments")
-            .update({ ptptn_proof_status: next, updated_at: now })
-            .eq("matric_no", student.matric_no)
-        : await supabase.from("a_payments").insert({
-            matric_no: student.matric_no,
-            payment_mode: "PTPTN",
-            ptptn_proof_status: next,
-            updated_at: now
-          });
-      error = res.error;
-    } else {
-      const patch =
-        key === "onboarding"
-          ? {
-              onboarding_checked: next,
-              onboarding_checked_at: next ? now : null,
-              onboarding_checked_by: next ? (member?.id ?? null) : null
-            }
-          : {
-              login_checked: next,
-              login_checked_at: next ? now : null,
-              login_checked_by: next ? (member?.id ?? null) : null
-            };
-
-      const res = await supabase
-        .from("a_students")
-        .update(patch)
-        .eq("matric_no", student.matric_no);
-      error = res.error;
-    }
+    const { error } = await supabase
+      .from("a_students")
+      .update(columns[key])
+      .eq("matric_no", student.matric_no);
 
     if (error) {
       toast.error(`Could not save: ${error.message}`);
@@ -140,10 +129,47 @@ export default function StudentChecks({
       return;
     }
 
-    if (next) await logEngagement(CHECK_TOPIC[key], "no_issue");
+    // Keep a_payments in step so the PTPTN proof metric, the table's Proof
+    // column and the CSV export all agree with the check.
+    if (key === "ptptn") {
+      const { data: existing } = await supabase
+        .from("a_payments")
+        .select("matric_no")
+        .eq("matric_no", student.matric_no)
+        .maybeSingle();
+
+      const proof = next === true;
+      if (existing) {
+        await supabase
+          .from("a_payments")
+          .update({ ptptn_proof_status: proof, updated_at: now })
+          .eq("matric_no", student.matric_no);
+      } else if (next !== null) {
+        await supabase.from("a_payments").insert({
+          matric_no: student.matric_no,
+          payment_mode: "PTPTN",
+          ptptn_proof_status: proof,
+          updated_at: now
+        });
+      }
+    }
+
+    // Log both answers — a reported "no" is as much a contact as a "yes".
+    if (next !== null) {
+      await logEngagement(
+        CHECK_TOPIC[key],
+        next ? "no_issue" : "no_response"
+      );
+    }
 
     setBusy(null);
-    toast.success(`${CHECK_TOPIC[key]} ${next ? "recorded" : "cleared"}`);
+    toast.success(
+      next === null
+        ? `${CHECK_TOPIC[key]} cleared`
+        : next
+          ? `${CHECK_TOPIC[key]} confirmed`
+          : `${CHECK_TOPIC[key]} reported as not done`
+    );
     router.refresh();
   };
 
@@ -228,7 +254,11 @@ export default function StudentChecks({
               <span
                 key={c.key}
                 className={`h-1 flex-1 rounded-full ${
-                  c.checked ? "bg-emerald-500" : "bg-muted"
+                  c.answer === true
+                    ? "bg-emerald-500"
+                    : c.answer === false
+                      ? "bg-red-500"
+                      : "bg-muted"
                 }`}
               />
             ))}
@@ -236,57 +266,89 @@ export default function StudentChecks({
 
         <ol className="flex flex-col gap-1.5">
           {checks.map((check, index) => {
-            const disabled =
-              !check.applicable || !check.unlocked || busy === check.key;
+            const locked = !check.applicable || !check.unlocked;
+            const working = busy === check.key;
             return (
               <li
                 key={check.key}
-                className={`flex items-start gap-2.5 rounded-lg border p-2.5 transition ${
+                className={`rounded-lg border p-2.5 transition ${
                   !check.applicable
                     ? "opacity-45"
                     : !check.unlocked
                       ? "opacity-60"
-                      : check.checked
+                      : check.answer === true
                         ? "border-emerald-200 bg-emerald-50/60 dark:border-emerald-900 dark:bg-emerald-950/30"
-                        : "hover:border-foreground/20"
+                        : check.answer === false
+                          ? "border-red-200 bg-red-50/60 dark:border-red-900 dark:bg-red-950/30"
+                          : "hover:border-foreground/20"
                 }`}
               >
-                <div className="mt-0.5">
-                  {busy === check.key ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  ) : !check.applicable || !check.unlocked ? (
-                    <Lock className="h-4 w-4 text-muted-foreground/60" />
-                  ) : (
-                    <Checkbox
-                      checked={check.checked}
-                      disabled={disabled}
-                      onCheckedChange={(v) => toggleCheck(check.key, !!v)}
-                      aria-label={check.label}
-                    />
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-medium tabular-nums text-muted-foreground">
-                      {index + 1}.
-                    </span>
+                <div className="flex items-start gap-2">
+                  <span className="mt-[3px] text-[11px] font-medium tabular-nums text-muted-foreground">
+                    {index + 1}.
+                  </span>
+                  <div className="min-w-0 flex-1">
                     <span className="text-[13px] font-medium">
                       {check.label}
                     </span>
-                    {check.checked && (
-                      <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                    )}
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+                      {!check.applicable
+                        ? "Not applicable — student is not paying by PTPTN"
+                        : !check.unlocked
+                          ? `Opens once "${checks[index - 1].label.toLowerCase()}" has an answer`
+                          : check.answer === true
+                            ? check.yesHint
+                            : check.answer === false
+                              ? check.noHint
+                              : check.pendingHint}
+                    </p>
                   </div>
-                  <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-                    {!check.applicable
-                      ? "Not applicable — student is not paying by PTPTN"
-                      : !check.unlocked
-                        ? `Locked until "${checks[index - 1].label.toLowerCase()}" is done`
-                        : check.checked
-                          ? check.checkedHint
-                          : check.uncheckedHint}
-                  </p>
+
+                  {working ? (
+                    <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-muted-foreground" />
+                  ) : locked ? (
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60" />
+                  ) : (
+                    // Click the active side again to clear back to "not actioned".
+                    <div className="flex shrink-0 overflow-hidden rounded-md border">
+                      <button
+                        type="button"
+                        title="Confirm done"
+                        aria-pressed={check.answer === true}
+                        onClick={() =>
+                          answerCheck(
+                            check.key,
+                            check.answer === true ? null : true
+                          )
+                        }
+                        className={`flex h-7 w-8 items-center justify-center transition ${
+                          check.answer === true
+                            ? "bg-emerald-500 text-white"
+                            : "text-muted-foreground hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/50"
+                        }`}
+                      >
+                        <Check className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        title={check.noLabel}
+                        aria-pressed={check.answer === false}
+                        onClick={() =>
+                          answerCheck(
+                            check.key,
+                            check.answer === false ? null : false
+                          )
+                        }
+                        className={`flex h-7 w-8 items-center justify-center border-l transition ${
+                          check.answer === false
+                            ? "bg-red-500 text-white"
+                            : "text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/50"
+                        }`}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </li>
             );

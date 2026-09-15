@@ -18,14 +18,18 @@ export interface Student {
   a_sos: SOS | null;
   campus_code: string | null;
 
-  // Engagement checks (see supabase/migrations/20260914_engagement_checks.sql).
-  // The PTPTN check has no column here — it reuses a_payments.ptptn_proof_status.
+  // Engagement checks. Three states each: null = not actioned yet,
+  // true = confirmed, false = reported not done.
+  // See supabase/migrations/20260915_check_tristate.sql.
   onboarding_checked: boolean | null;
   onboarding_checked_at: string | null;
   onboarding_checked_by: number | null;
   login_checked: boolean | null;
   login_checked_at: string | null;
   login_checked_by: number | null;
+  ptptn_checked: boolean | null;
+  ptptn_checked_at: string | null;
+  ptptn_checked_by: number | null;
   /** Running remarks log — one textarea, a new line per contact. */
   remarks: string | null;
   at_risk: boolean | null;

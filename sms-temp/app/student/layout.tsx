@@ -20,11 +20,13 @@ export default function ProtectedLayout({
       <SidebarProvider className="bg-sidebar">
         <AppSidebar />
         {/*
-        min-w-0 lets the table scroll horizontally instead of stretching the
-        flex row. No overflow-hidden here — it would make this a scrollport and
-        stop the sticky header and record rail from sticking.
-      */}
-        <SidebarInset className="min-w-0">
+          min-w-0 lets the table scroll horizontally instead of stretching the
+          flex row.
+          From xl up the shell is exactly one viewport tall and never scrolls,
+          so the table card keeps its header and horizontal scrollbar on screen.
+          The inset variant adds m-2 (1rem of vertical margin), hence the calc.
+        */}
+        <SidebarInset className="min-w-0 xl:h-[calc(100svh-1rem)] xl:overflow-hidden">
           <Toaster position="top-right" richColors />
 
           <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -38,7 +40,9 @@ export default function ProtectedLayout({
             </div>
           </header>
 
-          <div className="min-w-0 flex-1 px-4 py-5 lg:px-6">{children}</div>
+          <div className="flex min-w-0 flex-1 flex-col px-4 py-5 lg:px-6 xl:min-h-0 xl:overflow-hidden">
+            {children}
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </IntakeProvider>

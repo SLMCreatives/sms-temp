@@ -96,8 +96,8 @@ export default function StudentWorkspace({
     : "All students";
 
   return (
-    <div className="flex w-full flex-col gap-5">
-      <header className="flex flex-col gap-4">
+    <div className="flex w-full flex-col gap-5 xl:min-h-0 xl:flex-1">
+      <header className="flex flex-col gap-4 xl:shrink-0">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             {lockedSst && (
@@ -176,7 +176,7 @@ export default function StudentWorkspace({
         <NewStudentList data={visibleData} />
       </div>
 
-      <div className="hidden lg:block">
+      <div className="hidden lg:block xl:flex xl:min-h-0 xl:flex-1 xl:flex-col">
         <DataTable
           data={visibleData}
           columns={newStudentColumns}
