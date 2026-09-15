@@ -38,6 +38,7 @@ import {
 
 /** Log line written to a_engagements so the audit trail and SF export survive. */
 const CHECK_TOPIC: Record<CheckKey, string> = {
+  contacted: "Contacted",
   onboarding: "Onboarding Check",
   login: "Zero Login Check",
   ptptn: "PTPTN Application"
@@ -101,6 +102,11 @@ export default function StudentChecks({
     const by = next === null ? null : (member?.id ?? null);
 
     const columns: Record<CheckKey, Record<string, unknown>> = {
+      contacted: {
+        contacted: next,
+        contacted_at: stamp,
+        contacted_by: by
+      },
       onboarding: {
         onboarding_checked: next,
         onboarding_checked_at: stamp,
@@ -313,7 +319,9 @@ export default function StudentChecks({
                     <div className="flex shrink-0 overflow-hidden rounded-md border">
                       <button
                         type="button"
-                        title="Confirm done"
+                        title={
+                          check.canDecline ? "Confirm done" : "Mark as contacted"
+                        }
                         aria-pressed={check.answer === true}
                         onClick={() =>
                           answerCheck(
@@ -329,24 +337,26 @@ export default function StudentChecks({
                       >
                         <Check className="h-3.5 w-3.5" />
                       </button>
-                      <button
-                        type="button"
-                        title={check.noLabel}
-                        aria-pressed={check.answer === false}
-                        onClick={() =>
-                          answerCheck(
-                            check.key,
-                            check.answer === false ? null : false
-                          )
-                        }
-                        className={`flex h-7 w-8 items-center justify-center border-l transition ${
-                          check.answer === false
-                            ? "bg-red-500 text-white"
-                            : "text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/50"
-                        }`}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
+                      {check.canDecline && (
+                        <button
+                          type="button"
+                          title={check.noLabel}
+                          aria-pressed={check.answer === false}
+                          onClick={() =>
+                            answerCheck(
+                              check.key,
+                              check.answer === false ? null : false
+                            )
+                          }
+                          className={`flex h-7 w-8 items-center justify-center border-l transition ${
+                            check.answer === false
+                              ? "bg-red-500 text-white"
+                              : "text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/50"
+                          }`}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

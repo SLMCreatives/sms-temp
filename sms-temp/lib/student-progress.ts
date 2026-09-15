@@ -1,6 +1,6 @@
 import { StudentDashboardRow } from "@/lib/types/database";
 
-export type CheckKey = "onboarding" | "login" | "ptptn";
+export type CheckKey = "contacted" | "onboarding" | "login" | "ptptn";
 
 /**
  * Each check has three states rather than two, so "we have not asked yet" is
@@ -16,6 +16,8 @@ export type CheckAnswer = boolean | null;
  * queries (the header tracker) reuse this without selecting every column.
  */
 export type ChecksInput = {
+  contacted?: CheckAnswer;
+  contacted_at?: string | null;
   onboarding_checked?: CheckAnswer;
   onboarding_checked_at?: string | null;
   login_checked?: CheckAnswer;
@@ -38,6 +40,11 @@ export type StudentCheck = {
   pendingHint: string;
   /** What the "reported not done" button says. */
   noLabel: string;
+  /**
+   * False for "contacted", where a negative state is meaningless — not having
+   * reached the student is simply the absence of a tick.
+   */
+  canDecline: boolean;
   answer: CheckAnswer;
   /** True once someone has recorded an answer either way. */
   answered: boolean;
@@ -80,11 +87,17 @@ function answerOf(value: CheckAnswer | undefined): CheckAnswer {
 }
 
 /**
- * The three checks in order. A step unlocks once the previous one has an
- * answer — including a negative one, so reporting "did not join" moves the
- * student along instead of blocking the rest of the sequence.
+ * The four checks in order: contacted -> onboarding -> zero login -> PTPTN.
+ *
+ * A step unlocks once the previous one has an answer — including a negative
+ * one, so reporting "did not join" moves the student along instead of blocking
+ * the rest of the sequence.
  */
 export function getChecks(student: ChecksInput): StudentCheck[] {
+  const contacted = answerOf(student.contacted);
+  // Until the migration adds the column the value is undefined rather than
+  // null. Don't gate the rest of the sequence on a column that isn't there yet.
+  const contactGate = student.contacted === undefined || contacted === true;
   const onboarding = answerOf(student.onboarding_checked);
   const login = answerOf(student.login_checked);
 
@@ -98,16 +111,31 @@ export function getChecks(student: ChecksInput): StudentCheck[] {
 
   return [
     {
+      key: "contacted",
+      label: "Contacted",
+      yesHint: "Reached out to the student",
+      noHint: "",
+      pendingHint: "Not contacted yet",
+      noLabel: "",
+      canDecline: false,
+      answer: contacted,
+      answered: contacted === true,
+      applicable: true,
+      unlocked: true,
+      answeredAt: student.contacted_at ?? null
+    },
+    {
       key: "onboarding",
       label: "Onboarding check",
       yesHint: "Responded / joined the onboarding session",
-      noHint: "Did not join the onboarding session",
-      pendingHint: "Not actioned yet",
-      noLabel: "Did not join",
+      noHint: "Did not respond / did not join",
+      pendingHint: "Awaiting a response",
+      noLabel: "No response",
+      canDecline: true,
       answer: onboarding,
       answered: onboarding !== null,
       applicable: true,
-      unlocked: true,
+      unlocked: contactGate,
       answeredAt: student.onboarding_checked_at ?? null
     },
     {
@@ -117,10 +145,11 @@ export function getChecks(student: ChecksInput): StudentCheck[] {
       noHint: "Has not logged in to CN yet",
       pendingHint: "Not actioned yet",
       noLabel: "No CN login",
+      canDecline: true,
       answer: login,
       answered: login !== null,
       applicable: true,
-      unlocked: onboarding !== null,
+      unlocked: contactGate && onboarding !== null,
       answeredAt: student.login_checked_at ?? null
     },
     {
@@ -130,10 +159,11 @@ export function getChecks(student: ChecksInput): StudentCheck[] {
       noHint: "Has not applied for PTPTN yet",
       pendingHint: "Not actioned yet",
       noLabel: "Not applied",
+      canDecline: true,
       answer: ptptn,
       answered: ptptn !== null,
       applicable: ptptnApplies,
-      unlocked: onboarding !== null && login !== null,
+      unlocked: contactGate && onboarding !== null && login !== null,
       answeredAt:
         student.ptptn_checked_at ??
         (ptptnApplies ? (student.a_payments?.updated_at ?? null) : null)
@@ -210,6 +240,9 @@ export function checkDotClass(check: StudentCheck) {
 /** Short state word for tooltips. */
 export function checkStateLabel(check: StudentCheck) {
   if (!check.applicable) return "not applicable";
+  if (check.key === "contacted") {
+    return check.answer === true ? "contacted" : "not contacted yet";
+  }
   if (check.answer === true) return "confirmed";
   if (check.answer === false) return check.noLabel.toLowerCase();
   return check.unlocked ? "pending" : "locked";

@@ -30,6 +30,7 @@ import {
   BanknoteArrowUp,
   Laptop,
   LogIn,
+  PhoneCall,
   RotateCcw,
   School,
   Search,
@@ -93,6 +94,7 @@ function filterChipLabel(id: string, value: unknown) {
   if (id === "at_risk") return "Flagged at risk";
   if (id === "No of Engagements") return "Never engaged";
   if (id === "checks") {
+    if (value === "contacted") return "Not contacted yet";
     if (value === "onboarding") return "Onboarding pending";
     if (value === "login") return "Login check pending";
     if (value === "ptptn") return "PTPTN check pending";
@@ -278,20 +280,25 @@ export function DataTable<TData, TValue>({
 
   // Metrics follow the check sequence, so each tile is the next thing to work.
   // "Pending" means unanswered — a reported "no" counts as done, not outstanding.
-  const onboardingPending = visible.filter(
+  const notContacted = visible.filter(
     (s) => !getChecks(s)[0].answered
   ).length;
-  const loginPending = visible.filter((s) => {
+  const contacted = visible.length - notContacted;
+  const onboardingPending = visible.filter((s) => {
     const c = getChecks(s);
     return c[0].answered && !c[1].answered;
   }).length;
+  const loginPending = visible.filter((s) => {
+    const c = getChecks(s);
+    return c[1].answered && !c[2].answered;
+  }).length;
   const ptptnPending = visible.filter((s) => {
-    const c = getChecks(s)[2];
+    const c = getChecks(s)[3];
     return c.applicable && !c.answered;
   }).length;
 
   // How many came back negative, shown as the sub-label on each tile.
-  const declined = [0, 1, 2].map(
+  const declined = [1, 2, 3].map(
     (i) =>
       visible.filter((s) => {
         const c = getChecks(s)[i];
@@ -307,7 +314,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="flex w-full flex-col gap-5 xl:min-h-0 xl:flex-1">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:shrink-0 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:shrink-0 xl:grid-cols-6">
         <MetricCard
           icon={Users}
           label={scopeLabel}
@@ -321,8 +328,17 @@ export function DataTable<TData, TValue>({
           }
         />
         <MetricCard
+          icon={PhoneCall}
+          label="1 · Contacted"
+          value={contacted}
+          sub={notContacted ? `${notContacted} to go` : "all reached"}
+          tone={notContacted > 0 ? "warning" : "neutral"}
+          active={table.getColumn("checks")?.getFilterValue() === "contacted"}
+          onClick={() => toggleQuickFilter("checks", "contacted")}
+        />
+        <MetricCard
           icon={UserCheck}
-          label="1 · Onboarding"
+          label="2 · Onboarding"
           value={onboardingPending}
           sub={declined[0] ? `pending · ${declined[0]} did not join` : "pending"}
           tone={onboardingPending > 0 ? "danger" : "neutral"}
@@ -331,7 +347,7 @@ export function DataTable<TData, TValue>({
         />
         <MetricCard
           icon={LogIn}
-          label="2 · Zero login"
+          label="3 · Zero login"
           value={loginPending}
           sub={declined[1] ? `pending · ${declined[1]} no login` : "pending"}
           tone={loginPending > 0 ? "warning" : "neutral"}
@@ -340,7 +356,7 @@ export function DataTable<TData, TValue>({
         />
         <MetricCard
           icon={BanknoteArrowUp}
-          label="3 · PTPTN"
+          label="4 · PTPTN"
           value={ptptnPending}
           sub={declined[2] ? `pending · ${declined[2]} not applied` : "pending"}
           tone={ptptnPending > 0 ? "warning" : "neutral"}

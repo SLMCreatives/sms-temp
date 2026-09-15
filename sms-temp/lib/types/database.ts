@@ -21,6 +21,9 @@ export interface Student {
   // Engagement checks. Three states each: null = not actioned yet,
   // true = confirmed, false = reported not done.
   // See supabase/migrations/20260915_check_tristate.sql.
+  contacted: boolean | null;
+  contacted_at: string | null;
+  contacted_by: number | null;
   onboarding_checked: boolean | null;
   onboarding_checked_at: string | null;
   onboarding_checked_by: number | null;

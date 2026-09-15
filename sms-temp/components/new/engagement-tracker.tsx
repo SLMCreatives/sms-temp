@@ -21,15 +21,17 @@ type TrackerRow = {
   matric_no: string;
   full_name: string;
   sst_id: number | null;
+  contacted: boolean | null;
   onboarding_checked: boolean | null;
   login_checked: boolean | null;
+  ptptn_checked: boolean | null;
   a_payments: {
     payment_mode: string | null;
     ptptn_proof_status: boolean | null;
   } | null;
 };
 
-const CHECK_LABELS = ["Onboarding", "Zero login", "PTPTN"];
+const CHECK_LABELS = ["Contacted", "Onboarding", "Zero login", "PTPTN"];
 
 /** Answered / confirmed / reported-no for one check across a set of students. */
 function checkTally(rows: TrackerRow[], index: number) {
@@ -82,7 +84,7 @@ export function EngagementTracker() {
       let q = supabase
         .from("a_students")
         .select(
-          "matric_no, full_name, sst_id, onboarding_checked, login_checked, a_payments(payment_mode, ptptn_proof_status)"
+          "matric_no, full_name, sst_id, contacted, onboarding_checked, login_checked, ptptn_checked, a_payments(payment_mode, ptptn_proof_status)"
         )
         .eq("intake_code", intake);
 
@@ -116,7 +118,7 @@ export function EngagementTracker() {
   }, [rows]);
 
   const perCheck = useMemo(
-    () => [0, 1, 2].map((i) => checkTally(rows, i)),
+    () => [0, 1, 2, 3].map((i) => checkTally(rows, i)),
     [rows]
   );
 
@@ -129,7 +131,7 @@ export function EngagementTracker() {
       return {
         member: m,
         count: mine.length,
-        checks: [0, 1, 2].map((i) => checkTally(mine, i))
+        checks: [0, 1, 2, 3].map((i) => checkTally(mine, i))
       };
     });
   }, [rows, isAdmin]);
@@ -202,7 +204,7 @@ export function EngagementTracker() {
             </div>
             <Bar done={overall.done} total={overall.total} />
 
-            <div className="grid grid-cols-3 gap-1.5 pt-1">
+            <div className="grid grid-cols-4 gap-1.5 pt-1">
               {perCheck.map((t, i) => (
                 <div
                   key={CHECK_LABELS[i]}

@@ -420,11 +420,13 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     filterFn: (row, _columnId, filterValue) => {
       const checks = getChecks(row.original);
       // "pending" means nobody has answered the step yet, either way.
-      if (filterValue === "onboarding") return !checks[0].answered;
-      if (filterValue === "login")
+      if (filterValue === "contacted") return !checks[0].answered;
+      if (filterValue === "onboarding")
         return checks[0].answered && !checks[1].answered;
+      if (filterValue === "login")
+        return checks[1].answered && !checks[2].answered;
       if (filterValue === "ptptn")
-        return checks[2].applicable && !checks[2].answered;
+        return checks[3].applicable && !checks[3].answered;
       if (filterValue === "declined")
         return checks.some((c) => c.applicable && c.answer === false);
       return true;
