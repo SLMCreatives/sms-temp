@@ -18,11 +18,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getSstById } from "@/lib/sst-members";
-import { getStudentLevel } from "@/lib/student-level";
+import {
+  getStudentLevel,
+  levelGroupOf,
+  parseLevelGroupFilter
+} from "@/lib/student-level";
 import {
   checkDotClass,
   checkStateLabel,
-  getChecks
+  getChecks,
+  isSegmentPending
 } from "@/lib/student-progress";
 
 export type Engagements = {
@@ -364,7 +369,13 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     accessorFn: (row) => getStudentLevel(row.programme_name) ?? "",
     id: "study_level",
     header: "Level",
-    filterFn: "equalsString",
+    filterFn: (row, _columnId, filterValue) => {
+      if (!filterValue) return true;
+      const value = String(filterValue);
+      const group = parseLevelGroupFilter(value);
+      if (group) return levelGroupOf(row.original.programme_name) === group;
+      return getStudentLevel(row.original.programme_name) === value;
+    },
     cell: ({ row }) => (
       <span className="text-[11px] text-muted-foreground">
         {getStudentLevel(row.original.programme_name) ?? "—"}
@@ -419,16 +430,16 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
     enableSorting: false,
     filterFn: (row, _columnId, filterValue) => {
       const checks = getChecks(row.original);
-      // "pending" means nobody has answered the step yet, either way.
-      if (filterValue === "contacted") return !checks[0].answered;
-      if (filterValue === "onboarding")
-        return checks[0].answered && !checks[1].answered;
-      if (filterValue === "login")
-        return checks[1].answered && !checks[2].answered;
-      if (filterValue === "ptptn")
-        return checks[3].applicable && !checks[3].answered;
       if (filterValue === "declined")
         return checks.some((c) => c.applicable && c.answer === false);
+      if (
+        filterValue === "contacted" ||
+        filterValue === "onboarding" ||
+        filterValue === "login" ||
+        filterValue === "ptptn"
+      ) {
+        return isSegmentPending(row.original, filterValue);
+      }
       return true;
     },
     cell: ({ row }) => {

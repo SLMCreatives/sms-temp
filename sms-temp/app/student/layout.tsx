@@ -40,7 +40,7 @@ export default function ProtectedLayout({
             </div>
           </header>
 
-          <div className="flex min-w-0 flex-1 flex-col px-4 py-5 lg:px-6 xl:min-h-0 xl:overflow-hidden">
+          <div className="flex min-w-0 flex-1 flex-col px-4 py-3 lg:px-5 xl:min-h-0 xl:overflow-hidden">
             {children}
           </div>
         </SidebarInset>

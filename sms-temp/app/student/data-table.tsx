@@ -28,11 +28,9 @@ import { NewStudentCard } from "@/components/new/student-card";
 import { StudentDashboardRow } from "@/lib/types/database";
 import {
   BanknoteArrowUp,
-  Laptop,
   LogIn,
   PhoneCall,
   RotateCcw,
-  School,
   Search,
   SlidersHorizontal,
   TriangleAlert,
@@ -60,7 +58,12 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { SST_MEMBERS } from "@/lib/sst-members";
-import { levelOptionsFrom } from "@/lib/student-level";
+import {
+  LEVEL_GROUPS,
+  levelGroupFilterValue,
+  levelOptionsFrom,
+  parseLevelGroupFilter
+} from "@/lib/student-level";
 import { getChecks, getProgress } from "@/lib/student-progress";
 
 const ALL = "all";
@@ -107,7 +110,15 @@ function filterChipLabel(id: string, value: unknown) {
   }
   if (id === "payment_mode") return `Payment: ${String(value)}`;
   if (id === "Campus Code") return `Campus: ${String(value)}`;
-  if (id === "study_level") return `Level: ${String(value)}`;
+  if (id === "study_level") {
+    const group = parseLevelGroupFilter(String(value));
+    if (group) {
+      return `Level: ${
+        LEVEL_GROUPS.find((g) => g.value === group)?.label ?? group
+      }`;
+    }
+    return `Level: ${String(value)}`;
+  }
   if (id === "study_mode") return String(value);
   return String(value);
 }
@@ -121,14 +132,17 @@ function MetricCard({
   label,
   value,
   sub,
+  of,
   tone = "neutral",
   active = false,
   onClick
 }: {
   icon: React.ElementType;
   label: string;
-  value: string | number;
+  value: number;
   sub?: string;
+  /** Denominator for the share shown next to the value. */
+  of?: number;
   tone?: "neutral" | "danger" | "warning";
   active?: boolean;
   onClick?: () => void;
@@ -145,6 +159,7 @@ function MetricCard({
   };
 
   const interactive = typeof onClick === "function";
+  const pct = of && of > 0 ? Math.round((value / of) * 100) : null;
 
   return (
     <button
@@ -152,35 +167,42 @@ function MetricCard({
       onClick={onClick}
       disabled={!interactive}
       aria-pressed={interactive ? active : undefined}
-      className={`group flex flex-col gap-2 rounded-xl border bg-card px-4 py-3 text-left transition ${
-        interactive ? "cursor-pointer hover:border-foreground/25 hover:shadow-sm" : "cursor-default"
+      title={
+        interactive
+          ? active
+            ? "Filtering — click to clear"
+            : "Click to filter"
+          : undefined
+      }
+      className={`flex flex-col gap-1 rounded-lg border bg-card px-2.5 py-2 text-left transition ${
+        interactive
+          ? "cursor-pointer hover:border-foreground/25"
+          : "cursor-default"
       } ${active ? `ring-2 ${activeRing[tone]}` : ""}`}
     >
-      <span className="flex items-center gap-1.5">
-        <Icon className={`h-3.5 w-3.5 ${accents[tone]}`} />
-        <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+      <span className="flex items-center gap-1 truncate">
+        <Icon className={`h-3 w-3 shrink-0 ${accents[tone]}`} />
+        <span className="truncate text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
           {label}
         </span>
       </span>
       <span className="flex items-baseline gap-1.5">
         <span
-          className={`text-2xl font-semibold leading-none tabular-nums ${
+          className={`text-xl font-semibold leading-none tabular-nums ${
             tone === "neutral" ? "text-foreground" : accents[tone]
           }`}
         >
           {value}
         </span>
-        {sub && (
-          <span className="text-xs text-muted-foreground tabular-nums">
-            {sub}
+        {pct !== null && (
+          <span className="text-[11px] font-medium tabular-nums text-muted-foreground">
+            {pct}%
           </span>
         )}
       </span>
-      {interactive && (
-        <span className="text-[10px] text-muted-foreground/70">
-          {active ? "Filtering — click to clear" : "Click to filter"}
-        </span>
-      )}
+      <span className="truncate text-[10px] leading-tight text-muted-foreground">
+        {sub ?? " "}
+      </span>
     </button>
   );
 }
@@ -220,6 +242,10 @@ export function DataTable<TData, TValue>({
     onColumnPinningChange: setColumnPinning,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
+    // Key rows by matric number, not by array index. With index ids a reorder
+    // would leave the selection pointing at whichever student landed on that
+    // index, silently swapping the record panel to someone else.
+    getRowId: (row) => (row as StudentDashboardRow).matric_no,
     enableMultiRowSelection: false,
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
@@ -306,41 +332,52 @@ export function DataTable<TData, TValue>({
       }).length
   );
 
+  const ptptnApplicable = visible.filter(
+    (s) => getChecks(s)[3].applicable
+  ).length;
   const atRisk = visible.filter((s) => !!s.at_risk).length;
   const allDone = visible.filter((s) => getProgress(s).complete).length;
+
+  // Once the filter is on, the visible rows ARE the not-contacted ones, so the
+  // tile flips to report that instead of a "0 contacted" that reads as an error.
+  const notContactedActive =
+    table.getColumn("checks")?.getFilterValue() === "contacted";
 
   const selectedRows = table.getFilteredSelectedRowModel().rows;
   const hasSelection = selectedRows.length > 0;
 
   return (
-    <div className="flex w-full flex-col gap-5 xl:min-h-0 xl:flex-1">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:shrink-0 xl:grid-cols-6">
+    <div className="flex w-full flex-col gap-3 xl:min-h-0 xl:flex-1">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:shrink-0 xl:grid-cols-6">
         <MetricCard
           icon={Users}
           label={scopeLabel}
           value={visible.length}
-          sub={
-            visible.length
-              ? `${allDone} done`
-              : visible.length !== data.length
-                ? `of ${data.length}`
-                : undefined
-          }
+          of={data.length}
+          sub={`${allDone} fully checked`}
         />
         <MetricCard
           icon={PhoneCall}
-          label="1 · Contacted"
-          value={contacted}
-          sub={notContacted ? `${notContacted} to go` : "all reached"}
+          label={notContactedActive ? "1 · Not contacted" : "1 · Contacted"}
+          value={notContactedActive ? notContacted : contacted}
+          of={visible.length}
+          sub={
+            notContactedActive
+              ? "showing these"
+              : notContacted
+                ? `${notContacted} to go`
+                : "all reached"
+          }
           tone={notContacted > 0 ? "warning" : "neutral"}
-          active={table.getColumn("checks")?.getFilterValue() === "contacted"}
+          active={notContactedActive}
           onClick={() => toggleQuickFilter("checks", "contacted")}
         />
         <MetricCard
           icon={UserCheck}
           label="2 · Onboarding"
           value={onboardingPending}
-          sub={declined[0] ? `pending · ${declined[0]} did not join` : "pending"}
+          of={visible.length}
+          sub={declined[0] ? `pending · ${declined[0]} no reply` : "pending"}
           tone={onboardingPending > 0 ? "danger" : "neutral"}
           active={table.getColumn("checks")?.getFilterValue() === "onboarding"}
           onClick={() => toggleQuickFilter("checks", "onboarding")}
@@ -349,6 +386,7 @@ export function DataTable<TData, TValue>({
           icon={LogIn}
           label="3 · Zero login"
           value={loginPending}
+          of={visible.length}
           sub={declined[1] ? `pending · ${declined[1]} no login` : "pending"}
           tone={loginPending > 0 ? "warning" : "neutral"}
           active={table.getColumn("checks")?.getFilterValue() === "login"}
@@ -358,7 +396,14 @@ export function DataTable<TData, TValue>({
           icon={BanknoteArrowUp}
           label="4 · PTPTN"
           value={ptptnPending}
-          sub={declined[2] ? `pending · ${declined[2]} not applied` : "pending"}
+          of={ptptnApplicable}
+          sub={
+            ptptnApplicable
+              ? declined[2]
+                ? `of ${ptptnApplicable} · ${declined[2]} not applied`
+                : `of ${ptptnApplicable} PTPTN`
+              : "no PTPTN students"
+          }
           tone={ptptnPending > 0 ? "warning" : "neutral"}
           active={table.getColumn("checks")?.getFilterValue() === "ptptn"}
           onClick={() => toggleQuickFilter("checks", "ptptn")}
@@ -367,6 +412,7 @@ export function DataTable<TData, TValue>({
           icon={TriangleAlert}
           label="At risk"
           value={atRisk}
+          of={visible.length}
           sub="flagged"
           tone={atRisk > 0 ? "danger" : "neutral"}
           active={table.getColumn("at_risk")?.getFilterValue() === true}
@@ -375,7 +421,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       <div
-        className={`grid grid-cols-1 items-start gap-5 xl:min-h-0 xl:flex-1 xl:grid-rows-[minmax(0,1fr)] xl:items-stretch ${
+        className={`grid grid-cols-1 items-start gap-3 xl:min-h-0 xl:flex-1 xl:grid-rows-[minmax(0,1fr)] xl:items-stretch ${
           hasSelection ? "xl:grid-cols-[minmax(0,1fr)_380px]" : "xl:grid-cols-1"
         }`}
       >
@@ -418,6 +464,15 @@ export function DataTable<TData, TValue>({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={ALL}>All levels</SelectItem>
+                  <SelectSeparator />
+                  {LEVEL_GROUPS.map((group) => (
+                    <SelectItem
+                      key={group.value}
+                      value={levelGroupFilterValue(group.value)}
+                    >
+                      {group.label}
+                    </SelectItem>
+                  ))}
                   <SelectSeparator />
                   {levelOptions.map((level) => (
                     <SelectItem key={level} value={level}>
@@ -474,14 +529,8 @@ export function DataTable<TData, TValue>({
                 <SelectContent>
                   <SelectItem value={ALL}>All modes</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="Online">
-                    <Laptop className="mr-2 h-3.5 w-3.5" />
-                    Online
-                  </SelectItem>
-                  <SelectItem value="Conventional">
-                    <School className="mr-2 h-3.5 w-3.5" />
-                    Conventional
-                  </SelectItem>
+                  <SelectItem value="Online">Online</SelectItem>
+                  <SelectItem value="Conventional">Conventional</SelectItem>
                 </SelectContent>
               </Select>
 

@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Check,
+  ListChecks,
   Loader2,
   Lock,
+  MessageSquareText,
   PenLine,
   TriangleAlert,
   X
@@ -14,6 +16,7 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "../ui/button";
+import { PanelCard } from "./panel-card";
 import { Checkbox } from "../ui/checkbox";
 import { Textarea } from "../ui/textarea";
 import {
@@ -241,18 +244,13 @@ export default function StudentChecks({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Progress ------------------------------------------------------- */}
-      <div>
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Engagement checks
-          </span>
-          <span className="text-[11px] tabular-nums text-muted-foreground">
-            {progress.done}/{progress.total}
-          </span>
-        </div>
-
+    <>
+      {/* Engagement checks ---------------------------------------------- */}
+      <PanelCard
+        title="Engagement checks"
+        icon={ListChecks}
+        meta={`${progress.done}/${progress.total}`}
+      >
         <div className="mb-3 flex gap-1">
           {checks
             .filter((c) => c.applicable)
@@ -364,16 +362,17 @@ export default function StudentChecks({
             );
           })}
         </ol>
-      </div>
+      </PanelCard>
 
-      {/* At risk -------------------------------------------------------- */}
-      <div
-        className={`rounded-lg border p-3 ${
-          student.at_risk
-            ? "border-amber-300 bg-amber-50/70 dark:border-amber-900 dark:bg-amber-950/30"
-            : ""
-        }`}
-      >
+      {/* Retention risk -------------------------------------------------- */}
+      <PanelCard title="Retention risk" icon={TriangleAlert}>
+        <div
+          className={`rounded-lg ${
+            student.at_risk
+              ? "border border-amber-300 bg-amber-50/70 p-2.5 dark:border-amber-900 dark:bg-amber-950/30"
+              : ""
+          }`}
+        >
         <label className="flex cursor-pointer items-center gap-2">
           <Checkbox
             checked={!!student.at_risk}
@@ -429,10 +428,9 @@ export default function StudentChecks({
             />
           </div>
         )}
-      </div>
+        </div>
 
-      {/* Suggested status ----------------------------------------------- */}
-      <div className="flex items-center gap-2 rounded-lg border border-dashed p-2.5">
+        <div className="mt-2.5 flex items-center gap-2 rounded-lg border border-dashed p-2.5">
         <AlertTriangle
           className={`h-3.5 w-3.5 shrink-0 ${
             statusDiffers ? "text-amber-500" : "text-muted-foreground/50"
@@ -468,14 +466,14 @@ export default function StudentChecks({
             )}
           </Button>
         )}
-      </div>
+        </div>
+      </PanelCard>
 
       {/* Remarks --------------------------------------------------------- */}
-      <div>
-        <div className="mb-1.5 flex items-center justify-between">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Remarks
-          </span>
+      <PanelCard
+        title="Remarks"
+        icon={MessageSquareText}
+        action={
           <Button
             variant="ghost"
             size="sm"
@@ -485,7 +483,8 @@ export default function StudentChecks({
             <PenLine className="h-3 w-3" />
             New line
           </Button>
-        </div>
+        }
+      >
         <Textarea
           ref={remarksRef}
           value={remarks}
@@ -501,7 +500,7 @@ export default function StudentChecks({
               ? "Unsaved — click outside the box to save"
               : ""}
         </p>
-      </div>
-    </div>
+      </PanelCard>
+    </>
   );
 }

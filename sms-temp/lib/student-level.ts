@@ -44,3 +44,60 @@ export function levelOptionsFrom(
   }
   return sortLevels(Array.from(levels));
 }
+
+/** Broad academic bands used by the mobile filters. */
+export type LevelGroup = "undergraduate" | "postgraduate";
+
+/**
+ * Derived from the first word of the programme name. Verified against the live
+ * data, which uses exactly seven: Foundation, Certificate, Diploma, Bachelor
+ * (undergraduate) and Master, Post-Graduate, Doctor (postgraduate).
+ * "Post-Graduate" is the postgraduate diploma and is hyphenated in the data.
+ */
+const POSTGRADUATE_LEVELS = new Set([
+  "master",
+  "masters",
+  "post-graduate",
+  "postgraduate",
+  "doctor",
+  "doctorate",
+  "phd"
+]);
+
+const UNDERGRADUATE_LEVELS = new Set([
+  "foundation",
+  "certificate",
+  "diploma",
+  "bachelor",
+  "bachelors"
+]);
+
+export function levelGroupOf(
+  programmeName: string | null | undefined
+): LevelGroup | null {
+  const level = getStudentLevel(programmeName)?.toLowerCase();
+  if (!level) return null;
+  if (POSTGRADUATE_LEVELS.has(level)) return "postgraduate";
+  if (UNDERGRADUATE_LEVELS.has(level)) return "undergraduate";
+  return null;
+}
+
+/** Prefix marking a filter value as a band rather than a single level. */
+export const LEVEL_GROUP_PREFIX = "group:";
+
+export function levelGroupFilterValue(group: LevelGroup) {
+  return `${LEVEL_GROUP_PREFIX}${group}`;
+}
+
+/** Returns the band when the value is a group token, else null. */
+export function parseLevelGroupFilter(value: string): LevelGroup | null {
+  if (!value.startsWith(LEVEL_GROUP_PREFIX)) return null;
+  const group = value.slice(LEVEL_GROUP_PREFIX.length);
+  return group === "undergraduate" || group === "postgraduate" ? group : null;
+}
+
+export const LEVEL_GROUPS: { value: LevelGroup; label: string; short: string }[] =
+  [
+    { value: "undergraduate", label: "Undergraduate", short: "UG" },
+    { value: "postgraduate", label: "Postgraduate", short: "PG" }
+  ];

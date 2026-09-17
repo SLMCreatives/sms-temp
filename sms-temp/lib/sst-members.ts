@@ -32,7 +32,7 @@ export const ALL_SST_MEMBERS: SstMember[] = [
     isActive: true,
     image: "/sst/amirul.png",
     badgeClass:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-0"
+      "bg-blue-100 text-blue-900 dark:bg-blue-400/20 dark:text-blue-100 border-0"
   },
   {
     id: 2,
@@ -42,7 +42,7 @@ export const ALL_SST_MEMBERS: SstMember[] = [
     isActive: true,
     image: "/sst/farzana.png",
     badgeClass:
-      "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-0"
+      "bg-amber-100 text-amber-900 dark:bg-amber-400/20 dark:text-amber-100 border-0"
   },
   {
     id: 3,
@@ -52,7 +52,7 @@ export const ALL_SST_MEMBERS: SstMember[] = [
     isActive: false,
     image: "/sst/najwa.png",
     badgeClass:
-      "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-0"
+      "bg-green-100 text-green-900 dark:bg-green-400/20 dark:text-green-100 border-0"
   },
   {
     id: 4,
@@ -62,7 +62,7 @@ export const ALL_SST_MEMBERS: SstMember[] = [
     isActive: false,
     image: "/sst/ayu.jpeg",
     badgeClass:
-      "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300 border-0"
+      "bg-pink-100 text-pink-900 dark:bg-pink-400/20 dark:text-pink-100 border-0"
   },
   {
     id: 5,
@@ -72,7 +72,7 @@ export const ALL_SST_MEMBERS: SstMember[] = [
     isActive: true,
     isManager: true,
     badgeClass:
-      "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border-0"
+      "bg-slate-100 text-slate-900 dark:bg-slate-400/20 dark:text-slate-100 border-0"
   },
   {
     id: 6,
@@ -82,7 +82,7 @@ export const ALL_SST_MEMBERS: SstMember[] = [
     isActive: true,
     aliases: ["miru"],
     badgeClass:
-      "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-300 border-0"
+      "bg-violet-100 text-violet-900 dark:bg-violet-400/20 dark:text-violet-100 border-0"
   },
   {
     id: 7,
@@ -92,7 +92,7 @@ export const ALL_SST_MEMBERS: SstMember[] = [
     isActive: true,
     aliases: ["adib"],
     badgeClass:
-      "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300 border-0"
+      "bg-teal-100 text-teal-900 dark:bg-teal-400/20 dark:text-teal-100 border-0"
   }
 ];
 

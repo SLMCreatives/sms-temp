@@ -1,4 +1,4 @@
-import { StudentDashboardRow } from "@/lib/types/database";
+import type { StudentDashboardRow } from "@/lib/types/database";
 
 export type CheckKey = "contacted" | "onboarding" | "login" | "ptptn";
 
@@ -246,4 +246,44 @@ export function checkStateLabel(check: StudentCheck) {
   if (check.answer === true) return "confirmed";
   if (check.answer === false) return check.noLabel.toLowerCase();
   return check.unlocked ? "pending" : "locked";
+}
+
+/**
+ * Named slices of the check sequence, shared by the desktop stat tiles, the
+ * table's column filter and the mobile board — so the three can never drift
+ * apart on what "zero login" means.
+ */
+export type SegmentKey = "contacted" | "onboarding" | "login" | "ptptn";
+
+export const CHECK_SEGMENTS: {
+  value: SegmentKey;
+  label: string;
+  /** Position in the sequence returned by getChecks(). */
+  index: number;
+}[] = [
+  { value: "contacted", label: "Not contacted", index: 0 },
+  { value: "onboarding", label: "Onboarding", index: 1 },
+  { value: "login", label: "Zero login", index: 2 },
+  { value: "ptptn", label: "PTPTN", index: 3 }
+];
+
+/**
+ * True when this student is the next candidate for that step: the step applies,
+ * everything before it has an answer, and this one does not.
+ */
+export function isSegmentPending(
+  student: ChecksInput,
+  segment: SegmentKey
+): boolean {
+  const checks = getChecks(student);
+  const meta = CHECK_SEGMENTS.find((s) => s.value === segment);
+  if (!meta) return false;
+
+  const check = checks[meta.index];
+  if (!check.applicable || check.answered) return false;
+
+  // Every earlier applicable step must already be answered.
+  return checks
+    .slice(0, meta.index)
+    .every((c) => !c.applicable || c.answered);
 }

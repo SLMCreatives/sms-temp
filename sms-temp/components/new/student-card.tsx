@@ -1,34 +1,28 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import {
-  MessageCircle,
   BanknoteArrowUp,
+  ContactRound,
   History,
-  ListChecks,
   Mail,
+  MessageCircle,
   Phone,
   UserCircle,
   X
 } from "lucide-react";
 import Link from "next/link";
+
 import StudentInfo from "./student-info";
 import StudentPayment from "./student-payment";
-import { StudentDashboardRow } from "@/lib/types/database";
+import StudentChecks from "./student-checks";
 import EditStudent from "./edit-student";
 import StudentEngagement from "./student-engagement";
-import StudentChecks from "./student-checks";
-import { getProgress } from "@/lib/student-progress";
+import { PanelCard } from "./panel-card";
+import { StudentDashboardRow } from "@/lib/types/database";
 import { getSstById } from "@/lib/sst-members";
 import { initialsOf } from "@/app/student/studentColumns";
 import { getStudentLevel } from "@/lib/student-level";
-
-const tabs = [
-  { value: "checks", label: "Checks", icon: ListChecks },
-  { value: "information", label: "Details", icon: UserCircle },
-  { value: "payment", label: "Payment", icon: BanknoteArrowUp },
-  { value: "history", label: "History", icon: History }
-];
+import { getProgress } from "@/lib/student-progress";
 
 const STATUS_TONE: Record<string, string> = {
   Active:
@@ -55,24 +49,32 @@ export function NewStudentCard({
   const progress = getProgress(student);
 
   return (
-    <section
-      key={index}
-      className="flex flex-col overflow-hidden rounded-xl border bg-card"
-    >
-      <header className="relative flex flex-col gap-3 border-b p-4">
-        <div className="flex items-start gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+    // Stacked cards in one scroll container — the aside owns the scrolling.
+    <div key={index} className="flex flex-col gap-3">
+      {/* Identity ------------------------------------------------------- */}
+      {/*
+        Pinned to the top of the panel scroll so the name, status and quick
+        actions stay visible while the sections below scroll under it.
+        position:sticky is itself a positioned value, so the absolutely
+        placed edit/close buttons still anchor to this card.
+      */}
+      <PanelCard
+        bodyClassName="p-3"
+        className="relative xl:sticky xl:top-0 xl:z-20 xl:shadow-sm"
+      >
+        <div className="flex items-start gap-2.5">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
             {initialsOf(student.full_name)}
           </span>
-          <div className="min-w-0 flex-1 pr-14">
-            <h2 className="truncate text-[15px] font-semibold capitalize leading-tight">
+          <div className="min-w-0 flex-1 pr-12">
+            <h2 className="truncate text-[14px] font-semibold capitalize leading-tight">
               {student.full_name?.toLowerCase()}
             </h2>
-            <p className="truncate font-mono text-[11px] text-muted-foreground">
+            <p className="truncate font-mono text-[10px] text-muted-foreground">
               {student.matric_no}
             </p>
           </div>
-          <div className="absolute right-3 top-3 flex items-center gap-0.5">
+          <div className="absolute right-2 top-2 flex items-center gap-0.5">
             <EditStudent student={student} />
             {onClose && (
               <button
@@ -87,37 +89,38 @@ export function NewStudentCard({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="mt-2.5 flex flex-wrap items-center gap-1">
           <span
-            className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${
-              STATUS_TONE[student.status ?? ""] ?? "bg-muted text-muted-foreground"
+            className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+              STATUS_TONE[student.status ?? ""] ??
+              "bg-muted text-muted-foreground"
             }`}
           >
             {student.status ?? "—"}
           </span>
           {level && (
-            <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
               {level}
             </span>
           )}
           {student.campus_code && (
-            <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
               {student.campus_code}
             </span>
           )}
-          <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+          <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
             {student.study_mode === "Online" ? "Online" : "Conventional"}
           </span>
           {owner && (
             <span
-              className={`ml-auto rounded-md px-1.5 py-0.5 text-[10px] font-medium ${owner.badgeClass}`}
+              className={`ml-auto rounded px-1.5 py-0.5 text-[10px] font-medium ${owner.badgeClass}`}
             >
               {owner.name}
             </span>
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="mt-2.5 grid grid-cols-4 gap-1.5">
           <a
             href={phone ? `https://wa.me/6${phone}` : undefined}
             target="_blank"
@@ -156,12 +159,24 @@ export function NewStudentCard({
             <Mail className="h-3.5 w-3.5" />
             Email
           </a>
+          <a
+            href={`/student/contacts?matric=${encodeURIComponent(student.matric_no)}`}
+            title="Save this student to your phone contacts"
+            className={`flex items-center justify-center gap-1.5 rounded-lg border py-1.5 text-[11px] font-medium transition ${
+              phone || student.email
+                ? "hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950/40 dark:hover:text-amber-300"
+                : "pointer-events-none opacity-40"
+            }`}
+          >
+            <ContactRound className="h-3.5 w-3.5" />
+            Save
+          </a>
         </div>
 
-        <div className="grid grid-cols-3 divide-x rounded-lg border bg-muted/30">
-          <div className="px-2 py-1.5 text-center">
+        <div className="mt-2.5 grid grid-cols-3 divide-x rounded-lg border bg-muted/30">
+          <div className="px-2 py-1 text-center">
             <p
-              className={`text-sm font-semibold tabular-nums ${
+              className={`text-[13px] font-semibold tabular-nums ${
                 visits === 0 ? "text-red-600 dark:text-red-400" : ""
               }`}
             >
@@ -171,17 +186,17 @@ export function NewStudentCard({
               CN visits
             </p>
           </div>
-          <div className="px-2 py-1.5 text-center">
-            <p className="text-sm font-semibold tabular-nums">
+          <div className="px-2 py-1 text-center">
+            <p className="text-[13px] font-semibold tabular-nums">
               {Math.round((student.a_lms_activity?.latest_cp ?? 0) * 100)}%
             </p>
             <p className="text-[9px] uppercase tracking-wide text-muted-foreground">
               Progress
             </p>
           </div>
-          <div className="px-2 py-1.5 text-center">
+          <div className="px-2 py-1 text-center">
             <p
-              className={`text-sm font-semibold tabular-nums ${
+              className={`text-[13px] font-semibold tabular-nums ${
                 progress.complete
                   ? "text-emerald-600 dark:text-emerald-400"
                   : "text-amber-600 dark:text-amber-400"
@@ -194,37 +209,34 @@ export function NewStudentCard({
             </p>
           </div>
         </div>
-      </header>
+      </PanelCard>
 
-      <Tabs defaultValue="checks" className="flex flex-col">
-        <TabsList className="flex shrink-0 items-center gap-0.5 border-b px-2 pt-1.5">
-          {tabs.map((tab) => (
-            <TabsTrigger
-              key={tab.value}
-              value={tab.value}
-              className="group flex flex-1 flex-col items-center gap-0.5 rounded-none border-b-2 border-transparent px-1 pb-1.5 pt-1 text-[10px] font-medium text-muted-foreground transition data-[state=active]:border-primary data-[state=active]:text-foreground hover:text-foreground"
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      {/* Details -------------------------------------------------------- */}
+      <PanelCard title="Student details" icon={UserCircle} collapsible>
+        <StudentInfo student={student} />
+      </PanelCard>
 
-        <div className="max-h-[46vh] overflow-y-auto p-4">
-          <TabsContent value="checks">
-            <StudentChecks student={student} />
-          </TabsContent>
-          <TabsContent value="information">
-            <StudentInfo student={student} />
-          </TabsContent>
-          <TabsContent value="payment">
-            <StudentPayment student={student} />
-          </TabsContent>
-          <TabsContent value="history">
-            <StudentEngagement student={student} />
-          </TabsContent>
-        </div>
-      </Tabs>
-    </section>
+      {/* Checks, retention risk and remarks each render their own card. */}
+      <StudentChecks student={student} />
+
+      {/* Secondary sections, collapsed so the panel stays short ---------- */}
+      <PanelCard
+        title="Payment"
+        icon={BanknoteArrowUp}
+        collapsible
+        defaultOpen={false}
+      >
+        <StudentPayment student={student} />
+      </PanelCard>
+
+      <PanelCard
+        title="Engagement history"
+        icon={History}
+        collapsible
+        defaultOpen={false}
+      >
+        <StudentEngagement student={student} />
+      </PanelCard>
+    </div>
   );
 }

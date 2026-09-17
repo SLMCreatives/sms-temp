@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ChevronLeft, Users, UserRound } from "lucide-react";
+import { ChevronLeft, ContactRound, Users, UserRound } from "lucide-react";
 
 import { DataTable } from "./data-table";
 import { newStudentColumns, initialsOf } from "./studentColumns";
@@ -95,9 +95,18 @@ export default function StudentWorkspace({
     ? `${scopedSst.name}'s students`
     : "All students";
 
+  // Downloads the students in the current scope as a .vcf. Scoped by intake and
+  // owner — not by the table's column filters — so the label says what it does.
+  const contactsHref =
+    `/student/contacts?intake=${encodeURIComponent(intake)}` +
+    (scopedSst ? `&sst=${scopedSst.id}` : "");
+  const contactsWithPhone = visibleData.filter(
+    (s) => s.phone || s.email
+  ).length;
+
   return (
-    <div className="flex w-full flex-col gap-5 xl:min-h-0 xl:flex-1">
-      <header className="flex flex-col gap-4 xl:shrink-0">
+    <div className="flex w-full flex-col gap-3 xl:min-h-0 xl:flex-1">
+      <header className="flex flex-col gap-2 xl:shrink-0">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             {lockedSst && (
@@ -117,8 +126,10 @@ export default function StudentWorkspace({
               </span>
             )}
             <div>
-              <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-              <p className="text-xs text-muted-foreground">
+              <h1 className="text-lg font-semibold leading-tight tracking-tight">
+                {title}
+              </h1>
+              <p className="text-[11px] leading-tight text-muted-foreground">
                 {subtitle ?? "Student Success Team · engagement workspace"}
               </p>
             </div>
@@ -131,7 +142,7 @@ export default function StudentWorkspace({
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b pb-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b pb-2">
           {!lockedSst && currentSst && (
             <Segmented<Scope>
               value={scope}
@@ -142,6 +153,18 @@ export default function StudentWorkspace({
               ]}
             />
           )}
+
+          <a
+            href={contactsHref}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-foreground/25 hover:text-foreground"
+            title={`Save ${contactsWithPhone} contacts to your phone as a .vcf file`}
+          >
+            <ContactRound className="h-3.5 w-3.5" />
+            Save contacts
+            <span className="tabular-nums opacity-60">
+              {contactsWithPhone}
+            </span>
+          </a>
 
           <nav className="flex flex-wrap items-center gap-1">
             <span className="mr-1 text-[11px] uppercase tracking-wide text-muted-foreground">

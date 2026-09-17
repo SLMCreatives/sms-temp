@@ -15,11 +15,16 @@ const withAlpha = (token: string) =>
 
 export default {
   darkMode: ["class"],
+  // lib/ and hooks/ hold class strings too — the SST badge palette and the
+  // check-dot colours live in lib/. Without them here those classes are never
+  // generated, so the styles silently do nothing at runtime.
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
+    "./hooks/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

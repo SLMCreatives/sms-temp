@@ -86,7 +86,8 @@ export function EngagementTracker() {
         .select(
           "matric_no, full_name, sst_id, contacted, onboarding_checked, login_checked, ptptn_checked, a_payments(payment_mode, ptptn_proof_status)"
         )
-        .eq("intake_code", intake);
+        .eq("intake_code", intake)
+        .order("matric_no", { ascending: true });
 
       if (!isSulaiman) {
         const member = resolveSstByName(fullName);
@@ -205,7 +206,11 @@ export function EngagementTracker() {
             <Bar done={overall.done} total={overall.total} />
 
             <div className="grid grid-cols-4 gap-1.5 pt-1">
-              {perCheck.map((t, i) => (
+              {perCheck.map((t, i) => {
+                // Share of the students this step actually applies to — PTPTN
+                // divides by its own smaller population, not the whole cohort.
+                const pct = t.total ? Math.round((t.done / t.total) * 100) : 0;
+                return (
                 <div
                   key={CHECK_LABELS[i]}
                   className="rounded-lg bg-muted/50 px-1.5 py-1.5 text-center"
@@ -215,6 +220,17 @@ export function EngagementTracker() {
                     <span className="text-[10px] font-normal text-muted-foreground">
                       /{t.total}
                     </span>
+                  </p>
+                  <p
+                    className={`mt-0.5 text-[10px] font-semibold tabular-nums leading-none ${
+                      pct === 0
+                        ? "text-muted-foreground"
+                        : pct === 100
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-foreground"
+                    }`}
+                  >
+                    {pct}%
                   </p>
                   <p className="mt-0.5 text-[9px] leading-tight text-muted-foreground">
                     {CHECK_LABELS[i]}
@@ -231,7 +247,8 @@ export function EngagementTracker() {
                     )}
                   </p>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             <p className="text-[10px] text-muted-foreground">
