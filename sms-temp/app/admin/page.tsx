@@ -2,12 +2,19 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -15,165 +22,106 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DataExport from "@/components/new/data-export";
 import AddStudents from "@/components/new/add-students";
+import AssignSST from "@/components/new/assign-sst";
 
 const supabase = createClient();
 
-export default function SSTManagement() {
-  const [loading, setLoading] = useState(false);
-  const [week, setWeek] = useState(1);
-  const [message, setMessage] = useState({ text: "", type: "" });
+const WEEKS = [1, 2, 3, 4];
 
-  const handleInitialAssignment = async () => {
-    if (
-      !confirm(
-        "This will distribute all the unassigned students to active SST members. Proceed?"
-      )
-    )
-      return;
+const TABS = [
+  {
+    value: "export",
+    label: "Data Export",
+    blurb: "Pull student and engagement data out as a spreadsheet."
+  },
+  {
+    value: "add",
+    label: "Add Students",
+    blurb: "Add one student, or import a cohort from a spreadsheet."
+  },
+  {
+    value: "sst",
+    label: "SST Management",
+    blurb: "Distribute caseloads across the team and generate weekly tasks."
+  }
+];
 
-    setLoading(true);
-    const { error } = await supabase.rpc("a_students_auto_assign_sst");
-
-    if (error) {
-      setMessage({ text: `Error: ${error.message}`, type: "error" });
-    } else {
-      setMessage({
-        text: "Successfully assigned students to SST members.",
-        type: "success"
-      });
-    }
-    setLoading(false);
-  };
-  /*  const handleInitialAssignmentNov25 = async () => {
-    if (
-      !confirm(
-        "This will distribute all the unassigned students to active SST members. Proceed?"
-      )
-    )
-      return;
-
-    setLoading(true);
-    const { error } = await supabase.rpc("nov25_auto_assign_sst");
-
-    if (error) {
-      setMessage({ text: `Error: ${error.message}`, type: "error" });
-    } else {
-      setMessage({
-        text: "Successfully assigned students to SST members.",
-        type: "success"
-      });
-    }
-    setLoading(false);
-  };
-
-  const handleInitialAssignmentC = async () => {
-    if (
-      !confirm(
-        "This will distribute all the unassigned students to active SST members. Proceed?"
-      )
-    )
-      return;
-
-    setLoading(true);
-    const { error } = await supabase.rpc("jan26_c_auto_assign_sst");
-
-    if (error) {
-      setMessage({ text: `Error: ${error.message}`, type: "error" });
-    } else {
-      setMessage({
-        text: "Successfully assigned students to SST members.",
-        type: "success"
-      });
-    }
-    setLoading(false);
-  }; */
+export default function AdminPage() {
+  const [tab, setTab] = useState("export");
+  const [week, setWeek] = useState<string>("");
+  const [generating, setGenerating] = useState(false);
 
   const handleGenerateTasks = async () => {
-    setLoading(true);
-    const { error } = await supabase.rpc("jan26_generate_weekly_tasks", {
-      target_week: week
-    });
+    if (!week) return;
 
-    if (error) {
-      setMessage({ text: `Error: ${error.message}`, type: "error" });
-    } else {
-      setMessage({
-        text: `Successfully generated tasks for week ${week}.`,
-        type: "success"
-      });
-    }
-    setLoading(false);
+    setGenerating(true);
+    const { error } = await supabase.rpc("jan26_generate_weekly_tasks", {
+      target_week: Number(week)
+    });
+    setGenerating(false);
+
+    if (error) toast.error(`Could not generate tasks: ${error.message}`);
+    else toast.success(`Generated tasks for week ${week}.`);
   };
+
+  const active = TABS.find((t) => t.value === tab);
+
   return (
-    <div className="max-w-5xl mx-auto p-8">
-      <h1 className="text-2xl font-bold mb-6">Admin</h1>
-      <Tabs defaultValue="export" className="w-full flex flex-col">
-        <TabsList className="mb-6">
-          <TabsTrigger value="export" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">Data Export</TabsTrigger>
-          <TabsTrigger value="add" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">Add Students</TabsTrigger>
-          <TabsTrigger value="sst" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white">SST Management</TabsTrigger>
+    <div className="w-full px-4 py-8 sm:px-6 lg:px-0">
+      <header className="mb-5">
+        <h1 className="text-2xl font-semibold tracking-tight">Admin</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {active?.blurb}
+        </p>
+      </header>
+
+      <Tabs value={tab} onValueChange={setTab} className="w-full">
+        <TabsList className="mb-5 max-w-full self-start">
+          {TABS.map((t) => (
+            <TabsTrigger
+              key={t.value}
+              value={t.value}
+              className="px-3 data-[state=active]:bg-cyan-500 data-[state=active]:text-white"
+            >
+              {t.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value="sst">
-          <p className="mb-4">
-            Manage SST assignments and generate weekly tasks.
-          </p>
-          {message.text && (
-            <div
-              className={`mb-4 p-4 rounded ${message.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-            >
-              {message.text}
-            </div>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="border p-6 rounded-lg shadow-sm">
-              <h2 className="text-xl font-semibold mb-4">
-                Initial SST Assignment
-              </h2>
-              <p className="mb-4">
-                Distribute unassigned students to active SST members.
-              </p>
-              <div className="flex flex-row flex-wrap gap-4">
-                <Button
-                  onClick={handleInitialAssignment}
-                  disabled={loading}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {loading ? "Processing..." : "Assign All Students"}
-                </Button>
-              </div>
-            </div>
+        <TabsContent value="sst" className="flex flex-col gap-5">
+          <AssignSST />
 
-            <div className="border p-6 rounded-lg shadow-sm gap-2">
-              <h2 className="text-xl font-semibold mb-4">
-                Generate Weekly Tasks
-              </h2>
-              <Label htmlFor="week" className="block mb-2">
-                Select Week:
-              </Label>
-              <Select onValueChange={(value) => setWeek(parseInt(value))}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a week" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {[1, 2, 3, 4].map((w) => (
-                      <SelectItem key={w} value={w.toString()}>
+          <Card className="md:max-w-md">
+            <CardHeader className="border-b">
+              <CardTitle className="text-base">Generate weekly tasks</CardTitle>
+              <CardDescription>
+                Creates the follow-up task list for every SST member for the
+                chosen week.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap items-end gap-3">
+              <div className="grid gap-1.5">
+                <Label htmlFor="week" className="text-xs">
+                  Week
+                </Label>
+                <Select value={week} onValueChange={setWeek}>
+                  <SelectTrigger id="week" className="h-9 w-40 text-sm">
+                    <SelectValue placeholder="Select a week" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" sideOffset={4} align="start">
+                    {WEEKS.map((w) => (
+                      <SelectItem key={w} value={String(w)}>
                         Week {w}
                       </SelectItem>
                     ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={handleGenerateTasks}
-                disabled={loading}
-                className="bg-green-600 text-white mt-2 px-4 py-4 rounded hover:bg-green-700 disabled:opacity-50"
-              >
-                {loading ? "Processing..." : "Generate Tasks"}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={handleGenerateTasks} disabled={!week || generating}>
+                {generating ? "Generating…" : "Generate tasks"}
               </Button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="export">

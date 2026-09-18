@@ -5,7 +5,6 @@ import {
   SidebarProvider,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/sonner";
 
 export default function ProtectedLayout({
   children
@@ -19,9 +18,11 @@ export default function ProtectedLayout({
           <AppSidebar />
           <SidebarInset>
             <SidebarTrigger className=" sticky top-2 left-2 z-40 md:hidden " />
-            <div className="flex flex-col gap-20 max-w-3xl lg:max-w-full lg:w-[100vw] lg:px-32 mx-auto dark:bg-black">
-              <Toaster position="top-right" richColors />
-              <div className="fixed top-4 right-4">
+            {/* w-full, never 100vw: this sits inside SidebarInset, which is
+                already narrowed by the sidebar, so a viewport-width child
+                overflows by exactly the sidebar's width. */}
+            <div className="flex w-full min-w-0 flex-col max-w-3xl lg:max-w-full lg:px-32 mx-auto dark:bg-black">
+              <div className="fixed top-4 right-4 z-30">
                 <UserProfile />
               </div>
               {children}

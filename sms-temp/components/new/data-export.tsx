@@ -8,13 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import * as XLSX from "xlsx";
-import type {
-  Student,
-  Payment,
-  LMSActivity,
-  Engagement,
-  SOS
-} from "@/lib/types/database";
+import type { Student, Payment, LMSActivity } from "@/lib/types/database";
 
 const supabase = createClient();
 
@@ -59,27 +53,37 @@ const COLUMN_GROUPS = [
     ]
   },
   {
-    group: "Engagements (Summary)",
-    key: "engagements",
+    // The four-step check sequence. Values are rendered through the same
+    // lib/student-progress helpers the app uses, so the sheet and the screen
+    // can never disagree about what a check says.
+    group: "Engagement Checks",
+    key: "checks",
     fields: [
-      { key: "total_engagements", label: "Total Engagements" },
-      { key: "last_engagement_date", label: "Last Engagement Date" },
-      { key: "last_sentiment", label: "Last Sentiment" },
-      { key: "last_outcome", label: "Last Outcome" },
-      { key: "last_remarks", label: "Last Remarks" }
+      { key: "contacted_state", label: "Contacted" },
+      { key: "contacted_at", label: "Contacted At" },
+      { key: "contacted_by", label: "Contacted By" },
+      { key: "onboarding_state", label: "Onboarding Check" },
+      { key: "onboarding_checked_at", label: "Onboarding Checked At" },
+      { key: "onboarding_checked_by", label: "Onboarding Checked By" },
+      { key: "login_state", label: "Zero Login Check" },
+      { key: "login_checked_at", label: "Zero Login Checked At" },
+      { key: "login_checked_by", label: "Zero Login Checked By" },
+      { key: "ptptn_state", label: "PTPTN Application" },
+      { key: "ptptn_checked_at", label: "PTPTN Checked At" },
+      { key: "ptptn_checked_by", label: "PTPTN Checked By" },
+      { key: "checks_done", label: "Checks Answered" },
+      { key: "checks_total", label: "Checks Applicable" },
+      { key: "next_check", label: "Next Check Due" }
     ]
   },
   {
-    group: "SOS Survey",
-    key: "sos",
+    group: "Retention Risk",
+    key: "risk",
     fields: [
-      { key: "nps", label: "NPS Score" },
-      { key: "q1", label: "Q1" },
-      { key: "q2", label: "Q2" },
-      { key: "q3", label: "Q3" },
-      { key: "q4", label: "Q4" },
-      { key: "q5", label: "Q5" },
-      { key: "feedback", label: "Feedback" }
+      { key: "at_risk", label: "At Risk" },
+      { key: "at_risk_intent", label: "At Risk Intent" },
+      { key: "at_risk_reason", label: "At Risk Reason" },
+      { key: "remarks", label: "Remarks" }
     ]
   }
 ];
@@ -91,6 +95,34 @@ const LABEL_MAP = Object.fromEntries(
 
 const STATUS_OPTIONS = ["Active", "Withdraw", "Deferred", "At Risk"];
 import { SST_MEMBERS, getSstById } from "@/lib/sst-members";
+import {
+  AT_RISK_INTENTS,
+  getChecks,
+  getProgress,
+  type StudentCheck
+} from "@/lib/student-progress";
+
+/**
+ * Spreadsheet wording for one check. The three states come straight from
+ * getChecks, so PTPTN applicability and the a_payments proof fallback behave
+ * exactly as they do in the app; only the phrasing is export-specific.
+ * The negative wording reuses the check's own noLabel ("No response",
+ * "No CN login", "Not applied").
+ */
+function checkState(check: StudentCheck): string {
+  // "Not applicable" only when nothing was ever recorded. 536 students carry a
+  // PTPTN answer from the proof backfill while paying by SELF/DECLINE OFFER
+  // etc., so applicability alone would drop a real answer from the sheet.
+  if (!check.applicable && check.answer === null) return "Not applicable";
+  if (check.answer === true) return "Yes";
+  if (check.answer === false) return check.noLabel || "No";
+  return "Not actioned";
+}
+
+/** SST id -> name, so "…Checked By" reads as a person and not a number. */
+const sstName = (id: number | null | undefined) =>
+  id == null ? null : (getSstById(id)?.name ?? String(id));
+
 const FACULTY_OPTIONS = ["FOB", "FEH", "FAiFT"];
 const STUDY_MODE_OPTIONS = ["Online", "Conventional"];
 const INTAKE_QUERY_TABLE = "a_students" as const;
@@ -99,8 +131,6 @@ const INTAKE_QUERY_TABLE = "a_students" as const;
 type StudentRow = Student & {
   a_payments: Payment | null;
   a_lms_activity: LMSActivity | null;
-  a_engagements: Engagement[] | null;
-  a_sos: SOS | null;
 };
 
 export default function DataExport() {
@@ -192,9 +222,7 @@ export default function DataExport() {
     setLoading(true);
     const base = supabase
       .from("a_students")
-      .select(
-        "*, a_payments(*), a_lms_activity(*), a_engagements(*), a_sos(*)"
-      );
+      .select("*, a_payments(*), a_lms_activity(*)");
     const { data, error } = await applyFilters(base);
 
     if (error || !data) {
@@ -204,12 +232,9 @@ export default function DataExport() {
     }
 
     const rows = (data as StudentRow[]).map((s) => {
-      const engagements = s.a_engagements ?? [];
-      const sorted = [...engagements].sort(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-      const lastEng = sorted[0];
+      const [contacted, onboarding, login, ptptn] = getChecks(s);
+      const progress = getProgress(s);
+      const intent = AT_RISK_INTENTS.find((i) => i.value === s.at_risk_intent);
 
       const flat: Record<string, unknown> = {
         matric_no: s.matric_no,
@@ -227,24 +252,31 @@ export default function DataExport() {
         payment_mode: s.a_payments?.payment_mode ?? null,
         payment_status: s.a_payments?.payment_status ?? null,
         ptptn_proof_status: s.a_payments?.ptptn_proof_status ?? null,
+        contacted_state: checkState(contacted),
+        contacted_at: s.contacted_at ?? null,
+        contacted_by: sstName(s.contacted_by),
+        onboarding_state: checkState(onboarding),
+        onboarding_checked_at: s.onboarding_checked_at ?? null,
+        onboarding_checked_by: sstName(s.onboarding_checked_by),
+        login_state: checkState(login),
+        login_checked_at: s.login_checked_at ?? null,
+        login_checked_by: sstName(s.login_checked_by),
+        ptptn_state: checkState(ptptn),
+        ptptn_checked_at: s.ptptn_checked_at ?? null,
+        ptptn_checked_by: sstName(s.ptptn_checked_by),
+        checks_done: progress.done,
+        checks_total: progress.total,
+        next_check: progress.next?.label ?? "All done",
+        at_risk: s.at_risk ? "Yes" : "No",
+        at_risk_intent: intent?.label ?? null,
+        at_risk_reason: s.at_risk_reason ?? null,
+        remarks: s.remarks ?? null,
         cp_w1: s.a_lms_activity?.cp_w1 ?? null,
         cp_w2: s.a_lms_activity?.cp_w2 ?? null,
         cp_w3: s.a_lms_activity?.cp_w3 ?? null,
         latest_cp: s.a_lms_activity?.latest_cp ?? null,
         last_login_at: s.a_lms_activity?.last_login_at ?? null,
         course_visits: s.a_lms_activity?.course_visits ?? null,
-        total_engagements: engagements.length,
-        last_engagement_date: lastEng?.created_at ?? null,
-        last_sentiment: lastEng?.sentiment ?? null,
-        last_outcome: lastEng?.outcome ?? null,
-        last_remarks: lastEng?.remarks ?? null,
-        nps: s.a_sos?.nps ?? null,
-        q1: s.a_sos?.q1 ?? null,
-        q2: s.a_sos?.q2 ?? null,
-        q3: s.a_sos?.q3 ?? null,
-        q4: s.a_sos?.q4 ?? null,
-        q5: s.a_sos?.q5 ?? null,
-        feedback: s.a_sos?.feedback ?? null
       };
 
       return Object.fromEntries(

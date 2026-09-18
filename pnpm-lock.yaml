@@ -1,0 +1,24 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    devDependencies:
+      baseline-browser-mapping:
+        specifier: ^2.11.24
+        version: 2.11.24
+
+packages:
+
+  baseline-browser-mapping@2.11.24:
+    resolution: {integrity: sha512-hYrgxie335U08WqICoGqKRzV1HFXv6zdxwJE4ekCb80CM9a0SVVsN4QPwT67RraRo+9h8IATk6uxHJw7QSkdOg==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
+snapshots:
+
+  baseline-browser-mapping@2.11.24: {}
