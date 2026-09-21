@@ -11,6 +11,10 @@ import { StudentDashboardRow } from "@/lib/types/database";
 import { SST_MEMBERS, SstMember } from "@/lib/sst-members";
 import { INTAKES } from "@/lib/intakes";
 import { useIntake } from "@/components/new/intake-context";
+import {
+  useRealtimeStudents,
+  type ConnectionState
+} from "@/hooks/use-realtime-students";
 
 export type { Intake } from "@/lib/intakes";
 
@@ -66,14 +70,51 @@ function Segmented<T extends string>({
   );
 }
 
+/**
+ * Tells the team whether what they are looking at is still being kept current.
+ * Without it a stalled socket is indistinguishable from a quiet afternoon.
+ */
+function LiveBadge({ state }: { state: ConnectionState }) {
+  const copy = {
+    live: {
+      label: "Live",
+      dot: "bg-emerald-500 animate-pulse",
+      title: "Changes made by the team show up here automatically"
+    },
+    connecting: {
+      label: "Connecting",
+      dot: "bg-amber-500",
+      title: "Connecting to live updates…"
+    },
+    offline: {
+      label: "Offline",
+      dot: "bg-muted-foreground/50",
+      title: "Not receiving live updates — reload the page"
+    }
+  }[state];
+
+  return (
+    <span
+      title={copy.title}
+      className="inline-flex shrink-0 items-center gap-1.5 text-[11px] leading-tight text-muted-foreground"
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${copy.dot}`} />
+      {copy.label}
+    </span>
+  );
+}
+
 export default function StudentWorkspace({
-  data,
+  data: initialData,
   currentSst,
   isManager,
   lockedSst = null,
   title = "Students",
   subtitle
 }: StudentWorkspaceProps) {
+  // Live rows: seeded by the server render, then kept in step with the
+  // database so a change another SST member makes lands without a refresh.
+  const { data, connection } = useRealtimeStudents(initialData);
   const { intake, setIntake } = useIntake();
   // Default to the signed-in member's own students; managers and anyone not on
   // the roster start on the full list because "mine" would be empty for them.
@@ -129,9 +170,12 @@ export default function StudentWorkspace({
               <h1 className="text-lg font-semibold leading-tight tracking-tight">
                 {title}
               </h1>
-              <p className="text-[11px] leading-tight text-muted-foreground">
-                {subtitle ?? "Student Success Team · engagement workspace"}
-              </p>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <p className="text-[11px] leading-tight text-muted-foreground">
+                  {subtitle ?? "Student Success Team · engagement workspace"}
+                </p>
+                <LiveBadge state={connection} />
+              </div>
             </div>
           </div>
 
