@@ -15,12 +15,22 @@
 /** The minimum a row needs — lets lighter queries reuse this. */
 export type CnActivityInput = {
   study_mode?: string | null;
+  status?: string | null;
   a_lms_activity?: {
     course_visits?: number | null;
     /** Course progress as a fraction of 1, not a percentage. */
     latest_cp?: number | null;
   } | null;
 };
+
+/**
+ * Only Active students are worth chasing on CN engagement. A withdrawn or
+ * deferred student with no visits is the expected outcome, not outstanding
+ * work, and leaving them in inflates every tier with people nobody will call.
+ */
+export function isActiveStudent(student: CnActivityInput): boolean {
+  return student.status === "Active";
+}
 
 /** True when CN has been read for this student and reports no visits at all. */
 export function hasZeroVisits(student: CnActivityInput): boolean {
@@ -62,6 +72,10 @@ export type CnFilterKey = "zero" | "under10" | "under20";
  * under 20% — so they read as escalating tiers of "how far behind is this
  * student", and only one can be applied at a time.
  *
+ * Every tier is Active-only. The status test lives here rather than inside
+ * hasZeroVisits / belowProgress because those are also used to colour the
+ * table, where a withdrawn student's zero still deserves its red cell.
+ *
  * To add a milestone for a future check, add an entry here: the column filter,
  * the toolbar select and its counts all read from this list.
  */
@@ -76,20 +90,22 @@ export const CN_ACTIVITY_FILTERS: {
   {
     value: "zero",
     label: "0 CN visits",
-    chip: "0 CN visits",
-    matches: hasZeroVisits
+    chip: "Active · 0 CN visits",
+    matches: (student) => isActiveStudent(student) && hasZeroVisits(student)
   },
   {
     value: "under10",
     label: "Under 10% progress",
-    chip: "CN progress under 10%",
-    matches: (student) => belowProgress(student, 0.1)
+    chip: "Active · CN progress under 10%",
+    matches: (student) =>
+      isActiveStudent(student) && belowProgress(student, 0.1)
   },
   {
     value: "under20",
     label: "Under 20% progress",
-    chip: "CN progress under 20%",
-    matches: (student) => belowProgress(student, 0.2)
+    chip: "Active · CN progress under 20%",
+    matches: (student) =>
+      isActiveStudent(student) && belowProgress(student, 0.2)
   }
 ];
 

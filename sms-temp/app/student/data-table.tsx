@@ -45,7 +45,9 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectSeparator,
   SelectTrigger,
   SelectValue
@@ -581,16 +583,27 @@ export function DataTable<TData, TValue>({
                 <SelectContent>
                   <SelectItem value={ALL}>All CN activity</SelectItem>
                   <SelectSeparator />
-                  {CN_ACTIVITY_FILTERS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <span className="flex w-full items-center gap-2">
-                        {option.label}
-                        <span className="tabular-nums text-muted-foreground">
-                          {cnCounts[option.value] ?? 0}
+                  {/*
+                    SelectLabel reads Radix's group context, so it only works
+                    inside a SelectGroup. The tiers are Active-only and the
+                    counts say so too — without the caption the numbers look
+                    wrong next to the table.
+                  */}
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-normal uppercase tracking-wide text-muted-foreground">
+                      Active students only
+                    </SelectLabel>
+                    {CN_ACTIVITY_FILTERS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <span className="flex w-full items-center gap-2">
+                          {option.label}
+                          <span className="tabular-nums text-muted-foreground">
+                            {cnCounts[option.value] ?? 0}
+                          </span>
                         </span>
-                      </span>
-                    </SelectItem>
-                  ))}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
 
