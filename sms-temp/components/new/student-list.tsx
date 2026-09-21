@@ -32,6 +32,11 @@ import {
   isSegmentPending,
   SegmentKey
 } from "@/lib/student-progress";
+import {
+  getOfferLetter,
+  OFFER_LETTER_LABEL,
+  offerLetterState
+} from "@/lib/offer-letter";
 import { initialsOf } from "@/app/student/studentColumns";
 
 type View = "board" | "list";
@@ -67,6 +72,7 @@ function StudentTile({
 }) {
   const progress = getProgress(student);
   const level = getStudentLevel(student.programme_name);
+  const offerLetter = offerLetterState(getOfferLetter(student));
 
   return (
     <button
@@ -102,6 +108,16 @@ function StudentTile({
           <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[9px] text-muted-foreground">
             {student.study_mode === "Online" ? "Online" : "Conv."}
           </span>
+          {/* Only shown once someone has recorded an answer — an absent badge
+              means "not asked yet", not "not accepted". */}
+          {offerLetter.answer !== null && (
+            <span
+              title={`${OFFER_LETTER_LABEL}: ${offerLetter.label}`}
+              className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-medium ${offerLetter.badgeClass}`}
+            >
+              OL
+            </span>
+          )}
         </span>
       </div>
     </button>

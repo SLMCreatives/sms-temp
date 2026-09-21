@@ -28,6 +28,7 @@ import { NewStudentCard } from "@/components/new/student-card";
 import { StudentDashboardRow } from "@/lib/types/database";
 import {
   BanknoteArrowUp,
+  CheckCheck,
   LogIn,
   PhoneCall,
   RotateCcw,
@@ -102,6 +103,7 @@ function filterChipLabel(id: string, value: unknown) {
     if (value === "login") return "Login check pending";
     if (value === "ptptn") return "PTPTN check pending";
     if (value === "declined") return "Reported not done";
+    if (value === "complete") return "Fully checked";
     return "Checks incomplete";
   }
   if (id === "sst_id") {
@@ -143,19 +145,21 @@ function MetricCard({
   sub?: string;
   /** Denominator for the share shown next to the value. */
   of?: number;
-  tone?: "neutral" | "danger" | "warning";
+  tone?: "neutral" | "danger" | "warning" | "success";
   active?: boolean;
   onClick?: () => void;
 }) {
   const accents = {
     neutral: "text-muted-foreground",
     danger: "text-red-600 dark:text-red-400",
-    warning: "text-amber-600 dark:text-amber-400"
+    warning: "text-amber-600 dark:text-amber-400",
+    success: "text-emerald-600 dark:text-emerald-400"
   };
   const activeRing = {
     neutral: "ring-foreground/30 bg-muted/50",
     danger: "ring-red-400 bg-red-50 dark:bg-red-950/40",
-    warning: "ring-amber-400 bg-amber-50 dark:bg-amber-950/40"
+    warning: "ring-amber-400 bg-amber-50 dark:bg-amber-950/40",
+    success: "ring-emerald-400 bg-emerald-50 dark:bg-emerald-950/40"
   };
 
   const interactive = typeof onClick === "function";
@@ -336,7 +340,10 @@ export function DataTable<TData, TValue>({
     (s) => getChecks(s)[3].applicable
   ).length;
   const atRisk = visible.filter((s) => !!s.at_risk).length;
+  // Every applicable step answered. Shown as its own tile so the team can pull
+  // up the finished caseload, and subtracted for the "still outstanding" count.
   const allDone = visible.filter((s) => getProgress(s).complete).length;
+  const outstanding = visible.length - allDone;
 
   // Once the filter is on, the visible rows ARE the not-contacted ones, so the
   // tile flips to report that instead of a "0 contacted" that reads as an error.
@@ -348,13 +355,13 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="flex w-full flex-col gap-3 xl:min-h-0 xl:flex-1">
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:shrink-0 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:shrink-0 xl:grid-cols-7">
         <MetricCard
           icon={Users}
           label={scopeLabel}
           value={visible.length}
           of={data.length}
-          sub={`${allDone} fully checked`}
+          sub={outstanding ? `${outstanding} still outstanding` : "all checks done"}
         />
         <MetricCard
           icon={PhoneCall}
@@ -407,6 +414,16 @@ export function DataTable<TData, TValue>({
           tone={ptptnPending > 0 ? "warning" : "neutral"}
           active={table.getColumn("checks")?.getFilterValue() === "ptptn"}
           onClick={() => toggleQuickFilter("checks", "ptptn")}
+        />
+        <MetricCard
+          icon={CheckCheck}
+          label="Fully checked"
+          value={allDone}
+          of={visible.length}
+          sub={allDone ? "every step answered" : "none complete yet"}
+          tone="success"
+          active={table.getColumn("checks")?.getFilterValue() === "complete"}
+          onClick={() => toggleQuickFilter("checks", "complete")}
         />
         <MetricCard
           icon={TriangleAlert}

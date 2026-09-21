@@ -47,6 +47,12 @@ export interface Payment {
   payment_mode: string;
   payment_status: string;
   ptptn_proof_status: boolean;
+  /**
+   * Offer letter acceptance. Three states, like the engagement checks:
+   * null = not recorded yet, true = accepted, false = confirmed not accepted.
+   * Most rows are still null, so "not accepted" must not be shown for them.
+   */
+  ol_accepted: boolean | null;
   updated_at: string;
 }
 

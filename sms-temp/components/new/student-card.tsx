@@ -17,6 +17,7 @@ import StudentPayment from "./student-payment";
 import StudentChecks from "./student-checks";
 import EditStudent from "./edit-student";
 import StudentEngagement from "./student-engagement";
+import OfferLetterToggle from "./offer-letter-toggle";
 import { PanelCard } from "./panel-card";
 import { StudentDashboardRow } from "@/lib/types/database";
 import { getSstById } from "@/lib/sst-members";
@@ -119,6 +120,8 @@ export function NewStudentCard({
             </span>
           )}
         </div>
+
+        <OfferLetterToggle student={student} />
 
         <div className="mt-2.5 grid grid-cols-4 gap-1.5">
           <a

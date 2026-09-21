@@ -163,6 +163,26 @@ export default function StudentChecks({
       }
     }
 
+    // A check owns its engagement: at most one per topic, always matching the
+    // answer now stored. Clearing the check has to retract the engagement too,
+    // or the history keeps asserting a contact that has been taken back — and
+    // re-answering replaces the old entry instead of stacking a second,
+    // contradictory one next to it.
+    //
+    // Only the four CHECK_TOPIC strings are touched. The manual engagement
+    // form writes different topics ("Onboarding Pulse Check", "CN Engagement
+    // Check", "PTPTN Pulse Check", "Others"), so a hand-written log is never
+    // caught by this.
+    const { error: clearError } = await supabase
+      .from("a_engagements")
+      .delete()
+      .eq("matric_no", student.matric_no)
+      .eq("topic", CHECK_TOPIC[key]);
+
+    if (clearError) {
+      toast.error(`Could not clear the old engagement: ${clearError.message}`);
+    }
+
     // Log both answers — a reported "no" is as much a contact as a "yes".
     if (next !== null) {
       await logEngagement(

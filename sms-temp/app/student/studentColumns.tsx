@@ -27,6 +27,7 @@ import {
   checkDotClass,
   checkStateLabel,
   getChecks,
+  getProgress,
   isSegmentPending
 } from "@/lib/student-progress";
 
@@ -432,6 +433,9 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
       const checks = getChecks(row.original);
       if (filterValue === "declined")
         return checks.some((c) => c.applicable && c.answer === false);
+      // Every applicable step answered — a reported "no" counts, the work is
+      // done either way. PTPTN students need four, everyone else three.
+      if (filterValue === "complete") return getProgress(row.original).complete;
       if (
         filterValue === "contacted" ||
         filterValue === "onboarding" ||
