@@ -11,7 +11,8 @@ import {
   ColumnPinningState,
   ColumnFiltersState,
   VisibilityState,
-  getFilteredRowModel
+  getFilteredRowModel,
+  getFacetedRowModel
 } from "@tanstack/react-table";
 
 import {
@@ -66,6 +67,7 @@ import {
   parseLevelGroupFilter
 } from "@/lib/student-level";
 import { getChecks, getProgress } from "@/lib/student-progress";
+import { CN_ACTIVITY_FILTERS, getCnFilter } from "@/lib/cn-activity";
 
 const ALL = "all";
 
@@ -94,7 +96,7 @@ interface DataTableProps<TData, TValue> {
 /** Human-readable text for the active-filter chips under the toolbar. */
 function filterChipLabel(id: string, value: unknown) {
   if (id === "ptptn_proof_status") return "PTPTN proof pending";
-  if (id === "course_visits") return "Zero CN logins";
+  if (id === "course_visits") return getCnFilter(value)?.chip ?? "CN activity";
   if (id === "at_risk") return "Flagged at risk";
   if (id === "No of Engagements") return "Never engaged";
   if (id === "checks") {
@@ -253,6 +255,9 @@ export function DataTable<TData, TValue>({
     enableMultiRowSelection: false,
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    // Lets the CN select count each option against every OTHER active filter,
+    // so picking one tier does not zero out the numbers beside the others.
+    getFacetedRowModel: getFacetedRowModel(),
     autoResetPageIndex: false
   });
 
@@ -340,6 +345,22 @@ export function DataTable<TData, TValue>({
     (s) => getChecks(s)[3].applicable
   ).length;
   const atRisk = visible.filter((s) => !!s.at_risk).length;
+  // Confirmed zeros only — students CN has been read for and reports no visits.
+  // The students we simply hold no CN data for are counted separately and put
+  // in the sub-label, so the gap is visible instead of inflating the headline.
+  // Counted against every filter EXCEPT this one, so each tier shows what
+  // picking it would actually yield rather than collapsing to 0 once one is on.
+  const cnCounts = React.useMemo(() => {
+    const scope = (
+      table.getColumn("course_visits")?.getFacetedRowModel().rows ?? []
+    ).map((r) => r.original as StudentDashboardRow);
+    const counts: Record<string, number> = { [ALL]: scope.length };
+    for (const option of CN_ACTIVITY_FILTERS) {
+      counts[option.value] = scope.filter(option.matches).length;
+    }
+    return counts;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, columnFilters, data]);
   // Every applicable step answered. Shown as its own tile so the team can pull
   // up the finished caseload, and subtracted for the "still outstanding" count.
   const allDone = visible.filter((s) => getProgress(s).complete).length;
@@ -542,6 +563,34 @@ export function DataTable<TData, TValue>({
                   <SelectItem value="PTPTN">PTPTN</SelectItem>
                   <SelectItem value="SELF">Self paying</SelectItem>
                   <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/*
+                Shares the course_visits filter with the "0 CN visits" tile —
+                the tiers are nested, so only one can apply and the two
+                controls stay in step with each other.
+              */}
+              <Select
+                value={getFilter("course_visits")}
+                onValueChange={(value) => setFilter("course_visits", value)}
+              >
+                <SelectTrigger className="h-9 w-auto gap-1.5 border-0 bg-muted/50 text-[13px]">
+                  <SelectValue placeholder="CN activity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>All CN activity</SelectItem>
+                  <SelectSeparator />
+                  {CN_ACTIVITY_FILTERS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="flex w-full items-center gap-2">
+                        {option.label}
+                        <span className="tabular-nums text-muted-foreground">
+                          {cnCounts[option.value] ?? 0}
+                        </span>
+                      </span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 

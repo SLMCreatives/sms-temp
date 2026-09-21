@@ -30,6 +30,7 @@ import {
   getProgress,
   isSegmentPending
 } from "@/lib/student-progress";
+import { getCnFilter } from "@/lib/cn-activity";
 
 export type Engagements = {
   [x: string]: string | number | Date;
@@ -548,10 +549,16 @@ export const newStudentColumns: ColumnDef<StudentDashboardRow>[] = [
         <ArrowUpDown className="h-3 w-3" />
       </button>
     ),
+    // Carries every CN engagement cut, not just visits — the stat tile's
+    // "0 CN visits" and the toolbar's progress tiers are one filter, because
+    // they are nested tiers of the same question and only one can apply.
+    // Each requires the LMS row to exist: without it we have no CN data for
+    // the student at all, which is not the same as having looked and found
+    // nothing. See CN_ACTIVITY_FILTERS for the list.
     filterFn: (row, _columnId, filterValue) => {
-      // Used by the "Zero logins" quick filter in the toolbar.
-      if (filterValue !== "zero") return true;
-      return (row.original.a_lms_activity?.course_visits ?? 0) === 0;
+      const option = getCnFilter(filterValue);
+      if (!option) return true;
+      return option.matches(row.original);
     },
     cell: ({ row }) => {
       const visits = row.original.a_lms_activity?.course_visits ?? 0;
