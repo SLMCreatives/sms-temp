@@ -3,6 +3,7 @@
 import {
   BanknoteArrowUp,
   ContactRound,
+  EyeOff,
   History,
   Mail,
   MessageCircle,
@@ -37,11 +38,20 @@ const STATUS_TONE: Record<string, string> = {
 export function NewStudentCard({
   student,
   index,
-  onClose
+  onClose,
+  filteredOut = false,
+  onClearFilters
 }: {
   student: StudentDashboardRow;
   index: number;
   onClose?: () => void;
+  /**
+   * The student no longer matches the table's active filters, so their row has
+   * gone from the list behind this panel. The record stays open regardless —
+   * this just says why the list moved.
+   */
+  filteredOut?: boolean;
+  onClearFilters?: () => void;
 }) {
   const owner = getSstById(student.sst_id);
   const level = getStudentLevel(student.programme_name);
@@ -120,6 +130,30 @@ export function NewStudentCard({
             </span>
           )}
         </div>
+
+        {/*
+          Sits inside the sticky identity card so it is on screen whatever the
+          panel is scrolled to, and below the absolutely placed edit/close
+          buttons so it never runs under them.
+        */}
+        {filteredOut && (
+          <div className="mt-2.5 flex items-center gap-2 rounded-lg border border-dashed border-amber-300 bg-amber-50/60 p-2 dark:border-amber-900 dark:bg-amber-950/30">
+            <EyeOff className="h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+            <p className="min-w-0 flex-1 text-[11px] leading-snug text-muted-foreground">
+              Not in the list any more — they no longer match the active
+              filter. This record stays open until you close it.
+            </p>
+            {onClearFilters && (
+              <button
+                type="button"
+                onClick={onClearFilters}
+                className="shrink-0 rounded-md border bg-background px-2 py-1 text-[11px] font-medium transition hover:border-foreground/25"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
 
         <OfferLetterToggle student={student} />
 

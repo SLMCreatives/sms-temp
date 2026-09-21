@@ -350,8 +350,20 @@ export function DataTable<TData, TValue>({
   const notContactedActive =
     table.getColumn("checks")?.getFilterValue() === "contacted";
 
-  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  // Deliberately the unfiltered selection. getFilteredSelectedRowModel() drops
+  // the row the moment it stops matching the active filter, so ticking a check
+  // while filtered by that very check — "2 · Onboarding", tick onboarding —
+  // unmounted the whole panel mid-edit and left the user hunting for the
+  // student again. Selection is keyed by matric_no via getRowId, so it also
+  // survives the realtime data swaps. The record now closes only when asked.
+  const selectedRows = table.getSelectedRowModel().rows;
   const hasSelection = selectedRows.length > 0;
+
+  // Lets the open record say so when it is no longer in the list behind it.
+  const visibleIds = React.useMemo(
+    () => new Set(visible.map((s) => s.matric_no)),
+    [visible]
+  );
 
   return (
     <div className="flex w-full flex-col gap-3 xl:min-h-0 xl:flex-1">
@@ -766,6 +778,8 @@ export function DataTable<TData, TValue>({
                 key={row.id}
                 student={row.original as StudentDashboardRow}
                 index={index + 1}
+                filteredOut={!visibleIds.has(row.id)}
+                onClearFilters={() => table.resetColumnFilters()}
                 onClose={() => row.toggleSelected(false)}
               />
             ))}
