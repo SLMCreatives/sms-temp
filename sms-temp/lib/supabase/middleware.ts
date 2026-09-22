@@ -42,6 +42,18 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
+  // Already signed in and still looking at the sign-in pages — there is
+  // nothing to do there, so send them straight to the workspace. The other
+  // /auth routes (confirm, update-password, error) stay reachable: a password
+  // reset signs you in *before* it lands on update-password.
+  // Exact paths, so /auth/sign-up-success still renders.
+  const signInPages = ["/auth/login", "/auth/sign-up"];
+  if (user && signInPages.includes(request.nextUrl.pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/student";
+    return NextResponse.redirect(url);
+  }
+
   if (
     request.nextUrl.pathname !== "/" &&
     !user &&

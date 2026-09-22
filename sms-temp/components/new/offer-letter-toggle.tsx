@@ -62,8 +62,12 @@ export default function OfferLetterToggle({
           .update({ ol_accepted: next, updated_at: now })
           .eq("matric_no", student.matric_no)
       : await supabase.from("a_payments").insert({
+          // No payment_mode here. Recording an offer letter says nothing about
+          // how the student intends to pay, and this branch only runs when
+          // there is no row — so any value written would be a guess presented
+          // to the team as fact. The column is nullable and ~800 rows are
+          // already null, so it stays unset until someone actually picks one.
           matric_no: student.matric_no,
-          payment_mode: student.a_payments?.payment_mode ?? "SELF",
           ol_accepted: next,
           updated_at: now
         });

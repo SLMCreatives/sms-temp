@@ -155,8 +155,11 @@ export default function StudentChecks({
           .eq("matric_no", student.matric_no);
       } else if (next !== null) {
         await supabase.from("a_payments").insert({
+          // No payment_mode. This ran even for next === false — answering "no,
+          // not PTPTN" created a row classifying the student as PTPTN. The
+          // check records whether proof arrived; the Payment Mode field in
+          // edit-student.tsx is where someone actually chooses how they pay.
           matric_no: student.matric_no,
-          payment_mode: "PTPTN",
           ptptn_proof_status: proof,
           updated_at: now
         });
