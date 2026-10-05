@@ -24,6 +24,10 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import ImportRecords, {
+  LMS_ACTIVITY_SPEC,
+  PAYMENTS_SPEC
+} from "@/components/new/import-records";
 
 const supabase = createClient();
 
@@ -309,8 +313,9 @@ export default function AddStudents() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Add students to the <code>a_students</code> table one at a time, or import
-        many at once from an Excel file.
+        Add students to the <code>a_students</code> table one at a time or in
+        bulk from an Excel file, and update existing students&apos; LMS activity
+        and payment records from a spreadsheet.
       </p>
 
       <Tabs defaultValue="individual" className="w-full">
@@ -326,6 +331,18 @@ export default function AddStudents() {
             className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white"
           >
             Bulk Import (Excel)
+          </TabsTrigger>
+          <TabsTrigger
+            value="lms"
+            className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white"
+          >
+            LMS Activity
+          </TabsTrigger>
+          <TabsTrigger
+            value="payments"
+            className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white"
+          >
+            Payments
           </TabsTrigger>
         </TabsList>
 
@@ -514,6 +531,15 @@ export default function AddStudents() {
               </>
             )}
           </div>
+        </TabsContent>
+
+        {/* Upserts into the one-row-per-student side tables. */}
+        <TabsContent value="lms">
+          <ImportRecords spec={LMS_ACTIVITY_SPEC} />
+        </TabsContent>
+
+        <TabsContent value="payments">
+          <ImportRecords spec={PAYMENTS_SPEC} />
         </TabsContent>
       </Tabs>
     </div>

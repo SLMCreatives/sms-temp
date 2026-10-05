@@ -37,7 +37,8 @@ const TABS = [
   {
     value: "add",
     label: "Add Students",
-    blurb: "Add one student, or import a cohort from a spreadsheet."
+    blurb:
+      "Add one student or a whole cohort, and update LMS activity and payment records from a spreadsheet."
   },
   {
     value: "sst",
